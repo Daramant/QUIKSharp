@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="AutoLogin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Win32Functions.cs" />
+    <Compile Include="WindowTools.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\QuikSharp\QuikSharp.csproj">
