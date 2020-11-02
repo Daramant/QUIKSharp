@@ -3,7 +3,7 @@
 
 using System;
 
-namespace QuikSharp
+namespace QuikSharp.QuikEvents
 {
     // TODO Redirect these callbacks to events or rather do with events from the beginning
 
@@ -40,7 +40,7 @@ namespace QuikSharp
     /// OnTrade - новая сделка
     /// OnTransReply - ответ на транзакцию
     /// </summary>
-    public interface IQuikEvents : IQuikService
+    public interface IQuikEvents
     {
         /// <summary>
         /// Событие вызывается когда библиотека QuikSharp успешно подключилась к Quik'у

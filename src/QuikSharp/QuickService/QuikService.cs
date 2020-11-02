@@ -17,19 +17,23 @@ using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using QuikSharp.QuikEvents;
+using QuikSharp.Messages;
 
-namespace QuikSharp
+namespace QuikSharp.QuickService
 {
     /// <summary>
     ///
     /// </summary>
-    public sealed class QuikService
+    public sealed class QuikService : IQuikService
     {
         private static readonly Dictionary<int, QuikService> Services =
             new Dictionary<int, QuikService>();
 
         private static readonly object StaticSync = new object();
         private readonly AsyncManualResetEvent _connectedMre = new AsyncManualResetEvent();
+
+        private readonly IQuikEvents _quikEvents;
 
         internal JsonSerializer Serializer;
 
@@ -41,39 +45,40 @@ namespace QuikSharp
         /// <summary>
         /// For each port only one instance of QuikService
         /// </summary>
-        public static QuikService Create(int port, string host)
-        {
-            lock (StaticSync)
-            {
-                QuikService service;
-                if (Services.ContainsKey(port))
-                {
-                    service = Services[port];
-                    service.Start();
-                }
-                else
-                {
-                    service = new QuikService(port, host);
-                    Services.Add(port, service);
-                }
+        //public static QuikService Create(int port, string host)
+        //{
+        //    lock (StaticSync)
+        //    {
+        //        QuikService service;
+        //        if (Services.ContainsKey(port))
+        //        {
+        //            service = Services[port];
+        //            service.Start();
+        //        }
+        //        else
+        //        {
+        //            service = new QuikService(port, host);
+        //            Services.Add(port, service);
+        //        }
 
-                service.Serializer = new JsonSerializer
-                {
-                    TypeNameHandling = TypeNameHandling.None,
-                    NullValueHandling = NullValueHandling.Ignore
-                };
-                service.Serializer.Converters.Add(new MessageConverter(service));
-                return service;
-            }
-        }
+        //        service.Serializer = new JsonSerializer
+        //        {
+        //            TypeNameHandling = TypeNameHandling.None,
+        //            NullValueHandling = NullValueHandling.Ignore
+        //        };
+        //        service.Serializer.Converters.Add(new MessageConverter(service));
+        //        return service;
+        //    }
+        //}
 
-        private QuikService(int responsePort, string host)
+        public QuikService(IQuikEvents quikEvents, int responsePort, string host)
         {
+            _quikEvents = quikEvents;
+
+
             _responsePort = responsePort;
             _callbackPort = _responsePort + 1;
             _host = IPAddress.Parse(host);
-            Start();
-            Events = new QuikEvents(this);
         }
 
         /// <summary>
@@ -85,11 +90,6 @@ namespace QuikSharp
         /// info.exe file path
         /// </summary>
         public string WorkingFolder { get; set; }
-
-        internal QuikEvents Events { get; set; }
-        internal IPersistentStorage Storage { get; set; }
-        internal CandleFunctions Candles { get; set; }
-        internal StopOrderFunctions StopOrders { get; set; }
 
         internal const int UniqueIdOffset = 0;
         internal readonly string SessionId = DateTime.Now.ToString("yyMMddHHmmss");
@@ -386,7 +386,7 @@ namespace QuikSharp
                             Trace.WriteLine("Connecting on callback channel... ");
                             EnsureConnectedClient(_cts.Token);
                             // now we are connected
-                            this.Events.OnConnectedToQuikCall(_responsePort); // Оповещаем клиента что произошло подключение к Quik'у
+                            quikEvents.OnConnectedToQuikCall(_responsePort); // Оповещаем клиента что произошло подключение к Quik'у
                             _connectedMre.Set();
 
                             // here we have a connected TCP client
@@ -430,7 +430,7 @@ namespace QuikSharp
                                 Trace.TraceError(e.ToString());
                                 // handled exception will cause reconnect in the outer loop
                                 _connectedMre.Reset();
-                                this.Events.OnDisconnectedFromQuikCall();
+                                quikEvents.OnDisconnectedFromQuikCall();
                             }
                         }
                     }
@@ -568,76 +568,76 @@ namespace QuikSharp
                     case EventNames.OnAccountBalance:
                         Trace.Assert(message is Message<AccountBalance>);
                         var accBal = ((Message<AccountBalance>) message).Data;
-                        Events.OnAccountBalanceCall(accBal);
+                        _quikEvents.OnAccountBalanceCall(accBal);
                         break;
 
                     case EventNames.OnAccountPosition:
                         Trace.Assert(message is Message<AccountPosition>);
                         var accPos = ((Message<AccountPosition>) message).Data;
-                        Events.OnAccountPositionCall(accPos);
+                        _quikEvents.OnAccountPositionCall(accPos);
                         break;
 
                     case EventNames.OnAllTrade:
                         Trace.Assert(message is Message<AllTrade>);
                         var allTrade = ((Message<AllTrade>) message).Data;
                         allTrade.LuaTimeStamp = message.CreatedTime;
-                        Events.OnAllTradeCall(allTrade);
+                        _quikEvents.OnAllTradeCall(allTrade);
                         break;
 
                     case EventNames.OnCleanUp:
                         Trace.Assert(message is Message<string>);
-                        Events.OnCleanUpCall();
+                        _quikEvents.OnCleanUpCall();
                         break;
 
                     case EventNames.OnClose:
                         Trace.Assert(message is Message<string>);
-                        Events.OnCloseCall();
+                        _quikEvents.OnCloseCall();
                         break;
 
                     case EventNames.OnConnected:
                         Trace.Assert(message is Message<string>);
-                        Events.OnConnectedCall();
+                        _quikEvents.OnConnectedCall();
                         break;
 
                     case EventNames.OnDepoLimit:
                         Trace.Assert(message is Message<DepoLimitEx>);
                         var dLimit = ((Message<DepoLimitEx>) message).Data;
-                        Events.OnDepoLimitCall(dLimit);
+                        _quikEvents.OnDepoLimitCall(dLimit);
                         break;
 
                     case EventNames.OnDepoLimitDelete:
                         Trace.Assert(message is Message<DepoLimitDelete>);
                         var dLimitDel = ((Message<DepoLimitDelete>) message).Data;
-                        Events.OnDepoLimitDeleteCall(dLimitDel);
+                        _quikEvents.OnDepoLimitDeleteCall(dLimitDel);
                         break;
 
                     case EventNames.OnDisconnected:
                         Trace.Assert(message is Message<string>);
-                        Events.OnDisconnectedCall();
+                        _quikEvents.OnDisconnectedCall();
                         break;
 
                     case EventNames.OnFirm:
                         Trace.Assert(message is Message<Firm>);
                         var frm = ((Message<Firm>) message).Data;
-                        Events.OnFirmCall(frm);
+                        _quikEvents.OnFirmCall(frm);
                         break;
 
                     case EventNames.OnFuturesClientHolding:
                         Trace.Assert(message is Message<FuturesClientHolding>);
                         var futPos = ((Message<FuturesClientHolding>) message).Data;
-                        Events.OnFuturesClientHoldingCall(futPos);
+                        _quikEvents.OnFuturesClientHoldingCall(futPos);
                         break;
 
                     case EventNames.OnFuturesLimitChange:
                         Trace.Assert(message is Message<FuturesLimits>);
                         var futLimit = ((Message<FuturesLimits>) message).Data;
-                        Events.OnFuturesLimitChangeCall(futLimit);
+                        _quikEvents.OnFuturesLimitChangeCall(futLimit);
                         break;
 
                     case EventNames.OnFuturesLimitDelete:
                         Trace.Assert(message is Message<FuturesLimitDelete>);
                         var limDel = ((Message<FuturesLimitDelete>) message).Data;
-                        Events.OnFuturesLimitDeleteCall(limDel);
+                        _quikEvents.OnFuturesLimitDeleteCall(limDel);
                         break;
 
                     case EventNames.OnInit:
@@ -648,13 +648,13 @@ namespace QuikSharp
                     case EventNames.OnMoneyLimit:
                         Trace.Assert(message is Message<MoneyLimitEx>);
                         var mLimit = ((Message<MoneyLimitEx>) message).Data;
-                        Events.OnMoneyLimitCall(mLimit);
+                        _quikEvents.OnMoneyLimitCall(mLimit);
                         break;
 
                     case EventNames.OnMoneyLimitDelete:
                         Trace.Assert(message is Message<MoneyLimitDelete>);
                         var mLimitDel = ((Message<MoneyLimitDelete>) message).Data;
-                        Events.OnMoneyLimitDeleteCall(mLimitDel);
+                        _quikEvents.OnMoneyLimitDeleteCall(mLimitDel);
                         break;
 
                     case EventNames.OnNegDeal:
@@ -667,52 +667,51 @@ namespace QuikSharp
                         Trace.Assert(message is Message<Order>);
                         var ord = ((Message<Order>) message).Data;
                         ord.LuaTimeStamp = message.CreatedTime;
-                        Events.OnOrderCall(ord);
+                        _quikEvents.OnOrderCall(ord);
                         break;
 
                     case EventNames.OnParam:
                         Trace.Assert(message is Message<Param>);
                         var data = ((Message<Param>) message).Data;
-                        Events.OnParamCall(data);
+                        _quikEvents.OnParamCall(data);
                         break;
 
                     case EventNames.OnQuote:
                         Trace.Assert(message is Message<OrderBook>);
                         var ob = ((Message<OrderBook>) message).Data;
                         ob.LuaTimeStamp = message.CreatedTime;
-                        Events.OnQuoteCall(ob);
+                        _quikEvents.OnQuoteCall(ob);
                         break;
 
                     case EventNames.OnStop:
                         Trace.Assert(message is Message<string>);
-                        Events.OnStopCall(int.Parse(((Message<string>) message).Data));
+                        _quikEvents.OnStopCall(int.Parse(((Message<string>) message).Data));
                         break;
 
                     case EventNames.OnStopOrder:
                         Trace.Assert(message is Message<StopOrder>);
                         StopOrder stopOrder = ((Message<StopOrder>) message).Data;
-                        //StopOrders.RaiseNewStopOrderEvent(stopOrder);
-                        Events.OnStopOrderCall(stopOrder);
+                        _quikEvents.OnStopOrderCall(stopOrder);
                         break;
 
                     case EventNames.OnTrade:
                         Trace.Assert(message is Message<Trade>);
                         var trade = ((Message<Trade>) message).Data;
                         trade.LuaTimeStamp = message.CreatedTime;
-                        Events.OnTradeCall(trade);
+                        _quikEvents.OnTradeCall(trade);
                         break;
 
                     case EventNames.OnTransReply:
                         Trace.Assert(message is Message<TransactionReply>);
                         var trReply = ((Message<TransactionReply>) message).Data;
                         trReply.LuaTimeStamp = message.CreatedTime;
-                        Events.OnTransReplyCall(trReply);
+                        _quikEvents.OnTransReplyCall(trReply);
                         break;
 
                     case EventNames.NewCandle:
                         Trace.Assert(message is Message<Candle>);
                         var candle = ((Message<Candle>) message).Data;
-                        Candles.RaiseNewCandleEvent(candle);
+                        _quikEvents.RaiseNewCandleEvent(candle);
                         break;
 
                     default:

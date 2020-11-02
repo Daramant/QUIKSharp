@@ -1,40 +1,13 @@
-// Copyright (c) 2014-2020 QUIKSharp Authors https://github.com/finsight/QUIKSharp/blob/master/AUTHORS.md. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
-
+﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace QuikSharp
+namespace QuikSharp.PersistentStorages
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public interface IPersistentStorage
-    {
-        /// <summary>
-        ///
-        /// </summary>
-        void Set<T>(string key, T value);
-
-        /// <summary>
-        ///
-        /// </summary>
-        T Get<T>(string key);
-
-        /// <summary>
-        ///
-        /// </summary>
-        bool Contains(string key);
-
-        /// <summary>
-        ///
-        /// </summary>
-        bool Remove(string key);
-    }
-
     /// <summary>
     /// Thread-unsafe
     /// </summary>
-    public class InMemoryStorage : IPersistentStorage
+    public class InMemoryPersistantStorage : IPersistentStorage
     {
         private static readonly IDictionary<string, object> Dic
             = new Dictionary<string, object>();
@@ -62,8 +35,8 @@ namespace QuikSharp
         {
             lock (syncRoot)
             {
-                var v = (T) Dic[key];
-                return (T) v;
+                var v = (T)Dic[key];
+                return (T)v;
             }
         }
 
