@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.DebugFunctions
+namespace QuikSharp.QuickFunctions.Candles
 {
-    public interface IDebugFunctions
+    public interface ICandleFunctions
     {
     }
 }

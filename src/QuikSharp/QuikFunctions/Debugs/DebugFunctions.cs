@@ -6,7 +6,7 @@ using QuikSharp.QuickService;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace QuikSharp.DebugFunctions
+namespace QuikSharp.QuickFunctions.Debugs
 {
     public class DebugFunctions : IDebugFunctions
     {

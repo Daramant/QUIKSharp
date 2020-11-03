@@ -1,50 +1,23 @@
-﻿// Copyright (c) 2014-2020 QUIKSharp Authors https://github.com/finsight/QUIKSharp/blob/master/AUTHORS.md. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
-
-using QuikSharp.CandleFunctions;
-using QuikSharp.ClassFunctions;
-using QuikSharp.DebugFunctions;
-using QuikSharp.OrderBookFunctions;
-using QuikSharp.OrderFunctions;
-using QuikSharp.QuickService;
-using QuikSharp.ServiceFunctions;
-using QuikSharp.StopOrderFunctions;
-using QuikSharp.TradingFunctions;
+﻿using QuikSharp.QuickFunctions.Candles;
+using QuikSharp.QuickFunctions.Classes;
+using QuikSharp.QuickFunctions.Debugs;
+using QuikSharp.QuickFunctions.OrderBooks;
+using QuikSharp.QuickFunctions.Orders;
+using QuikSharp.QuickFunctions.Services;
+using QuikSharp.QuickFunctions.StopOrders;
+using QuikSharp.QuickFunctions.Tradings;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace QuikSharp
+namespace QuikSharp.QuikFunctions
 {
-    /// <summary>
-    /// Quik interface in .NET
-    /// </summary>
-    public sealed class Quik : IQuick
+    public class QuikFunctions : IQuikFunctions
     {
-        /// <summary>
-        /// 34130
-        /// </summary>
-        public const int DefaultPort = 34130;
-
-        /// <summary>
-        /// localhost
-        /// </summary>
-        public const string DefaultHost = "127.0.0.1";
-
-        public IQuikService QuikService { get; }
-
-        /// <summary>
-        /// Persistent transaction storage
-        /// </summary>
-        public IPersistentStorage Storage { get; }
-
         /// <summary>
         /// Debug functions
         /// </summary>
         public IDebugFunctions Debug { get; }
-
-        /// <summary>
-        /// Функции обратного вызова
-        /// </summary>
-        public IQuikEvents Events { get; }
 
         /// <summary>
         /// Сервисные функции
@@ -81,12 +54,7 @@ namespace QuikSharp
         /// </summary>
         public ICandleFunctions Candles { get; }
 
-        /// <summary>
-        /// Quik interface in .NET constructor
-        /// </summary>
-        public Quik(
-            IQuikService quickService, 
-            IPersistentStorage storage,
+        public QuikFunctions(
             IDebugFunctions debugFunctions,
             IServiceFunctions serviceFunctions,
             IClassFunctions classFunctions,
@@ -97,11 +65,6 @@ namespace QuikSharp
             ICandleFunctions candleFunctions
             )
         {
-            
-            QuikService = quickService;
-            Storage = storage;
-
-            Events = QuikService.Events;
             Debug = debugFunctions;
             Service = serviceFunctions;
             Class = classFunctions;

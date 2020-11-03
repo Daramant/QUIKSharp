@@ -1,37 +1,23 @@
-﻿using QuikSharp.CandleFunctions;
-using QuikSharp.ClassFunctions;
-using QuikSharp.DebugFunctions;
-using QuikSharp.OrderBookFunctions;
-using QuikSharp.OrderFunctions;
-using QuikSharp.QuickService;
-using QuikSharp.QuikEvents;
-using QuikSharp.ServiceFunctions;
-using QuikSharp.StopOrderFunctions;
-using QuikSharp.TradingFunctions;
+﻿using QuikSharp.QuickFunctions.Candles;
+using QuikSharp.QuickFunctions.Classes;
+using QuikSharp.QuickFunctions.Debugs;
+using QuikSharp.QuickFunctions.OrderBooks;
+using QuikSharp.QuickFunctions.Orders;
+using QuikSharp.QuickFunctions.Services;
+using QuikSharp.QuickFunctions.StopOrders;
+using QuikSharp.QuickFunctions.Tradings;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp
+namespace QuikSharp.QuikFunctions
 {
-    public interface IQuick
+    public interface IQuikFunctions
     {
-        IQuikService QuikService { get; }
-
-        /// <summary>
-        /// Persistent transaction storage
-        /// </summary>
-        IPersistentStorage Storage { get; }
-
         /// <summary>
         /// Debug functions
         /// </summary>
         IDebugFunctions Debug { get; }
-
-        /// <summary>
-        /// Функции обратного вызова
-        /// </summary>
-        IQuikEvents Events { get; }
 
         /// <summary>
         /// Сервисные функции

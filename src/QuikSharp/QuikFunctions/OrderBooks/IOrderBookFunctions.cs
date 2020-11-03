@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.OrderBookFunctions
+namespace QuikSharp.QuickFunctions.OrderBooks
 {
     /// <summary>
     /// Функции для работы со стаканом котировок

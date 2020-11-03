@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.StopOrderFunctions
+namespace QuikSharp.QuickFunctions.Orders
 {
-    public interface IStopOrderFunctions
+    public interface IOrderFunctions
     {
     }
 }

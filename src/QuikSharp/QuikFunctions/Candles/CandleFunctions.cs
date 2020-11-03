@@ -7,7 +7,7 @@ using QuikSharp.QuickService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace QuikSharp.CandleFunctions
+namespace QuikSharp.QuickFunctions.Candles
 {
     /// <summary>
     /// Функции для получения свечей

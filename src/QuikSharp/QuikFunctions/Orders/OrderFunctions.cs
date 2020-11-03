@@ -11,7 +11,7 @@ using QuikSharp.TradingFunctions;
 using QuikSharp.QuickService;
 using QuikSharp.Messages;
 
-namespace QuikSharp.OrderFunctions
+namespace QuikSharp.QuickFunctions.Orders
 {
     /// <summary>
     /// Класс, содержащий методы работы с заявками.

@@ -6,7 +6,7 @@ using QuikSharp.DataStructures;
 using QuikSharp.Messages;
 using QuikSharp.QuickService;
 
-namespace QuikSharp.OrderBookFunctions
+namespace QuikSharp.QuickFunctions.OrderBooks
 {
     /// <summary>
     /// Функции для работы со стаканом котировок

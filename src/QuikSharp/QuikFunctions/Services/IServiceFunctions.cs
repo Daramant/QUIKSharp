@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QuikSharp.ServiceFunctions
+namespace QuikSharp.QuickFunctions.Services
 {
     /// <summary>
     /// Сервисные функции

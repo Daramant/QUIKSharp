@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace QuikSharp.StopOrderFunctions
+namespace QuikSharp.QuickFunctions.StopOrders
 {
     /// <summary>
     /// Функции для работы со стоп-заявками
