@@ -33,26 +33,7 @@
         <None Remove="lua\**\*.*" />
         <Content Include="lua\**\*.*" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\CandleFunctions\CandleFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\CandleFunctions\ICandleFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\ClassFunctions\ClassFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\ClassFunctions\IClassFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\DebugFunctions\DebugFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\DebugFunctions\IDebugFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\OrderBookFunctions\IOrderBookFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\OrderBookFunctions\OrderBookFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\OrderFunctions\IOrderFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\OrderFunctions\OrderFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\ServiceFunctions\InfoParamEnum.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\ServiceFunctions\IServiceFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\ServiceFunctions\ServiceFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\StopOrderFunctions\IStopOrderFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\StopOrderFunctions\StopOrderFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\TradingFunctions\ITradingFunctions.cs" />
-      <Compile Include="..\..\..\..\Projects %2528Quik%2529\QUIKSharp\src\QuikSharp\QuikFunctions\TradingFunctions\TradingFunctions.cs" />
-    </ItemGroup>
+    
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

@@ -17,10 +17,5 @@ namespace QuikSharp.Quik
         /// Функции обратного вызова
         /// </summary>
         IQuikEvents Events { get; }
-
-        /// <summary>
-        /// Persistent transaction storage
-        /// </summary>
-        IPersistentStorage Storage { get; }
     }
 }

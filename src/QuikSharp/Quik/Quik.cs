@@ -33,24 +33,17 @@ namespace QuikSharp.Quik
         public IQuikEvents Events { get; }
 
         /// <summary>
-        /// Persistent transaction storage
-        /// </summary>
-        public IPersistentStorage Storage { get; }
-
-        /// <summary>
         /// Quik interface in .NET constructor
         /// </summary>
         public Quik(
             IQuikService quickService, 
             IQuikFunctions quikFunctions,
-            IQuikEvents quikEvents,
-            IPersistentStorage storage)
+            IQuikEvents quikEvents)
         {
             
             Service = quickService;
             Functions = quikFunctions;
             Events = quikEvents;
-            Storage = storage;
         }
     }
 }

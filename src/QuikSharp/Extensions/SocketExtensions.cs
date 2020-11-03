@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2014-2020 QUIKSharp Authors https://github.com/finsight/QUIKSharp/blob/master/AUTHORS.md. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
-
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Text;
 
-namespace QuikSharp
+namespace QuikSharp.Extensions
 {
-    public static class NetworkUtils
+    public static class SocketExtensions
     {
         /// <summary>
         /// The connection state of a socket is reflected in the Connected property,
@@ -17,9 +17,9 @@ namespace QuikSharp
         public static bool IsConnectedNow(this Socket s)
         {
             var part1 = s.Poll(1000, SelectMode.SelectRead);
-            var part2 = (s.Available == 0);
-            if ((part1 && part2) || !s.Connected) return false;
-            return true;
+            var part2 = s.Available == 0;
+
+            return (!part1 || !part2) && s.Connected;
         }
     }
 }
