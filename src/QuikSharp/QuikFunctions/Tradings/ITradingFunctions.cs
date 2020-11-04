@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickFunctions.Tradings
+namespace QuikSharp.QuikFunctions.Tradings
 {
     /// <summary>
     /// Функции взаимодействия скрипта Lua и Рабочего места QUIK

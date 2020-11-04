@@ -1,4 +1,4 @@
-﻿using QuikSharp.QuickService;
+﻿using QuikSharp.QuikService;
 using QuikSharp.QuikEvents;
 using QuikSharp.QuikFunctions;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace QuikSharp.Quik
 {
-    public interface IQuick
+    public interface IQuik
     {
         IQuikService Service { get; }
 

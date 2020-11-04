@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickFunctions.Classes
+namespace QuikSharp.QuikFunctions.Classes
 {
     /// <summary>
     /// Функции для обращения к спискам доступных параметров

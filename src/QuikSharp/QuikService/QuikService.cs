@@ -23,7 +23,7 @@ using QuikSharp.Json.Serializers;
 using QuikSharp.Extensions;
 using QuikSharp.Exceptions;
 
-namespace QuikSharp.QuickService
+namespace QuikSharp.QuikService
 {
     /// <summary>
     ///
@@ -35,6 +35,10 @@ namespace QuikSharp.QuickService
         private readonly IQuikEventsInvoker _quikEventsInvoker;
         private readonly IJsonSerializer _jsonSerializer;
 
+        private readonly IPAddress _host;
+        private readonly int _responsePort;
+        private readonly int _callbackPort;
+
         static QuikService()
         {
             System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
@@ -42,17 +46,15 @@ namespace QuikSharp.QuickService
 
         public QuikService(
             IQuikEventsInvoker quikEventsInvoker, 
-            IJsonSerializer jsonSerializer, 
-            string host, 
-            int responsePort, 
-            int callbackPort)
+            IJsonSerializer jsonSerializer,
+            QuikServiceOptions options)
         {
             _quikEventsInvoker = quikEventsInvoker;
             _jsonSerializer = jsonSerializer;
 
-            _host = IPAddress.Parse(host);
-            _responsePort = responsePort;
-            _callbackPort = callbackPort;
+            _host = IPAddress.Parse(options.Host);
+            _responsePort = options.ResponsePort;
+            _callbackPort = options.CallbackPort;
         }
 
         /// <summary>
@@ -70,9 +72,7 @@ namespace QuikSharp.QuickService
         internal MemoryMappedFile mmf;
         internal MemoryMappedViewAccessor accessor;
 
-        private readonly IPAddress _host;
-        private readonly int _responsePort;
-        private readonly int _callbackPort;
+        
         private TcpClient _responseClient;
         private TcpClient _callbackClient;
 

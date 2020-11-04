@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickFunctions.Candles
+namespace QuikSharp.QuikFunctions.Candles
 {
     public interface ICandleFunctions
     {

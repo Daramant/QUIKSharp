@@ -11,19 +11,22 @@ namespace QuikSharp.Tests
         readonly DebugFunctions _df = new DebugFunctions(Quik.DefaultPort, Quik.DefaultHost);
 
         [Test]
-        public void PingWorks() {
+        public void PingWorks()
+        {
             var df = new DebugFunctions(Quik.DefaultPort, Quik.DefaultHost);
             var pong = df.Ping().Result;
         }
 
         [Test]
-        public void EchoWorks() {
+        public void EchoWorks()
+        {
             var echo = _df.Echo("echo").Result;
             Assert.AreEqual("echo", echo);
         }
 
         [Test]
-        public void IsQuik() {
+        public void IsQuik()
+        {
             Console.WriteLine(_df.IsQuik().Result);
         }
 
@@ -31,72 +34,77 @@ namespace QuikSharp.Tests
         /// Nice error messages and error location in lua
         /// </summary>
         [Test]
-        public void DivideStringByZero() {
-            Assert.Throws<AggregateException>(() => {
+        public void DivideStringByZero()
+        {
+            Assert.Throws<AggregateException>(() =>
+            {
                 var x = _df.DivideStringByZero().Result;
             });
         }
 
         [Test]
-        public void MultiPing() {
+        public void MultiPing()
+        {
             // Without multiplexing we wait for Lua and latency on each trip
             // Profiling shows that it is 73% of total time
 
             var sw = new Stopwatch();
             Console.WriteLine("Started");
-            for (int round = 0; round < 10; round++) {
+            for (int round = 0; round < 10; round++)
+            {
                 sw.Reset();
                 sw.Start();
 
                 var count = 10000;
 
-				//var array = new Task<string>[count];
-				//for (int i = 0; i < array.Length; i++) {
-				//    array[i] = _df.Ping();
-				//}
-				//for (int i = 0; i < array.Length; i++) {
-				//    var pong = array[i].Result;
-				//    array[i] = null;
-				//    Trace.Assert(pong == "Pong");
-				//}
+                //var array = new Task<string>[count];
+                //for (int i = 0; i < array.Length; i++) {
+                //    array[i] = _df.Ping();
+                //}
+                //for (int i = 0; i < array.Length; i++) {
+                //    var pong = array[i].Result;
+                //    array[i] = null;
+                //    Trace.Assert(pong == "Pong");
+                //}
 
-				/* for (var i = 0; i < count; i++) {
+                /* for (var i = 0; i < count; i++) {
 					 var pong = _df.Ping().Result;
 					 Trace.Assert(pong == "Pong");
 				 }*/
 
-				for (var i = 0; i < count; i++)
-					_df.Ping ().Wait ();
+                for (var i = 0; i < count; i++)
+                    _df.Ping().Wait();
 
-				sw.Stop();
+                sw.Stop();
                 Console.WriteLine("MultiPing takes msecs: " + sw.ElapsedMilliseconds);
             }
         }
 
-		[Test]
-		public async void MultiPingFast2 ()
-		{
-			var sw = new Stopwatch ();
-			Console.WriteLine ("Started");
-			for (int round = 0; round < 10; round++)
-			{
-				sw.Reset ();
-				sw.Start ();
+        [Test]
+        public async void MultiPingFast2()
+        {
+            var sw = new Stopwatch();
+            Console.WriteLine("Started");
+            for (int round = 0; round < 10; round++)
+            {
+                sw.Reset();
+                sw.Start();
 
-				var count = 10000;
-				var array = new Task<string> [count];
-				for (int i = 0; i < array.Length; i++)
-					array [i] = _df.Ping ();
+                var count = 10000;
+                var array = new Task<string>[count];
+                for (int i = 0; i < array.Length; i++)
+                    array[i] = _df.Ping();
 
-				// Чудесным образом данная конструкция работает чуточку быстрей (на 10% где то) чем _df.Ping ().Wait (); в функции MultiPing
-				await Task.WhenAll (array);
-				sw.Stop ();
-				Console.WriteLine ("MultiPing takes msecs: " + sw.ElapsedMilliseconds);
-			}
-		}
+                // Чудесным образом данная конструкция работает чуточку быстрей (на 10% где то) чем _df.Ping ().Wait (); в функции MultiPing
+                await Task.WhenAll(array);
+                sw.Stop();
+                Console.WriteLine("MultiPing takes msecs: " + sw.ElapsedMilliseconds);
+            }
+        }
 
-		[Test]
-        public void MultiPingFast() {
+        [Test]
+        public void MultiPingFast()
+        {
 
             // Multiplexing in action
             // We access results asyncronously and do not wait
@@ -106,16 +114,19 @@ namespace QuikSharp.Tests
 
             var sw = new Stopwatch();
             Console.WriteLine("Started");
-            for (int round = 0; round < 10; round++) {
+            for (int round = 0; round < 10; round++)
+            {
                 sw.Reset();
                 sw.Start();
 
                 var count = 10000;
                 var array = new Task<string>[count];
-                for (int i = 0; i < array.Length; i++) {
+                for (int i = 0; i < array.Length; i++)
+                {
                     array[i] = _df.Ping();
                 }
-                for (int i = 0; i < array.Length; i++) {
+                for (int i = 0; i < array.Length; i++)
+                {
                     var pong = array[i].Result;
                     array[i] = null;
                     Trace.Assert(pong == "Pong");

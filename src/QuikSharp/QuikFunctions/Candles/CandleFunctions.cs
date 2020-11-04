@@ -3,11 +3,11 @@
 
 using QuikSharp.DataStructures;
 using QuikSharp.Messages;
-using QuikSharp.QuickService;
+using QuikSharp.QuikService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickFunctions.Candles
+namespace QuikSharp.QuikFunctions.Candles
 {
     /// <summary>
     /// Функции для получения свечей

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickFunctions.StopOrders
+namespace QuikSharp.QuikFunctions.StopOrders
 {
     public interface IStopOrderFunctions
     {

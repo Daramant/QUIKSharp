@@ -2,13 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using QuikSharp.Messages;
-using QuikSharp.QuickService;
+using QuikSharp.QuikService;
 using QuikSharp.QuikFunctions.Services;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickFunctions.Services
+namespace QuikSharp.QuikFunctions.Services
 {
     /// <summary>
     /// Service functions implementations

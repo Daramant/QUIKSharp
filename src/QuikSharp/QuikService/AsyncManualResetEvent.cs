@@ -4,7 +4,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickService
+namespace QuikSharp.QuikService
 {
     // http://blogs.msdn.com/b/pfxteam/archive/2012/02/11/10266920.aspx
     internal class AsyncManualResetEvent

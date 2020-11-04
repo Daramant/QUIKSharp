@@ -5,13 +5,13 @@ using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Exceptions;
 using QuikSharp.Messages;
-using QuikSharp.QuickService;
+using QuikSharp.QuikService;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickFunctions.Tradings
+namespace QuikSharp.QuikFunctions.Tradings
 {
     /// <summary>
     /// Функции взаимодействия скрипта Lua и Рабочего места QUIK

@@ -2,11 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using QuikSharp.Messages;
-using QuikSharp.QuickService;
+using QuikSharp.QuikService;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickFunctions.Debugs
+namespace QuikSharp.QuikFunctions.Debugs
 {
     public class DebugFunctions : IDebugFunctions
     {

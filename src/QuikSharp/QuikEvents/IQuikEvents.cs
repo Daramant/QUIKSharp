@@ -177,5 +177,10 @@ namespace QuikSharp.QuikEvents
         /// Функция вызывается терминалом QUIK при получении ответа на транзакцию пользователя.
         /// </summary>
         event TransReplyHandler TransReply;
+
+        /// <summary>
+        /// Событие получения новой свечи. Для срабатывания необходимо подписаться с помощью метода Subscribe.
+        /// </summary>
+        event CandleHandler NewCandle;
     }
 }

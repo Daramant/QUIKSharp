@@ -7,11 +7,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-using QuikSharp.QuickService;
+using QuikSharp.QuikService;
 using QuikSharp.Messages;
-using QuikSharp.QuickFunctions.Tradings;
+using QuikSharp.QuikFunctions.Tradings;
 
-namespace QuikSharp.QuickFunctions.Orders
+namespace QuikSharp.QuikFunctions.Orders
 {
     /// <summary>
     /// Класс, содержащий методы работы с заявками.

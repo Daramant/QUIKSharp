@@ -4,13 +4,13 @@
 using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Messages;
-using QuikSharp.QuickFunctions.Tradings;
-using QuikSharp.QuickService;
+using QuikSharp.QuikFunctions.Tradings;
+using QuikSharp.QuikService;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuickFunctions.StopOrders
+namespace QuikSharp.QuikFunctions.StopOrders
 {
     /// <summary>
     /// Функции для работы со стоп-заявками
