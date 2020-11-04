@@ -27,8 +27,8 @@ namespace QuikSharp.QuickFunctions.OrderBooks
 
         public async Task<bool> Subscribe(string class_code, string sec_code)
         {
-            var response = await _quikService.Send<Message<bool>>(
-                (new Message<string>(class_code + "|" + sec_code, "Subscribe_Level_II_Quotes"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<bool>>(
+                (new Request<string>(class_code + "|" + sec_code, "Subscribe_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -39,8 +39,8 @@ namespace QuikSharp.QuickFunctions.OrderBooks
 
         public async Task<bool> Unsubscribe(string class_code, string sec_code)
         {
-            var response = await _quikService.Send<Message<bool>>(
-                (new Message<string>(class_code + "|" + sec_code, "Unsubscribe_Level_II_Quotes"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<bool>>(
+                (new Request<string>(class_code + "|" + sec_code, "Unsubscribe_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -51,15 +51,15 @@ namespace QuikSharp.QuickFunctions.OrderBooks
 
         public async Task<bool> IsSubscribed(string class_code, string sec_code)
         {
-            var response = await _quikService.Send<Message<bool>>(
-                (new Message<string>(class_code + "|" + sec_code, "IsSubscribed_Level_II_Quotes"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<bool>>(
+                (new Request<string>(class_code + "|" + sec_code, "IsSubscribed_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<OrderBook> GetQuoteLevel2(string class_code, string sec_code)
         {
-            var response = await _quikService.Send<Message<OrderBook>>(
-                (new Message<string>(class_code + "|" + sec_code, "GetQuoteLevel2"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<OrderBook>>(
+                (new Request<string>(class_code + "|" + sec_code, "GetQuoteLevel2"))).ConfigureAwait(false);
             return response.Data;
         }
     }

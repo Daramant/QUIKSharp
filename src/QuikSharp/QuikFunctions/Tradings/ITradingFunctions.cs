@@ -30,7 +30,7 @@ namespace QuikSharp.QuickFunctions.Tradings
     /// getClientCodeByTrdAcc - Функция возвращает код клиента фондового рынка с единой денежной позицией, соответствующий торговому счету срочного рынка
     /// isUcpClient - Функция предназначена для получения признака, указывающего имеет ли клиент единую денежную позицию
     /// </summary>
-    public interface ITradingFunctions : IQuikService
+    public interface ITradingFunctions
     {
         /// <summary>
         /// Функция для получения информации по бумажным лимитам
@@ -103,7 +103,7 @@ namespace QuikSharp.QuickFunctions.Tradings
         /// <returns></returns>
         Task<bool> ParamRequest(string classCode, string secCode, string paramName);
 
-        Task<bool> ParamRequest(string classCode, string secCode, ParamNames paramName);
+        Task<bool> ParamRequest(string classCode, string secCode, ParamName paramName);
 
         /// <summary>
         /// Функция отменяет заказ на получение параметров Таблицы текущих торгов
@@ -114,7 +114,7 @@ namespace QuikSharp.QuickFunctions.Tradings
         /// <returns></returns>
         Task<bool> CancelParamRequest(string classCode, string secCode, string paramName);
 
-        Task<bool> CancelParamRequest(string classCode, string secCode, ParamNames paramName);
+        Task<bool> CancelParamRequest(string classCode, string secCode, ParamName paramName);
 
         /// <summary>
         /// Функция для получения значений Таблицы текущих значений параметров
@@ -126,7 +126,7 @@ namespace QuikSharp.QuickFunctions.Tradings
         /// <returns></returns>
         Task<ParamTable> GetParamEx(string classCode, string secCode, string paramName, int timeout = Timeout.Infinite);
 
-        Task<ParamTable> GetParamEx(string classCode, string secCode, ParamNames paramName, int timeout = Timeout.Infinite);
+        Task<ParamTable> GetParamEx(string classCode, string secCode, ParamName paramName, int timeout = Timeout.Infinite);
 
         /// <summary>
         /// Функция для получения всех значений Таблицы текущих значений параметров
@@ -137,7 +137,7 @@ namespace QuikSharp.QuickFunctions.Tradings
         /// <returns></returns>
         Task<ParamTable> GetParamEx2(string classCode, string secCode, string paramName);
 
-        Task<ParamTable> GetParamEx2(string classCode, string secCode, ParamNames paramName);
+        Task<ParamTable> GetParamEx2(string classCode, string secCode, ParamName paramName);
 
         /// <summary>
         /// функция для получения таблицы сделок по заданному инструменту

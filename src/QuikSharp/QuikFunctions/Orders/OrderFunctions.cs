@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-using QuikSharp.TradingFunctions;
 using QuikSharp.QuickService;
 using QuikSharp.Messages;
+using QuikSharp.QuickFunctions.Tradings;
 
 namespace QuikSharp.QuickFunctions.Orders
 {
@@ -86,7 +86,7 @@ namespace QuikSharp.QuickFunctions.Orders
         /// <param name="price">Цена заявки</param>
         /// <param name="qty">Количество (в лотах)</param>
         /// <param name="orderType">Тип заявки (L - лимитная, M - рыночная)</param>
-        async Task<Order> SendOrder(string classCode, string securityCode, string accountID, Operation operation, decimal price, int qty, TransactionType orderType)
+        private async Task<Order> SendOrder(string classCode, string securityCode, string accountID, Operation operation, decimal price, int qty, TransactionType orderType)
         {
             long res = 0;
             bool set = false;
@@ -163,8 +163,8 @@ namespace QuikSharp.QuickFunctions.Orders
         /// <returns></returns>
         public async Task<Order> GetOrder(string classCode, long orderId)
         {
-            var message = new Message<string>(classCode + "|" + orderId, "get_order_by_number");
-            Message<Order> response = await _quikService.Send<Message<Order>>(message).ConfigureAwait(false);
+            var message = new Request<string>(classCode + "|" + orderId, "get_order_by_number");
+            Message<Order> response = await _quikService.Send<Response<Order>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -174,8 +174,8 @@ namespace QuikSharp.QuickFunctions.Orders
         /// <returns></returns>
         public async Task<List<Order>> GetOrders()
         {
-            var message = new Message<string>("", "get_orders");
-            Message<List<Order>> response = await _quikService.Send<Message<List<Order>>>(message).ConfigureAwait(false);
+            var message = new Request<string>("", "get_orders");
+            Message<List<Order>> response = await _quikService.Send<Response<List<Order>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -184,8 +184,8 @@ namespace QuikSharp.QuickFunctions.Orders
         /// </summary>
         public async Task<List<Order>> GetOrders(string classCode, string securityCode)
         {
-            var message = new Message<string>(classCode + "|" + securityCode, "get_orders");
-            Message<List<Order>> response = await _quikService.Send<Message<List<Order>>>(message).ConfigureAwait(false);
+            var message = new Request<string>(classCode + "|" + securityCode, "get_orders");
+            Message<List<Order>> response = await _quikService.Send<Response<List<Order>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -194,8 +194,8 @@ namespace QuikSharp.QuickFunctions.Orders
         /// </summary>
         public async Task<Order> GetOrder_by_transID(string classCode, string securityCode, long trans_id)
         {
-            var message = new Message<string>(classCode + "|" + securityCode + "|" + trans_id, "getOrder_by_ID");
-            Message<Order> response = await _quikService.Send<Message<Order>>(message).ConfigureAwait(false);
+            var message = new Request<string>(classCode + "|" + securityCode + "|" + trans_id, "getOrder_by_ID");
+            Message<Order> response = await _quikService.Send<Response<Order>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -204,8 +204,8 @@ namespace QuikSharp.QuickFunctions.Orders
         /// </summary>
         public async Task<Order> GetOrder_by_Number(long order_num)
         {
-            var message = new Message<string>(order_num.ToString(), "getOrder_by_Number");
-            Message<Order> response = await _quikService.Send<Message<Order>>(message).ConfigureAwait(false);
+            var message = new Request<string>(order_num.ToString(), "getOrder_by_Number");
+            Message<Order> response = await _quikService.Send<Response<Order>>(message).ConfigureAwait(false);
             return response.Data;
         }
     }

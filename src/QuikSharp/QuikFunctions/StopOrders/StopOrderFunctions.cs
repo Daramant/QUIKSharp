@@ -4,8 +4,8 @@
 using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Messages;
+using QuikSharp.QuickFunctions.Tradings;
 using QuikSharp.QuickService;
-using QuikSharp.TradingFunctions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -34,8 +34,8 @@ namespace QuikSharp.QuickFunctions.StopOrders
         /// <returns></returns>
         public async Task<List<StopOrder>> GetStopOrders()
         {
-            var message = new Message<string>("", "get_stop_orders");
-            Message<List<StopOrder>> response = await _quikService.Send<Message<List<StopOrder>>>(message).ConfigureAwait(false);
+            var message = new Request<string>("", "get_stop_orders");
+            Message<List<StopOrder>> response = await _quikService.Send<Response<List<StopOrder>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -44,8 +44,8 @@ namespace QuikSharp.QuickFunctions.StopOrders
         /// </summary>
         public async Task<List<StopOrder>> GetStopOrders(string classCode, string securityCode)
         {
-            var message = new Message<string>(classCode + "|" + securityCode, "get_stop_orders");
-            Message<List<StopOrder>> response = await _quikService.Send<Message<List<StopOrder>>>(message).ConfigureAwait(false);
+            var message = new Request<string>(classCode + "|" + securityCode, "get_stop_orders");
+            Message<List<StopOrder>> response = await _quikService.Send<Response<List<StopOrder>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 

@@ -99,8 +99,8 @@ public class Tool
                         firmID = quik.Class.GetClassInfo(classCode).Result.FirmId;
                         //step = Convert.ToDecimal(quik.Trading.GetParamEx(classCode, securityCode, "SEC_PRICE_STEP").Result.ParamValue.Replace('.', separator));
                         //priceAccuracy = Convert.ToInt32(Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, "SEC_SCALE").Result.ParamValue.Replace('.', separator)));
-                        step = Convert.ToDecimal(quik.Trading.GetParamEx(classCode, securityCode, ParamNames.SEC_PRICE_STEP).Result.ParamValue.Replace('.', separator));
-                        priceAccuracy = Convert.ToInt32(Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, ParamNames.SEC_SCALE).Result.ParamValue.Replace('.', separator)));
+                        step = Convert.ToDecimal(quik.Trading.GetParamEx(classCode, securityCode, ParamName.SEC_PRICE_STEP).Result.ParamValue.Replace('.', separator));
+                        priceAccuracy = Convert.ToInt32(Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, ParamName.SEC_SCALE).Result.ParamValue.Replace('.', separator)));
                     }
                     catch (Exception e)
                     {
@@ -112,13 +112,13 @@ public class Tool
                         Console.WriteLine("Получаем 'guaranteeProviding'.");
                         lot = 1;
                         //guaranteeProviding = Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, "BUYDEPO").Result.ParamValue.Replace('.', separator));
-                        guaranteeProviding = Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, ParamNames.BUYDEPO).Result.ParamValue.Replace('.', separator));
+                        guaranteeProviding = Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, ParamName.BUYDEPO).Result.ParamValue.Replace('.', separator));
                     }
                     else
                     {
                         Console.WriteLine("Получаем 'lot'.");
                         //lot = Convert.ToInt32(Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, "LOTSIZE").Result.ParamValue.Replace('.', separator)));
-                        lot = Convert.ToInt32(Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, ParamNames.LOTSIZE).Result.ParamValue.Replace('.', separator)));
+                        lot = Convert.ToInt32(Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, ParamName.LOTSIZE).Result.ParamValue.Replace('.', separator)));
                         guaranteeProviding = 0;
                     }
                 }

@@ -1,6 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using QuikSharp.DataStructures;
+using QuikSharp.DataStructures.Transaction;
+using QuikSharp.Exceptions;
+using QuikSharp.Messages;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace QuikSharp.Json.Converters
 {
@@ -43,6 +49,7 @@ namespace QuikSharp.Json.Converters
             }
             else if (FieldExists("id", jObject))
             {
+                // Если есть id, значит пришел ответ на запрос (IRespose).
                 var id = jObject.GetValue("id").Value<long>();
                 objectType = _service.Responses[id].Value;
                 return (IMessage)Activator.CreateInstance(objectType);
@@ -50,81 +57,81 @@ namespace QuikSharp.Json.Converters
             else if (FieldExists("cmd", jObject))
             {
                 // without id we have an event
-                EventNames eventName;
+                EventName eventName;
                 string cmd = jObject.GetValue("cmd").Value<string>();
                 var parsed = Enum.TryParse(cmd, true, out eventName);
                 if (parsed)
                 {
                     switch (eventName)
                     {
-                        case EventNames.OnAccountBalance:
-                            return new Message<AccountBalance> { Data = new AccountBalance() };
+                        case EventName.AccountBalance:
+                            return new Response<AccountBalance> { Data = new AccountBalance() };
 
-                        case EventNames.OnAccountPosition:
-                            return new Message<AccountPosition> { Data = new AccountPosition() };
+                        case EventName.AccountPosition:
+                            return new Response<AccountPosition> { Data = new AccountPosition() };
 
-                        case EventNames.OnAllTrade:
-                            return new Message<AllTrade> { Data = new AllTrade() };
+                        case EventName.AllTrade:
+                            return new Response<AllTrade> { Data = new AllTrade() };
 
-                        case EventNames.OnCleanUp:
-                        case EventNames.OnClose:
-                        case EventNames.OnConnected:
-                        case EventNames.OnDisconnected:
-                        case EventNames.OnInit:
+                        case EventName.CleanUp:
+                        case EventName.Close:
+                        case EventName.Connected:
+                        case EventName.Disconnected:
+                        case EventName.Init:
 
-                        case EventNames.OnStop:
-                            return new Message<string>();
+                        case EventName.Stop:
+                            return new Response<string>();
 
-                        case EventNames.OnDepoLimit:
-                            return new Message<DepoLimitEx> { Data = new DepoLimitEx() };
+                        case EventName.DepoLimit:
+                            return new Response<DepoLimitEx> { Data = new DepoLimitEx() };
 
-                        case EventNames.OnDepoLimitDelete:
-                            return new Message<DepoLimitDelete> { Data = new DepoLimitDelete() };
+                        case EventName.DepoLimitDelete:
+                            return new Response<DepoLimitDelete> { Data = new DepoLimitDelete() };
 
-                        case EventNames.OnFirm:
-                            return new Message<Firm> { Data = new Firm() };
+                        case EventName.Firm:
+                            return new Response<Firm> { Data = new Firm() };
 
-                        case EventNames.OnFuturesClientHolding:
-                            return new Message<FuturesClientHolding> { Data = new FuturesClientHolding() };
+                        case EventName.FuturesClientHolding:
+                            return new Response<FuturesClientHolding> { Data = new FuturesClientHolding() };
 
-                        case EventNames.OnFuturesLimitChange:
-                            return new Message<FuturesLimits> { Data = new FuturesLimits() };
+                        case EventName.FuturesLimitChange:
+                            return new Response<FuturesLimits> { Data = new FuturesLimits() };
 
-                        case EventNames.OnFuturesLimitDelete:
-                            return new Message<FuturesLimitDelete> { Data = new FuturesLimitDelete() };
+                        case EventName.FuturesLimitDelete:
+                            return new Response<FuturesLimitDelete> { Data = new FuturesLimitDelete() };
 
-                        case EventNames.OnMoneyLimit:
-                            return new Message<MoneyLimitEx> { Data = new MoneyLimitEx() };
+                        case EventName.MoneyLimit:
+                            return new Response<MoneyLimitEx> { Data = new MoneyLimitEx() };
 
-                        case EventNames.OnMoneyLimitDelete:
-                            return new Message<MoneyLimitDelete> { Data = new MoneyLimitDelete() };
+                        case EventName.MoneyLimitDelete:
+                            return new Response<MoneyLimitDelete> { Data = new MoneyLimitDelete() };
 
-                        case EventNames.OnNegDeal:
+                        case EventName.NegDeal:
                             break;
 
-                        case EventNames.OnNegTrade:
+                        case EventName.NegTrade:
                             break;
 
-                        case EventNames.OnOrder:
-                            return new Message<Order> { Data = new Order() };
+                        case EventName.Order:
+                            return new Response<Order> { Data = new Order() };
 
-                        case EventNames.OnParam:
-                            return new Message<Param> { Data = new Param() };
+                        case EventName.Param:
+                            return new Response<Param> { Data = new Param() };
 
-                        case EventNames.OnQuote:
-                            return new Message<OrderBook> { Data = new OrderBook() };
+                        case EventName.Quote:
+                            return new Response<OrderBook> { Data = new OrderBook() };
 
-                        case EventNames.OnStopOrder:
-                            return new Message<StopOrder> { Data = new StopOrder() };
+                        case EventName.StopOrder:
+                            return new Response<StopOrder> { Data = new StopOrder() };
 
-                        case EventNames.OnTrade:
-                            return new Message<Trade> { Data = new Trade() };
+                        case EventName.Trade:
+                            return new Response<Trade> { Data = new Trade() };
 
-                        case EventNames.OnTransReply:
-                            return new Message<TransactionReply> { Data = new TransactionReply() };
+                        case EventName.TransReply:
+                            return new Response<TransactionReply> { Data = new TransactionReply() };
 
-                        case EventNames.NewCandle:
-                            return new Message<Candle> { Data = new Candle() };
+                        case EventName.NewCandle:
+                            return new Response<Candle> { Data = new Candle() };
 
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -136,7 +143,7 @@ namespace QuikSharp.Json.Converters
                     switch (cmd)
                     {
                         case "lua_error":
-                            return new Message<string>();
+                            return new Response<string>();
 
                         default:
                             //return (IMessage)Activator.CreateInstance(typeof(Message<string>));

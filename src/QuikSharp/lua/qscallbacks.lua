@@ -25,7 +25,7 @@ end
 
 function OnDisconnected()
     local msg = {}
-    msg.cmd = "OnDisconnected"
+    msg.cmd = "Disconnected"
     msg.t = timemsec()
     msg.data = ""
     sendCallback(msg)
@@ -33,7 +33,7 @@ end
 
 function OnConnected()
     local msg = {}
-    msg.cmd = "OnConnected"
+    msg.cmd = "Connected"
     msg.t = timemsec()
     msg.data = ""
     sendCallback(msg)
@@ -43,7 +43,7 @@ function OnAllTrade(alltrade)
     if is_connected then
         local msg = {}
         msg.t = timemsec()
-        msg.cmd = "OnAllTrade"
+        msg.cmd = "AllTrade"
         msg.data = alltrade
         sendCallback(msg)
     end
@@ -52,7 +52,7 @@ end
 function OnClose()
     if is_connected then
         local msg = {}
-        msg.cmd = "OnClose"
+        msg.cmd = "Close"
         msg.t = timemsec()
         msg.data = ""
         sendCallback(msg)
@@ -63,7 +63,7 @@ end
 function OnInit(script_path)
     if is_connected then
         local msg = {}
-        msg.cmd = "OnInit"
+        msg.cmd = "Init"
         msg.t = timemsec()
         msg.data = script_path
         sendCallback(msg)
@@ -76,14 +76,14 @@ function OnOrder(order)
     msg.t = timemsec()
     msg.id = nil
     msg.data = order
-    msg.cmd = "OnOrder"
+    msg.cmd = "Order"
     sendCallback(msg)
 end
 
 function OnQuote(class_code, sec_code)
     if is_connected then
         local msg = {}
-        msg.cmd = "OnQuote"
+        msg.cmd = "Quote"
         msg.t = timemsec()
         local server_time = getInfoParam("SERVERTIME")
         local status, ql2 = pcall(getQuoteLevel2, class_code, sec_code)
@@ -104,7 +104,7 @@ function OnStop(s)
 
     if is_connected then
         local msg = {}
-        msg.cmd = "OnStop"
+        msg.cmd = "Stop"
         msg.t = timemsec()
         msg.data = s
         sendCallback(msg)
@@ -120,7 +120,7 @@ function OnTrade(trade)
     msg.t = timemsec()
     msg.id = nil
     msg.data = trade
-    msg.cmd = "OnTrade"
+    msg.cmd = "Trade"
     sendCallback(msg)
 end
 
@@ -129,7 +129,7 @@ function OnTransReply(trans_reply)
     msg.t = timemsec()
     msg.id = nil
     msg.data = trans_reply
-    msg.cmd = "OnTransReply"
+    msg.cmd = "TransReply"
     sendCallback(msg)
 end
 
@@ -137,13 +137,13 @@ function OnStopOrder(stop_order)
 	local msg = {}
     msg.t = timemsec()
     msg.data = stop_order
-    msg.cmd = "OnStopOrder"
+    msg.cmd = "StopOrder"
     sendCallback(msg)
 end
 
 function OnParam(class_code, sec_code)
     local msg = {}
-    msg.cmd = "OnParam"
+    msg.cmd = "Param"
     msg.t = timemsec()
 	local dat = {}
 	dat.class_code = class_code
@@ -156,7 +156,7 @@ function OnAccountBalance(acc_bal)
     local msg = {}
     msg.t = timemsec()
     msg.data = acc_bal
-    msg.cmd = "OnAccountBalance"
+    msg.cmd = "AccountBalance"
     sendCallback(msg)
 end
 
@@ -164,7 +164,7 @@ function OnAccountPosition(acc_pos)
     local msg = {}
     msg.t = timemsec()
     msg.data = acc_pos
-    msg.cmd = "OnAccountPosition"
+    msg.cmd = "AccountPosition"
     sendCallback(msg)
 end
 
@@ -172,7 +172,7 @@ function OnDepoLimit(dlimit)
     local msg = {}
     msg.t = timemsec()
     msg.data = dlimit
-    msg.cmd = "OnDepoLimit"
+    msg.cmd = "DepoLimit"
     sendCallback(msg)
 end
 
@@ -180,7 +180,7 @@ function OnDepoLimitDelete(dlimit_del)
     local msg = {}
     msg.t = timemsec()
     msg.data = dlimit_del
-    msg.cmd = "OnDepoLimitDelete"
+    msg.cmd = "DepoLimitDelete"
     sendCallback(msg)
 end
 
@@ -188,7 +188,7 @@ function OnFirm(firm)
     local msg = {}
     msg.t = timemsec()
     msg.data = firm
-    msg.cmd = "OnFirm"
+    msg.cmd = "Firm"
     sendCallback(msg)
 end
 
@@ -196,7 +196,7 @@ function OnFuturesClientHolding(fut_pos)
     local msg = {}
     msg.t = timemsec()
     msg.data = fut_pos
-    msg.cmd = "OnFuturesClientHolding"
+    msg.cmd = "FuturesClientHolding"
     sendCallback(msg)
 end
 
@@ -204,7 +204,7 @@ function OnFuturesLimitChange(fut_limit)
     local msg = {}
     msg.t = timemsec()
     msg.data = fut_limit
-    msg.cmd = "OnFuturesLimitChange"
+    msg.cmd = "FuturesLimitChange"
     sendCallback(msg)
 end
 
@@ -212,7 +212,7 @@ function OnFuturesLimitDelete(lim_del)
     local msg = {}
     msg.t = timemsec()
     msg.data = lim_del
-    msg.cmd = "OnFuturesLimitDelete"
+    msg.cmd = "FuturesLimitDelete"
     sendCallback(msg)
 end
 
@@ -220,7 +220,7 @@ function OnMoneyLimit(mlimit)
     local msg = {}
     msg.t = timemsec()
     msg.data = mlimit
-    msg.cmd = "OnMoneyLimit"
+    msg.cmd = "MoneyLimit"
     sendCallback(msg)
 end
 
@@ -228,7 +228,7 @@ function OnMoneyLimitDelete(mlimit_del)
     local msg = {}
     msg.t = timemsec()
     msg.data = mlimit_del
-    msg.cmd = "OnMoneyLimitDelete"
+    msg.cmd = "MoneyLimitDelete"
     sendCallback(msg)
 end
 

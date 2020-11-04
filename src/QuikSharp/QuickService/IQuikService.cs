@@ -8,7 +8,7 @@ namespace QuikSharp.QuickService
 {
     public interface IQuikService
     {
-        Task<TResponse> Send<TResponse>(IMessage request, int timeout = 0)
-            where TResponse : class, IMessage, new();
+        Task<TResponse> Send<TResponse>(IRequest request, int timeout = 0)
+            where TResponse : class, IResponse, new();
     }
 }

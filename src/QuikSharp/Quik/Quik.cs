@@ -23,13 +23,13 @@ namespace QuikSharp.Quik
         /// </summary>
         public const string DefaultHost = "127.0.0.1";
 
+        /// <inheritdoc />
         public IQuikService Service { get; }
 
+        /// <inheritdoc />
         public IQuikFunctions Functions { get; }
 
-        /// <summary>
-        /// Функции обратного вызова
-        /// </summary>
+        /// <inheritdoc />
         public IQuikEvents Events { get; }
 
         /// <summary>
@@ -40,7 +40,6 @@ namespace QuikSharp.Quik
             IQuikFunctions quikFunctions,
             IQuikEvents quikEvents)
         {
-            
             Service = quickService;
             Functions = quikFunctions;
             Events = quikEvents;

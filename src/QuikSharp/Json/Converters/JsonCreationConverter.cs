@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -42,7 +44,7 @@ namespace QuikSharp.Json.Converters
             object value,
             JsonSerializer serializer)
         {
-            throw new InvalidOperationException();
+            serializer.Serialize(writer, value);
         }
     }
 }

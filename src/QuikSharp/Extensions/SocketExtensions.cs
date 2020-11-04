@@ -14,7 +14,7 @@ namespace QuikSharp.Extensions
         /// is polling the state directly from the socket itself. The following
         /// extension class does this.
         /// </summary>
-        public static bool IsConnectedNow(this Socket s)
+        public static bool IsConnected(this Socket s)
         {
             var part1 = s.Poll(1000, SelectMode.SelectRead);
             var part2 = s.Available == 0;

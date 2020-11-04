@@ -8,174 +8,174 @@ namespace QuikSharp.QuikEvents
     // TODO Redirect these callbacks to events or rather do with events from the beginning
 
     /// <summary>
-    /// Implements all Quik callback functions to be processed on .NET side.
+    /// Implements all Quik callback functions to be processed  .NET side.
     /// These functions are called by Quik inside QLUA.
     ///
     /// Функции обратного вызова
     /// Функции вызываются при получении следующих данных или событий терминалом QUIK от сервера:
     /// main - реализация основного потока исполнения в скрипте
-    /// OnAccountBalance - изменение позиции по счету
-    /// OnAccountPosition - изменение позиции по счету
-    /// OnAllTrade - новая обезличенная сделка
-    /// OnCleanUp - смена торговой сессии и при выгрузке файла qlua.dll
-    /// OnClose - закрытие терминала QUIK
-    /// OnConnected - установление связи с сервером QUIK
-    /// OnDepoLimit - изменение бумажного лимита
-    /// OnDepoLimitDelete - удаление бумажного лимита
-    /// OnDisconnected - отключение от сервера QUIK
-    /// OnFirm - описание новой фирмы
-    /// OnFuturesClientHolding - изменение позиции по срочному рынку
-    /// OnFuturesLimitChange - изменение ограничений по срочному рынку
-    /// OnFuturesLimitDelete - удаление лимита по срочному рынку
-    /// OnInit - инициализация функции main
-    /// OnMoneyLimit - изменение денежного лимита
-    /// OnMoneyLimitDelete - удаление денежного лимита
-    /// OnNegDeal - новая заявка на внебиржевую сделку
-    /// OnNegTrade - новая сделка для исполнения
-    /// OnOrder - новая заявка или изменение параметров существующей заявки
-    /// OnParam - изменение текущих параметров
-    /// OnQuote - изменение стакана котировок
-    /// OnStop - остановка скрипта из диалога управления
-    /// OnStopOrder - новая стоп-заявка или изменение параметров существующей стоп-заявки
-    /// OnTrade - новая сделка
-    /// OnTransReply - ответ на транзакцию
+    /// AccountBalance - изменение позиции по счету
+    /// AccountPosition - изменение позиции по счету
+    /// AllTrade - новая обезличенная сделка
+    /// CleanUp - смена торговой сессии и при выгрузке файла qlua.dll
+    /// Close - закрытие терминала QUIK
+    /// Connected - установление связи с сервером QUIK
+    /// DepoLimit - изменение бумажного лимита
+    /// DepoLimitDelete - удаление бумажного лимита
+    /// Disconnected - отключение от сервера QUIK
+    /// Firm - описание новой фирмы
+    /// FuturesClientHolding - изменение позиции по срочному рынку
+    /// FuturesLimitChange - изменение ограничений по срочному рынку
+    /// FuturesLimitDelete - удаление лимита по срочному рынку
+    /// Init - инициализация функции main
+    /// MoneyLimit - изменение денежного лимита
+    /// MoneyLimitDelete - удаление денежного лимита
+    /// NegDeal - новая заявка на внебиржевую сделку
+    /// NegTrade - новая сделка для исполнения
+    /// Order - новая заявка или изменение параметров существующей заявки
+    /// Param - изменение текущих параметров
+    /// Quote - изменение стакана котировок
+    /// Stop - остановка скрипта из диалога управления
+    /// StopOrder - новая стоп-заявка или изменение параметров существующей стоп-заявки
+    /// Trade - новая сделка
+    /// TransReply - ответ на транзакцию
     /// </summary>
     public interface IQuikEvents
     {
         /// <summary>
         /// Событие вызывается когда библиотека QuikSharp успешно подключилась к Quik'у
         /// </summary>
-        event InitHandler OnConnectedToQuik;
+        event InitHandler ConnectedToQuik;
 
         /// <summary>
         /// Событие вызывается когда библиотека QuikSharp была отключена от Quik'а
         /// </summary>
-        event VoidHandler OnDisconnectedFromQuik;
+        event VoidHandler DisconnectedFromQuik;
 
         /// <summary>
         /// Событие вызывается при получении изменений текущей позиции по счету.
         /// </summary>
-        event AccountBalanceHandler OnAccountBalance;
+        event AccountBalanceHandler AccountBalance;
 
         /// <summary>
         /// Событие вызывается при изменении денежной позиции по счету.
         /// </summary>
-        event AccountPositionHandler OnAccountPosition;
+        event AccountPositionHandler AccountPosition;
 
         /// <summary>
         /// Новая обезличенная сделка
         /// </summary>
-        event AllTradeHandler OnAllTrade;
+        event AllTradeHandler AllTrade;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при смене сессии и при выгрузке файла qlua.dll
         /// </summary>
-        event VoidHandler OnCleanUp;
+        event VoidHandler CleanUp;
 
         /// <summary>
         /// Функция вызывается перед закрытием терминала QUIK.
         /// </summary>
-        event VoidHandler OnClose;
+        event VoidHandler Close;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при установлении связи с сервером QUIK.
         /// </summary>
-        event VoidHandler OnConnected;
+        event VoidHandler Connected;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений лимита по бумагам.
         /// </summary>
-        event DepoLimitHandler OnDepoLimit;
+        event DepoLimitHandler DepoLimit;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении клиентского лимита по бумагам.
         /// </summary>
-        event DepoLimitDeleteHandler OnDepoLimitDelete;
+        event DepoLimitDeleteHandler DepoLimitDelete;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при отключении от сервера QUIK.
         /// </summary>
-        event VoidHandler OnDisconnected;
+        event VoidHandler Disconnected;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении описания новой фирмы от сервера.
         /// </summary>
-        event FirmHandler OnFirm;
+        event FirmHandler Firm;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при изменении позиции по срочному рынку.
         /// </summary>
-        event FuturesClientHoldingHandler OnFuturesClientHolding;
+        event FuturesClientHoldingHandler FuturesClientHolding;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений ограничений по срочному рынку.
         /// </summary>
-        event FuturesLimitHandler OnFuturesLimitChange;
+        event FuturesLimitHandler FuturesLimitChange;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении лимита по срочному рынку.
         /// </summary>
-        event FuturesLimitDeleteHandler OnFuturesLimitDelete;
+        event FuturesLimitDeleteHandler FuturesLimitDelete;
 
         /// <summary>
         /// Depricated
         /// </summary>
-        event InitHandler OnInit;
+        event InitHandler Init;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений по денежному лимиту клиента.
         /// </summary>
-        event MoneyLimitHandler OnMoneyLimit;
+        event MoneyLimitHandler MoneyLimit;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении денежного лимита.
         /// </summary>
-        event MoneyLimitDeleteHandler OnMoneyLimitDelete;
+        event MoneyLimitDeleteHandler MoneyLimitDelete;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении внебиржевой заявки.
         /// </summary>
-        event EventHandler OnNegDeal;
+        event EventHandler NegDeal;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении сделки для исполнения.
         /// </summary>
-        event EventHandler OnNegTrade;
+        event EventHandler NegTrade;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении новой заявки или при изменении параметров существующей заявки.
         /// </summary>
-        event OrderHandler OnOrder;
+        event OrderHandler Order;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при при изменении текущих параметров.
         /// </summary>
-        event ParamHandler OnParam;
+        event ParamHandler Param;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменения стакана котировок.
         /// </summary>
-        event QuoteHandler OnQuote;
+        event QuoteHandler Quote;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при остановке скрипта из диалога управления.
         /// Примечание: Значение параметра «stop_flag» – «1».После окончания выполнения функции таймаут завершения работы скрипта 5 секунд. По истечении этого интервала функция main() завершается принудительно. При этом возможна потеря системных ресурсов.
         /// </summary>
-        event StopHandler OnStop;
+        event StopHandler Stop;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении новой стоп-заявки или при изменении параметров существующей стоп-заявки.
         /// </summary>
-        event StopOrderHandler OnStopOrder;
+        event StopOrderHandler StopOrder;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении сделки.
         /// </summary>
-        event TradeHandler OnTrade;
+        event TradeHandler Trade;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении ответа на транзакцию пользователя.
         /// </summary>
-        event TransReplyHandler OnTransReply;
+        event TransReplyHandler TransReply;
     }
 }

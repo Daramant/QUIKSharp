@@ -10,7 +10,7 @@ namespace QuikSharp.QuickFunctions.Classes
     /// <summary>
     /// Функции для обращения к спискам доступных параметров
     /// </summary>
-    public interface IClassFunctions : IQuikService
+    public interface IClassFunctions
     {
         /// <summary>
         /// Функция предназначена для получения списка кодов классов, переданных с сервера в ходе сеанса связи.

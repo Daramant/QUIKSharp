@@ -17,7 +17,7 @@ namespace QuikSharp.QuickFunctions.Debugs
             _quikService = quikService;
         }
 
-        private class PingRequest : Message<string>
+        private class PingRequest : Request<string>
         {
             public PingRequest()
                 : base("Ping", "ping", null)
@@ -25,10 +25,10 @@ namespace QuikSharp.QuickFunctions.Debugs
             }
         }
 
-        private class PingResponse : Message<string>
+        private class PingResponse : Response<string>
         {
             public PingResponse()
-                : base("Pong", "ping", null)
+                : base("Pong")
             {
             }
         }
@@ -36,7 +36,7 @@ namespace QuikSharp.QuickFunctions.Debugs
         public async Task<string> Ping()
         {
             // could have used StringMessage directly. This is an example of how to define DTOs for custom commands
-            var response = await QuikService.Send<PingResponse>((new PingRequest())).ConfigureAwait(false);
+            var response = await _quikService.Send<PingResponse>((new PingRequest())).ConfigureAwait(false);
             Trace.Assert(response.Data == "Pong");
             return response.Data;
         }
@@ -50,8 +50,8 @@ namespace QuikSharp.QuickFunctions.Debugs
         public async Task<T> Echo<T>(T msg)
         {
             // could have used StringMessage directly. This is an example of how to define DTOs for custom commands
-            var response = await _quikService.Send<Message<T>>(
-                (new Message<T>(msg, "echo"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<T>>(
+                (new Request<T>(msg, "echo"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -61,8 +61,8 @@ namespace QuikSharp.QuickFunctions.Debugs
         /// <returns></returns>
         public async Task<string> DivideStringByZero()
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>("", "divide_string_by_zero"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>("", "divide_string_by_zero"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -71,8 +71,8 @@ namespace QuikSharp.QuickFunctions.Debugs
         /// </summary>
         public async Task<bool> IsQuik()
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>("", "is_quik"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>("", "is_quik"))).ConfigureAwait(false);
             return response.Data == "1";
         }
     }

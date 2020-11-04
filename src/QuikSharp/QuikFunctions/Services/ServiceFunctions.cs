@@ -3,6 +3,7 @@
 
 using QuikSharp.Messages;
 using QuikSharp.QuickService;
+using QuikSharp.QuikFunctions.Services;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,29 +24,29 @@ namespace QuikSharp.QuickFunctions.Services
 
         public async Task<string> GetWorkingFolder()
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>("", "getWorkingFolder"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>("", "getWorkingFolder"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<bool> IsConnected(int timeout = Timeout.Infinite)
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>("", "isConnected")), timeout).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>("", "isConnected")), timeout).ConfigureAwait(false);
             return response.Data == "1";
         }
 
         public async Task<string> GetScriptPath()
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>("", "getScriptPath"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>("", "getScriptPath"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<string> GetInfoParam(InfoParams param)
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>(param.ToString(), "getInfoParam"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>(param.ToString(), "getInfoParam"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -54,18 +55,18 @@ namespace QuikSharp.QuickFunctions.Services
             switch (iconType)
             {
                 case NotificationType.Info:
-                    await _quikService.Send<Message<string>>(
-                        (new Message<string>(message, "message"))).ConfigureAwait(false);
+                    await _quikService.Send<Response<string>>(
+                        (new Request<string>(message, "message"))).ConfigureAwait(false);
                     break;
 
                 case NotificationType.Warning:
-                    await _quikService.Send<Message<string>>(
-                        (new Message<string>(message, "warning_message"))).ConfigureAwait(false);
+                    await _quikService.Send<Response<string>>(
+                        (new Request<string>(message, "warning_message"))).ConfigureAwait(false);
                     break;
 
                 case NotificationType.Error:
-                    await _quikService.Send<Message<string>>(
-                        (new Message<string>(message, "error_message"))).ConfigureAwait(false);
+                    await _quikService.Send<Response<string>>(
+                        (new Request<string>(message, "error_message"))).ConfigureAwait(false);
                     break;
 
                 default:
@@ -77,36 +78,31 @@ namespace QuikSharp.QuickFunctions.Services
 
         public async Task<bool> PrintDbgStr(string message)
         {
-            await _quikService.Send<Message<string>>(
-                (new Message<string>(message, "PrintDbgStr"))).ConfigureAwait(false);
+            await _quikService.Send<Response<string>>(
+                (new Request<string>(message, "PrintDbgStr"))).ConfigureAwait(false);
             return true;
         }
 
         public async Task<double> AddLabel(double price, string curDate, string curTime, string hint, string path, string tag, string alignment, double backgnd)
         {
-            var response = await _quikService.Send<Message<double>>(
-                    (new Message<string>(price + "|" + curDate + "|" + curTime + "|" + hint + "|" + path + "|" + tag + "|" + alignment + "|" + backgnd, "addLabel")))
+            var response = await _quikService.Send<Response<double>>(
+                    (new Request<string>(price + "|" + curDate + "|" + curTime + "|" + hint + "|" + path + "|" + tag + "|" + alignment + "|" + backgnd, "addLabel")))
                 .ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<bool> DelLabel(string tag, double id)
         {
-            await _quikService.Send<Message<string>>(
-                (new Message<string>(tag + "|" + id, "delLabel"))).ConfigureAwait(false);
+            await _quikService.Send<Response<string>>(
+                (new Request<string>(tag + "|" + id, "delLabel"))).ConfigureAwait(false);
             return true;
         }
 
         public async Task<bool> DelAllLabels(string tag)
         {
-            await _quikService.Send<Message<string>>(
-                (new Message<string>(tag, "delAllLabels"))).ConfigureAwait(false);
+            await _quikService.Send<Response<string>>(
+                (new Request<string>(tag, "delAllLabels"))).ConfigureAwait(false);
             return true;
-        }
-
-        public void InitializeCorrelationId(int startCorrelationId)
-        {
-            _quikService.InitializeCorrelationId(startCorrelationId);
         }
     }
 }

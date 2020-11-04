@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuikSharp.QuikFunctions.Services;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -74,11 +75,5 @@ namespace QuikSharp.QuickFunctions.Services
         /// <param name="tag"></param>
         /// <returns></returns>
         Task<bool> DelAllLabels(string tag);
-
-        /// <summary>
-        /// Устанавливает стартовое значение для CorrelactionId.
-        /// </summary>
-        /// <param name="startCorrelationId">Стартовое значение.</param>
-        void InitializeCorrelationId(int startCorrelationId);
     }
 }

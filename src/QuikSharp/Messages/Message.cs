@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using Newtonsoft.Json;
+using QuikSharp.Tools;
 using System;
 
 namespace QuikSharp.Messages
@@ -9,19 +10,23 @@ namespace QuikSharp.Messages
     /// <summary>
     /// Default generic implementation
     /// </summary>
-    internal class Message<T> : BaseMessage
+    internal class Message<T> : IMessage<T>
     {
         public Message()
         {
         }
 
-        public Message(T message, string command, DateTime? validUntil = null)
+        public Message(T data)
         {
-            Command = command;
-            CreatedTime = DateTime.Now.Ticks / 10000L - Epoch;
-            ValidUntil = validUntil;
-            Data = message;
+            Data = data;
+            CreatedTime = DateTimeTool.GetCurrentTime();
         }
+
+        /// <summary>
+        /// Timestamp in milliseconds, same as in Lua `socket.gettime() * 1000`
+        /// </summary>
+        [JsonProperty(PropertyName = "t")]
+        public long CreatedTime { get; set; }
 
         /// <summary>
         /// String message

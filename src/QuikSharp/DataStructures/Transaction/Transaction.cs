@@ -3,6 +3,7 @@
 
 using Newtonsoft.Json;
 using QuikSharp.Json.Converters;
+using QuikSharp.QuikEvents;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

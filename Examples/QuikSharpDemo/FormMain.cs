@@ -223,7 +223,7 @@ namespace QuikSharpDemo
         {
             if (_param.ClassCode == tool.ClassCode && _param.SecCode == tool.SecurityCode)
             {
-                double bid = Convert.ToDouble(_quik.Trading.GetParamEx2(tool.ClassCode, tool.SecurityCode, ParamNames.BID).Result.ParamValue.Replace('.', separator));
+                double bid = Convert.ToDouble(_quik.Trading.GetParamEx2(tool.ClassCode, tool.SecurityCode, ParamName.BID).Result.ParamValue.Replace('.', separator));
                 AppendText2TextBox(textBoxLogsWindow, "Вызвано событие OnParam. Актуальное значение параметра 'BID' = " + bid + Environment.NewLine);
             }
         }
@@ -615,7 +615,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Подписываемся на получение обновляемого параметра 'BID', через ParamRequest..." + Environment.NewLine);
-                        bool pReq = _quik.Trading.ParamRequest(tool.ClassCode, tool.SecurityCode, ParamNames.BID).Result;
+                        bool pReq = _quik.Trading.ParamRequest(tool.ClassCode, tool.SecurityCode, ParamName.BID).Result;
                         if (pReq)
                         {
                             AppendText2TextBox(textBoxLogsWindow, "Подписываемся на колбэк 'OnParam'..." + Environment.NewLine);
@@ -632,7 +632,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Отменяем подписку на получение обновляемого параметра 'BID', через ParamRequest..." + Environment.NewLine);
-                        bool pReq = _quik.Trading.CancelParamRequest(tool.ClassCode, tool.SecurityCode, ParamNames.BID).Result;
+                        bool pReq = _quik.Trading.CancelParamRequest(tool.ClassCode, tool.SecurityCode, ParamName.BID).Result;
                         if (pReq)
                         {
                             AppendText2TextBox(textBoxLogsWindow, "Отменяем подписку на колбэк 'OnParam'..." + Environment.NewLine);

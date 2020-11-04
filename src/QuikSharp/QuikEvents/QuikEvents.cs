@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace QuikSharp.QuikEvents
 {
-    internal class QuikEvents : IQuikEvents
+    public class QuikEvents : IQuikEvents, IQuikEventsInvoker
     {
         private readonly IPersistentStorage _persistentStorage;
 
@@ -20,189 +20,192 @@ namespace QuikSharp.QuikEvents
         /// <summary>
         /// Событие вызывается когда библиотека QuikSharp успешно подключилась к Quik'у
         /// </summary>
-        public event InitHandler OnConnectedToQuik;
+        public event InitHandler ConnectedToQuik;
 
-        internal void OnConnectedToQuikCall(int port)
+        public void OnConnectedToQuik(int port)
         {
-            OnConnectedToQuik?.Invoke(port);
-            OnInit?.Invoke(port);
+            ConnectedToQuik?.Invoke(port);
+            Init?.Invoke(port);
         }
 
         /// <summary>
         /// Событие вызывается когда библиотека QuikSharp была отключена от Quik'а
         /// </summary>
-        public event VoidHandler OnDisconnectedFromQuik;
+        public event VoidHandler DisconnectedFromQuik;
 
-        internal void OnDisconnectedFromQuikCall()
+        public void OnDisconnectedFromQuik()
         {
-            OnDisconnectedFromQuik?.Invoke();
+            DisconnectedFromQuik?.Invoke();
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK перед вызовом функции main().
         /// В качестве параметра принимает значение полного пути к запускаемому скрипту.
         /// </summary>
-        public event InitHandler OnInit;
+        public event InitHandler Init;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений текущей позиции по счету.
         /// </summary>
-        public event AccountBalanceHandler OnAccountBalance;
+        public event AccountBalanceHandler AccountBalance;
 
-        internal void OnAccountBalanceCall(AccountBalance accBal)
+        public void OnAccountBalance(AccountBalance accBal)
         {
-            OnAccountBalance?.Invoke(accBal);
+            AccountBalance?.Invoke(accBal);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при изменении денежной позиции по счету.
         /// </summary>
-        public event AccountPositionHandler OnAccountPosition;
+        public event AccountPositionHandler AccountPosition;
 
-        internal void OnAccountPositionCall(AccountPosition accPos)
+        public void OnAccountPosition(AccountPosition accPos)
         {
-            OnAccountPosition?.Invoke(accPos);
+            AccountPosition?.Invoke(accPos);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении обезличенной сделки.
         /// </summary>
-        public event AllTradeHandler OnAllTrade;
+        public event AllTradeHandler AllTrade;
 
-        internal void OnAllTradeCall(AllTrade allTrade) => OnAllTrade?.Invoke(allTrade);
+        public void OnAllTrade(AllTrade allTrade)
+        {
+            AllTrade?.Invoke(allTrade);
+        }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при смене сессии и при выгрузке файла qlua.dll
         /// </summary>
-        public event VoidHandler OnCleanUp;
+        public event VoidHandler CleanUp;
 
-        internal void OnCleanUpCall()
+        public void OnCleanUp()
         {
-            OnCleanUp?.Invoke();
+            CleanUp?.Invoke();
         }
 
         /// <summary>
         /// Функция вызывается перед закрытием терминала QUIK.
         /// </summary>
-        public event VoidHandler OnClose;
+        public event VoidHandler Close;
 
-        internal void OnCloseCall()
+        public void OnClose()
         {
-            OnClose?.Invoke();
+            Close?.Invoke();
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при установлении связи с сервером QUIK.
         /// </summary>
-        public event VoidHandler OnConnected;
+        public event VoidHandler Connected;
 
-        internal void OnConnectedCall()
+        public void OnConnected()
         {
-            OnConnected?.Invoke();
+            Connected?.Invoke();
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений лимита по бумагам.
         /// </summary>
-        public event DepoLimitHandler OnDepoLimit;
+        public event DepoLimitHandler DepoLimit;
 
-        internal void OnDepoLimitCall(DepoLimitEx dLimit)
+        public void OnDepoLimit(DepoLimitEx dLimit)
         {
-            OnDepoLimit?.Invoke(dLimit);
+            DepoLimit?.Invoke(dLimit);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении клиентского лимита по бумагам.
         /// </summary>
-        public event DepoLimitDeleteHandler OnDepoLimitDelete;
+        public event DepoLimitDeleteHandler DepoLimitDelete;
 
-        internal void OnDepoLimitDeleteCall(DepoLimitDelete dLimitDel)
+        public void OnDepoLimitDelete(DepoLimitDelete dLimitDel)
         {
-            OnDepoLimitDelete?.Invoke(dLimitDel);
+            DepoLimitDelete?.Invoke(dLimitDel);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при отключении от сервера QUIK.
         /// </summary>
-        public event VoidHandler OnDisconnected;
+        public event VoidHandler Disconnected;
 
-        internal void OnDisconnectedCall()
+        public void OnDisconnected()
         {
-            OnDisconnected?.Invoke();
+            Disconnected?.Invoke();
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении описания новой фирмы от сервера.
         /// </summary>
-        public event FirmHandler OnFirm;
+        public event FirmHandler Firm;
 
-        internal void OnFirmCall(Firm frm)
+        public void OnFirm(Firm frm)
         {
-            OnFirm?.Invoke(frm);
+            Firm?.Invoke(frm);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при изменении позиции по срочному рынку.
         /// </summary>
-        public event FuturesClientHoldingHandler OnFuturesClientHolding;
+        public event FuturesClientHoldingHandler FuturesClientHolding;
 
-        internal void OnFuturesClientHoldingCall(FuturesClientHolding futPos)
+        public void OnFuturesClientHolding(FuturesClientHolding futPos)
         {
-            OnFuturesClientHolding?.Invoke(futPos);
+            FuturesClientHolding?.Invoke(futPos);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений ограничений по срочному рынку.
         /// </summary>
-        public event FuturesLimitHandler OnFuturesLimitChange;
+        public event FuturesLimitHandler FuturesLimitChange;
 
-        internal void OnFuturesLimitChangeCall(FuturesLimits futLimit)
+        public void OnFuturesLimitChange(FuturesLimits futLimit)
         {
-            OnFuturesLimitChange?.Invoke(futLimit);
+            FuturesLimitChange?.Invoke(futLimit);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении лимита по срочному рынку.
         /// </summary>
-        public event FuturesLimitDeleteHandler OnFuturesLimitDelete;
+        public event FuturesLimitDeleteHandler FuturesLimitDelete;
 
-        internal void OnFuturesLimitDeleteCall(FuturesLimitDelete limDel)
+        public void OnFuturesLimitDelete(FuturesLimitDelete limDel)
         {
-            OnFuturesLimitDelete?.Invoke(limDel);
+            FuturesLimitDelete?.Invoke(limDel);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений по денежному лимиту клиента.
         /// </summary>
-        public event MoneyLimitHandler OnMoneyLimit;
+        public event MoneyLimitHandler MoneyLimit;
 
-        internal void OnMoneyLimitCall(MoneyLimitEx mLimit)
+        public void OnMoneyLimit(MoneyLimitEx mLimit)
         {
-            OnMoneyLimit?.Invoke(mLimit);
+            MoneyLimit?.Invoke(mLimit);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении денежного лимита.
         /// </summary>
-        public event MoneyLimitDeleteHandler OnMoneyLimitDelete;
+        public event MoneyLimitDeleteHandler MoneyLimitDelete;
 
-        internal void OnMoneyLimitDeleteCall(MoneyLimitDelete mLimitDel)
+        public void OnMoneyLimitDelete(MoneyLimitDelete mLimitDel)
         {
-            OnMoneyLimitDelete?.Invoke(mLimitDel);
+            MoneyLimitDelete?.Invoke(mLimitDel);
         }
 
-        public event EventHandler OnNegDeal;
+        public event EventHandler NegDeal;
 
-        public event EventHandler OnNegTrade;
+        public event EventHandler NegTrade;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении заявки или изменении параметров существующей заявки.
         /// </summary>
-        public event OrderHandler OnOrder;
+        public event OrderHandler Order;
 
-        internal void OnOrderCall(Order order)
+        public void OnOrder(Order order)
         {
-            OnOrder?.Invoke(order);
+            Order?.Invoke(order);
             // invoke event specific for the transaction
             string correlationId = order.TransID.ToString();
 
@@ -228,7 +231,7 @@ namespace QuikSharp.QuikEvents
             {
                 lock (tr)
                 {
-                    tr.OnOrderCall(order);
+                    tr.OnOrder(order);
                 }
             }
 
@@ -238,42 +241,42 @@ namespace QuikSharp.QuikEvents
         /// <summary>
         /// Функция вызывается терминалом QUIK при при изменении текущих параметров.
         /// </summary>
-        public event ParamHandler OnParam;
+        public event ParamHandler Param;
 
-        internal void OnParamCall(Param par)
+        public void OnParam(Param par)
         {
-            OnParam?.Invoke(par);
+            Param?.Invoke(par);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменения стакана котировок.
         /// </summary>
-        public event QuoteHandler OnQuote;
+        public event QuoteHandler Quote;
 
-        internal void OnQuoteCall(OrderBook orderBook)
+        public void OnQuote(OrderBook orderBook)
         {
-            OnQuote?.Invoke(orderBook);
+            Quote?.Invoke(orderBook);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при остановке скрипта из диалога управления и при закрытии терминала QUIK.
         /// </summary>
-        public event StopHandler OnStop;
+        public event StopHandler Stop;
 
-        internal void OnStopCall(int signal)
+        public void OnStop(int signal)
         {
-            OnStop?.Invoke(signal);
+            Stop?.Invoke(signal);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении новой стоп-заявки или при изменении параметров существующей стоп-заявки.
         /// </summary>
-        public event StopOrderHandler OnStopOrder;
+        public event StopOrderHandler StopOrder;
 
-        internal void OnStopOrderCall(StopOrder stopOrder)
+        public void OnStopOrder(StopOrder stopOrder)
         {
             //if (OnStopOrder != null) OnStopOrder(stopOrder);
-            OnStopOrder?.Invoke(stopOrder);
+            StopOrder?.Invoke(stopOrder);
             // invoke event specific for the transaction
             string correlationId = stopOrder.TransId.ToString();
 
@@ -299,7 +302,7 @@ namespace QuikSharp.QuikEvents
             {
                 lock (tr)
                 {
-                    tr.OnStopOrderCall(stopOrder);
+                    tr.OnStopOrder(stopOrder);
                 }
             }
 
@@ -309,11 +312,11 @@ namespace QuikSharp.QuikEvents
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении сделки.
         /// </summary>
-        public event TradeHandler OnTrade;
+        public event TradeHandler Trade;
 
-        internal void OnTradeCall(Trade trade)
+        public void OnTrade(Trade trade)
         {
-            OnTrade?.Invoke(trade);
+            Trade?.Invoke(trade);
             // invoke event specific for the transaction
             string correlationId = trade.Comment;
 
@@ -345,7 +348,7 @@ namespace QuikSharp.QuikEvents
             {
                 lock (tr)
                 {
-                    tr.OnTradeCall(trade);
+                    tr.OnTrade(trade);
                     // persist transaction with added trade
                     _persistentStorage.Set(correlationId, tr);
                 }
@@ -358,11 +361,11 @@ namespace QuikSharp.QuikEvents
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении ответа на транзакцию пользователя.
         /// </summary>
-        public event TransReplyHandler OnTransReply;
+        public event TransReplyHandler TransReply;
 
-        internal void OnTransReplyCall(TransactionReply reply)
+        public void OnTransReply(TransactionReply reply)
         {
-            OnTransReply?.Invoke(reply);
+            TransReply?.Invoke(reply);
 
             // invoke event specific for the transaction
             if (string.IsNullOrEmpty(reply.Comment)) //"Initialization user successful" transaction doesn't contain comment
@@ -373,7 +376,7 @@ namespace QuikSharp.QuikEvents
                 var tr = _persistentStorage.Get<Transaction>(reply.Comment);
                 lock (tr)
                 {
-                    tr.OnTransReplyCall(reply);
+                    tr.OnTransReply(reply);
                 }
             }
             else
@@ -388,7 +391,7 @@ namespace QuikSharp.QuikEvents
         /// </summary>
         public event CandleHandler NewCandle;
 
-        internal void RaiseNewCandleEvent(Candle candle)
+        public void OnNewCandle(Candle candle)
         {
             NewCandle?.Invoke(candle);
         }

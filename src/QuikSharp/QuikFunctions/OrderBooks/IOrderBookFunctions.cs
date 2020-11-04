@@ -9,7 +9,7 @@ namespace QuikSharp.QuickFunctions.OrderBooks
     /// <summary>
     /// Функции для работы со стаканом котировок
     /// </summary>
-    public interface IOrderBookFunctions : IQuikService
+    public interface IOrderBookFunctions
     {
         /// <summary>
         /// Функция заказывает на сервер получение стакана по указанному классу и бумаге.

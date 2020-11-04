@@ -28,8 +28,8 @@ namespace QuikSharp.QuickFunctions.Candles
         /// <returns></returns>
         public async Task<int> GetNumCandles(string graphicTag)
         {
-            var message = new Message<string>(graphicTag, "get_num_candles");
-            Message<int> response = await _quikService.Send<Message<int>>(message).ConfigureAwait(false);
+            var message = new Request<string>(graphicTag, "get_num_candles");
+            Message<int> response = await _quikService.Send<Response<int>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -53,8 +53,8 @@ namespace QuikSharp.QuickFunctions.Candles
         /// <returns></returns>
         public async Task<List<Candle>> GetCandles(string graphicTag, int line, int first, int count)
         {
-            var message = new Message<string>(graphicTag + "|" + line + "|" + first + "|" + count, "get_candles");
-            Message<List<Candle>> response = await _quikService.Send<Message<List<Candle>>>(message).ConfigureAwait(false);
+            var message = new Request<string>(graphicTag + "|" + line + "|" + first + "|" + count, "get_candles");
+            var response = await _quikService.Send<Response<List<Candle>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -81,8 +81,8 @@ namespace QuikSharp.QuickFunctions.Candles
         /// <returns>Список свечей.</returns>
         public async Task<List<Candle>> GetLastCandles(string classCode, string securityCode, CandleInterval interval, int count)
         {
-            var message = new Message<string>(classCode + "|" + securityCode + "|" + (int) interval + "|" + count, "get_candles_from_data_source");
-            Message<List<Candle>> response = await _quikService.Send<Message<List<Candle>>>(message).ConfigureAwait(false);
+            var message = new Request<string>(classCode + "|" + securityCode + "|" + (int) interval + "|" + count, "get_candles_from_data_source");
+            Message<List<Candle>> response = await _quikService.Send<Response<List<Candle>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -94,8 +94,8 @@ namespace QuikSharp.QuickFunctions.Candles
         /// <param name="interval">интервал свечей (тайм-фрейм).</param>
         public async Task Subscribe(string classCode, string securityCode, CandleInterval interval)
         {
-            var message = new Message<string>(classCode + "|" + securityCode + "|" + (int) interval, "subscribe_to_candles");
-            await _quikService.Send<Message<string>>(message).ConfigureAwait(false);
+            var message = new Request<string>(classCode + "|" + securityCode + "|" + (int) interval, "subscribe_to_candles");
+            await _quikService.Send<Response<string>>(message).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -106,8 +106,8 @@ namespace QuikSharp.QuickFunctions.Candles
         /// <param name="interval">интервал свечей (тайм-фрейм).</param>
         public async Task Unsubscribe(string classCode, string securityCode, CandleInterval interval)
         {
-            var message = new Message<string>(classCode + "|" + securityCode + "|" + (int) interval, "unsubscribe_from_candles");
-            await _quikService.Send<Message<string>>(message).ConfigureAwait(false);
+            var message = new Request<string>(classCode + "|" + securityCode + "|" + (int) interval, "unsubscribe_from_candles");
+            await _quikService.Send<Response<string>>(message).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -118,8 +118,8 @@ namespace QuikSharp.QuickFunctions.Candles
         /// <param name="interval">интервал свечей (тайм-фрейм).</param>
         public async Task<bool> IsSubscribed(string classCode, string securityCode, CandleInterval interval)
         {
-            var message = new Message<string>(classCode + "|" + securityCode + "|" + (int) interval, "is_subscribed");
-            Message<bool> response = await _quikService.Send<Message<bool>>(message).ConfigureAwait(false);
+            var message = new Request<string>(classCode + "|" + securityCode + "|" + (int) interval, "is_subscribed");
+            Message<bool> response = await _quikService.Send<Response<bool>>(message).ConfigureAwait(false);
             return response.Data;
         }
     }

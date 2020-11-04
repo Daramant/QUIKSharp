@@ -24,8 +24,8 @@ namespace QuikSharp.QuickFunctions.Classes
 
         public async Task<string[]> GetClassesList()
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>("", "getClassesList"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>("", "getClassesList"))).ConfigureAwait(false);
             return response.Data == null
                 ? new string[0]
                 : response.Data.TrimEnd(',').Split(new[] {","}, StringSplitOptions.None);
@@ -33,15 +33,15 @@ namespace QuikSharp.QuickFunctions.Classes
 
         public async Task<ClassInfo> GetClassInfo(string classID)
         {
-            var response = await _quikService.Send<Message<ClassInfo>>(
-                (new Message<string>(classID, "getClassInfo"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<ClassInfo>>(
+                (new Request<string>(classID, "getClassInfo"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<SecurityInfo> GetSecurityInfo(string classCode, string secCode)
         {
-            var response = await _quikService.Send<Message<SecurityInfo>>(
-                (new Message<string>(classCode + "|" + secCode, "getSecurityInfo"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<SecurityInfo>>(
+                (new Request<string>(classCode + "|" + secCode, "getSecurityInfo"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -52,8 +52,8 @@ namespace QuikSharp.QuickFunctions.Classes
 
         public async Task<string[]> GetClassSecurities(string classID)
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>(classID, "getClassSecurities"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>(classID, "getClassSecurities"))).ConfigureAwait(false);
             return response.Data == null
                 ? new string[0]
                 : response.Data.TrimEnd(',').Split(new[] {","}, StringSplitOptions.None);
@@ -61,29 +61,29 @@ namespace QuikSharp.QuickFunctions.Classes
 
         public async Task<string> GetSecurityClass(string classesList, string secCode)
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>(classesList + "|" + secCode, "getSecurityClass"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>(classesList + "|" + secCode, "getSecurityClass"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<string> GetClientCode()
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>("", "getClientCode"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>("", "getClientCode"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<string> GetTradeAccount(string classCode)
         {
-            var response = await _quikService.Send<Message<string>>(
-                (new Message<string>(classCode, "getTradeAccount"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<string>>(
+                (new Request<string>(classCode, "getTradeAccount"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<List<TradesAccounts>> GetTradeAccounts()
         {
-            var response = await _quikService.Send<Message<List<TradesAccounts>>>(
-                (new Message<string>("", "getTradeAccounts"))).ConfigureAwait(false);
+            var response = await _quikService.Send<Response<List<TradesAccounts>>>(
+                (new Request<string>("", "getTradeAccounts"))).ConfigureAwait(false);
             return response.Data;
         }
     }
