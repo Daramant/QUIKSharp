@@ -107,7 +107,7 @@ namespace QuikSharp.QuikService
         /// <summary>
         /// If received message has a correlation id then use its Data to SetResult on TCS and remove the TCS from the dic
         /// </summary>
-        private readonly ConcurrentDictionary<long, PendingResponse> PendingResponses = new ConcurrentDictionary<long, PendingResponse>();
+        internal readonly ConcurrentDictionary<long, PendingResponse> PendingResponses = new ConcurrentDictionary<long, PendingResponse>();
 
         /// <summary>
         ///
@@ -731,7 +731,7 @@ namespace QuikSharp.QuikService
         /// <summary>
         /// Get or Generate unique transaction ID for function SendTransaction()
         /// </summary>
-        internal int GetUniqueTransactionId()
+        public int GetUniqueTransactionId()
         {
             if (mmf == null || accessor == null)
             {

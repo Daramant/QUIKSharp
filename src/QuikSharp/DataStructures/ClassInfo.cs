@@ -41,12 +41,5 @@ namespace QuikSharp.DataStructures
         /// </summary>
         [JsonProperty("nsecs")]
         public int NSecs { get; set; }
-
-        // ReSharper restore InconsistentNaming
-
-        public override string ToString()
-        {
-            return this.ToJson();
-        }
     }
 }

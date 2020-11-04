@@ -6,7 +6,7 @@ using System.Text;
 
 namespace QuikSharp.Json.Converters
 {
-    internal abstract class JsonCreationConverter<T> : JsonConverter
+    public abstract class JsonCreationConverter<T> : JsonConverter
     {
         /// <summary>
         /// Create an instance of objectType, based properties in the JSON object

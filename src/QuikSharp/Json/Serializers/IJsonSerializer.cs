@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,5 +21,7 @@ namespace QuikSharp.Json.Serializers
         ///
         /// </summary>
         string Serialize<T>(T obj);
+
+        void AddConverter(JsonConverter jsonConverter);
     }
 }

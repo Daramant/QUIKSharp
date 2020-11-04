@@ -5,7 +5,7 @@ using QuikSharp.DataStructures.Transaction;
 namespace QuikSharp.Tests
 {
     [TestFixture]
-    public class OrderFunctionsTest : BaseTest
+    public class OrderFunctionsTests : BaseTest
     {
         [SetUp]
         public void SetUp()

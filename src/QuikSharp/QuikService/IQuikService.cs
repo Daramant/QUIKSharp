@@ -13,5 +13,7 @@ namespace QuikSharp.QuikService
 
         Task<TResponse> Send<TResponse>(IRequest request, int timeout = 0)
             where TResponse : class, IResponse, new();
+
+        int GetUniqueTransactionId();
     }
 }

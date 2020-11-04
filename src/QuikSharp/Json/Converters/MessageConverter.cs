@@ -3,6 +3,7 @@ using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Exceptions;
 using QuikSharp.Messages;
+using QuikSharp.QuikService;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Json.Converters
 {
-    internal class MessageConverter : JsonCreationConverter<IMessage>
+    public class MessageConverter : JsonCreationConverter<IMessage>
     {
-        private QuikService _service;
+        private QuikService.QuikService _service; // TODO: Убрать использование.
 
-        public MessageConverter(QuikService service)
+        public MessageConverter(QuikService.QuikService service)
         {
             _service = service;
         }
@@ -28,31 +29,29 @@ namespace QuikSharp.Json.Converters
                 var id = jObject.GetValue("id").Value<long>();
                 var cmd = jObject.GetValue("cmd").Value<string>();
                 var message = jObject.GetValue("lua_error").Value<string>();
-                LuaException exn;
+                LuaException exception;
                 switch (cmd)
                 {
                     case "lua_transaction_error":
-                        exn = new TransactionException(message);
+                        exception = new TransactionException(message);
                         break;
 
                     default:
-                        exn = new LuaException(message);
+                        exception = new LuaException(message);
                         break;
                 }
 
-                KeyValuePair<TaskCompletionSource<IMessage>, Type> kvp;
-                _service.Responses.TryRemove(id, out kvp);
-                var tcs = kvp.Key;
-                tcs.SetException(exn);
+                _service.PendingResponses.TryRemove(id, out var pendingResponse);
+                pendingResponse.TaskCompletionSource.SetException(exception);
                 // terminate listener task that was processing this task
-                throw exn;
+                throw exception;
             }
             else if (FieldExists("id", jObject))
             {
                 // Если есть id, значит пришел ответ на запрос (IRespose).
                 var id = jObject.GetValue("id").Value<long>();
-                objectType = _service.Responses[id].Value;
-                return (IMessage)Activator.CreateInstance(objectType);
+                objectType = _service.PendingResponses[id].ResponseType;
+                return (IResponse)Activator.CreateInstance(objectType);
             }
             else if (FieldExists("cmd", jObject))
             {

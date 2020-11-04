@@ -21,11 +21,11 @@ namespace QuikSharp.DataStructures.Transaction
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении ответа на транзакцию пользователя.
         /// </summary>
-        public event TransReplyHandler OnTransReply;
+        public event TransReplyHandler TransReply;
 
-        internal void OnTransReplyCall(TransactionReply reply)
+        internal void OnTransReply(TransactionReply reply)
         {
-            OnTransReply?.Invoke(reply);
+            TransReply?.Invoke(reply);
             // this should happen only once per transaction id
             Trace.Assert(TransactionReply == null);
             TransactionReply = reply;
@@ -39,11 +39,11 @@ namespace QuikSharp.DataStructures.Transaction
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении новой заявки или при изменении параметров существующей заявки.
         /// </summary>
-        public event OrderHandler OnOrder;
+        public event OrderHandler Order;
 
-        internal void OnOrderCall(Order order)
+        internal void OnOrder(Order order)
         {
-            OnOrder?.Invoke(order);
+            Order?.Invoke(order);
             if (Orders == null)
             {
                 Orders = new List<Order>();
@@ -55,11 +55,11 @@ namespace QuikSharp.DataStructures.Transaction
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении новой стоп-заявки или при изменении параметров существующей стоп-заявки.
         /// </summary>
-        public event StopOrderHandler OnStopOrder;
+        public event StopOrderHandler StopOrder;
 
-        internal void OnStopOrderCall(StopOrder stopOrder)
+        internal void OnStopOrder(StopOrder stopOrder)
         {
-            OnStopOrder?.Invoke(stopOrder);
+            StopOrder?.Invoke(stopOrder);
             if (StopOrders == null)
             {
                 StopOrders = new List<StopOrder>();
@@ -81,11 +81,11 @@ namespace QuikSharp.DataStructures.Transaction
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении сделки.
         /// </summary>
-        public event TradeHandler OnTrade;
+        public event TradeHandler Trade;
 
-        internal void OnTradeCall(Trade trade)
+        internal void OnTrade(Trade trade)
         {
-            OnTrade?.Invoke(trade);
+            Trade?.Invoke(trade);
             if (Trades == null)
             {
                 Trades = new List<Trade>();

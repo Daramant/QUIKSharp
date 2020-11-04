@@ -7,7 +7,7 @@ using QuikSharp.DataStructures;
 namespace QuikSharp.Tests
 {
 	[TestFixture]
-	public class TradingFunctionsTest : BaseTest
+	public class TradingFunctionsTests : BaseTest
 	{
 		[SetUp]
 		public void SetUp()

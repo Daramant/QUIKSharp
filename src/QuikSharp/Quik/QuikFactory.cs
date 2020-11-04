@@ -1,4 +1,5 @@
-﻿using QuikSharp.Json.Serializers;
+﻿using QuikSharp.Json.Converters;
+using QuikSharp.Json.Serializers;
 using QuikSharp.PersistentStorages;
 using QuikSharp.QuikFunctions.Candles;
 using QuikSharp.QuikFunctions.Classes;
@@ -25,6 +26,8 @@ namespace QuikSharp.Quik
             var quikEvents = new QuikEvents.QuikEvents(persistentStorage);
             var quikService = new QuikService.QuikService(quikEvents, jsonSerializer, options);
             var tradingFunctions = new TradingFunctions(quikService, persistentStorage);
+
+            jsonSerializer.AddConverter(new MessageConverter(quikService));
 
             return new Quik(
                 quikService,

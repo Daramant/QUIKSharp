@@ -37,7 +37,7 @@ namespace QuikSharp.Tests
     }
 
     [TestFixture]
-    public class TransactionSpecTest : BaseTest
+    public class TransactionSpecTests : BaseTest
     {
         [SetUp]
         public void SetUp()

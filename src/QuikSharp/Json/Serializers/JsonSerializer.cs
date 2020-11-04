@@ -15,6 +15,8 @@ namespace QuikSharp.Json.Serializers
         [ThreadStatic]
         private static StringBuilder _stringBuilder;
 
+        public QuikService.QuikService QuikService { get; set; } // TODO: Убрать.
+
         public JsonSerializer()
         {
             _serializer = new Newtonsoft.Json.JsonSerializer
@@ -23,7 +25,12 @@ namespace QuikSharp.Json.Serializers
                 NullValueHandling = NullValueHandling.Ignore
             };
 
-            _serializer.Converters.Add(new RequestConverter(service));
+            //_serializer.Converters.Add(new MessageConverter(quikService));
+        }
+
+        public void AddConverter(JsonConverter jsonConverter)
+        {
+            _serializer.Converters.Add(jsonConverter);
         }
 
         /// <inheritdoc />

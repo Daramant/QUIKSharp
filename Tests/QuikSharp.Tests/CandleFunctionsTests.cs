@@ -8,7 +8,7 @@ using QuikSharp.DataStructures;
 namespace QuikSharp.Tests
 {
     [TestFixture]
-    public class CandleFunctionsTest : BaseTest
+    public class CandleFunctionsTests : BaseTest
     {
         [SetUp]
         public void SetUp()

@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace QuikSharp.Tests
 {
     [TestFixture]
-    public class OrderBookFunctionsTest : BaseTest
+    public class OrderBookFunctionsTests : BaseTest
     {
         [SetUp]
         public void SetUp()

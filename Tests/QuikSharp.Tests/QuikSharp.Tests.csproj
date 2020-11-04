@@ -55,15 +55,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseTest.cs" />
-    <Compile Include="CandleFunctionsTest.cs" />
-    <Compile Include="OrderBookFunctionsTest.cs" />
-    <Compile Include="ClassFunctionsTest.cs" />
-    <Compile Include="OrderFunctionsTest.cs" />
-    <Compile Include="Ping.cs" />
+    <Compile Include="CandleFunctionsTests.cs" />
+    <Compile Include="OrderBookFunctionsTests.cs" />
+    <Compile Include="ClassFunctionsTests.cs" />
+    <Compile Include="OrderFunctionsTests.cs" />
+    <Compile Include="PingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceFuncitonsTest.cs" />
-    <Compile Include="TradingFunctionsTest.cs" />
-    <Compile Include="TransactionSpecTest.cs" />
+    <Compile Include="ServiceFuncitonsTests.cs" />
+    <Compile Include="TradingFunctionsTests.cs" />
+    <Compile Include="TransactionSpecTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

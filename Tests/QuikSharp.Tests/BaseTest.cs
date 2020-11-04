@@ -1,4 +1,5 @@
-﻿using QuikSharp.Json.Serializers;
+﻿using QuikSharp.Json.Converters;
+using QuikSharp.Json.Serializers;
 using QuikSharp.Quik;
 using QuikSharp.QuikService;
 using System;
@@ -27,6 +28,8 @@ namespace QuikSharp.Tests
             Quik.Service.Start();
 
             JsonSerializer = new JsonSerializer();
+
+            JsonSerializer.AddConverter(new MessageConverter((QuikService.QuikService)Quik.Service));
         }
     }
 }

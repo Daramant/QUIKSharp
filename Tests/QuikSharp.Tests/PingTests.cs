@@ -6,28 +6,31 @@ using NUnit.Framework;
 namespace QuikSharp.Tests
 {
     [TestFixture]
-    public class Ping
+    public class PingTests : BaseTest
     {
-        readonly DebugFunctions _df = new DebugFunctions(Quik.DefaultPort, Quik.DefaultHost);
+        [SetUp]
+        public void SetUp()
+        {
+            SetUpQuik();
+        }
 
         [Test]
         public void PingWorks()
         {
-            var df = new DebugFunctions(Quik.DefaultPort, Quik.DefaultHost);
-            var pong = df.Ping().Result;
+            var pong = Quik.Functions.Debug.Ping().Result;
         }
 
         [Test]
         public void EchoWorks()
         {
-            var echo = _df.Echo("echo").Result;
+            var echo = Quik.Functions.Debug.Echo("echo").Result;
             Assert.AreEqual("echo", echo);
         }
 
         [Test]
         public void IsQuik()
         {
-            Console.WriteLine(_df.IsQuik().Result);
+            Console.WriteLine(Quik.Functions.Debug.IsQuik().Result);
         }
 
         /// <summary>
@@ -38,7 +41,7 @@ namespace QuikSharp.Tests
         {
             Assert.Throws<AggregateException>(() =>
             {
-                var x = _df.DivideStringByZero().Result;
+                var x = Quik.Functions.Debug.DivideStringByZero().Result;
             });
         }
 
@@ -73,7 +76,7 @@ namespace QuikSharp.Tests
 				 }*/
 
                 for (var i = 0; i < count; i++)
-                    _df.Ping().Wait();
+                    Quik.Functions.Debug.Ping().Wait();
 
                 sw.Stop();
                 Console.WriteLine("MultiPing takes msecs: " + sw.ElapsedMilliseconds);
@@ -93,7 +96,7 @@ namespace QuikSharp.Tests
                 var count = 10000;
                 var array = new Task<string>[count];
                 for (int i = 0; i < array.Length; i++)
-                    array[i] = _df.Ping();
+                    array[i] = Quik.Functions.Debug.Ping();
 
                 // Чудесным образом данная конструкция работает чуточку быстрей (на 10% где то) чем _df.Ping ().Wait (); в функции MultiPing
                 await Task.WhenAll(array);
@@ -123,7 +126,7 @@ namespace QuikSharp.Tests
                 var array = new Task<string>[count];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = _df.Ping();
+                    array[i] = Quik.Functions.Debug.Ping();
                 }
                 for (int i = 0; i < array.Length; i++)
                 {
