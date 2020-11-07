@@ -20,46 +20,46 @@ namespace QuikSharp.QuikFunctions.OrderBooks
             _quikService = quikService;
         }
 
-        public async Task<bool> Subscribe(ISecurity security)
+        public async Task<bool> SubscribeAsync(ISecurity security)
         {
-            return await Subscribe(security.ClassCode, security.SecCode).ConfigureAwait(false);
+            return await SubscribeAsync(security.ClassCode, security.SecCode).ConfigureAwait(false);
         }
 
-        public async Task<bool> Subscribe(string class_code, string sec_code)
+        public async Task<bool> SubscribeAsync(string class_code, string sec_code)
         {
-            var response = await _quikService.Send<Response<bool>>(
-                (new Request<string>(class_code + "|" + sec_code, "Subscribe_Level_II_Quotes"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<bool>>(
+                (new Command<string>(class_code + "|" + sec_code, "Subscribe_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<bool> Unsubscribe(ISecurity security)
+        public async Task<bool> UnsubscribeAsync(ISecurity security)
         {
-            return await Unsubscribe(security.ClassCode, security.SecCode).ConfigureAwait(false);
+            return await UnsubscribeAsync(security.ClassCode, security.SecCode).ConfigureAwait(false);
         }
 
-        public async Task<bool> Unsubscribe(string class_code, string sec_code)
+        public async Task<bool> UnsubscribeAsync(string class_code, string sec_code)
         {
-            var response = await _quikService.Send<Response<bool>>(
-                (new Request<string>(class_code + "|" + sec_code, "Unsubscribe_Level_II_Quotes"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<bool>>(
+                (new Command<string>(class_code + "|" + sec_code, "Unsubscribe_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<bool> IsSubscribed(ISecurity security)
+        public async Task<bool> IsSubscribedAsync(ISecurity security)
         {
-            return await IsSubscribed(security.ClassCode, security.SecCode).ConfigureAwait(false);
+            return await IsSubscribedAsync(security.ClassCode, security.SecCode).ConfigureAwait(false);
         }
 
-        public async Task<bool> IsSubscribed(string class_code, string sec_code)
+        public async Task<bool> IsSubscribedAsync(string class_code, string sec_code)
         {
-            var response = await _quikService.Send<Response<bool>>(
-                (new Request<string>(class_code + "|" + sec_code, "IsSubscribed_Level_II_Quotes"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<bool>>(
+                (new Command<string>(class_code + "|" + sec_code, "IsSubscribed_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<OrderBook> GetQuoteLevel2(string class_code, string sec_code)
+        public async Task<OrderBook> GetQuoteLevel2Async(string class_code, string sec_code)
         {
-            var response = await _quikService.Send<Response<OrderBook>>(
-                (new Request<string>(class_code + "|" + sec_code, "GetQuoteLevel2"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<OrderBook>>(
+                (new Command<string>(class_code + "|" + sec_code, "GetQuoteLevel2"))).ConfigureAwait(false);
             return response.Data;
         }
     }

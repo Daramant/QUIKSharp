@@ -19,19 +19,19 @@ namespace QuikSharp.Tests
         [Test]
         public void IsConencted()
         {
-            Console.WriteLine("IsConnected? : " + Quik.Functions.Service.IsConnected().Result);
+            Console.WriteLine("IsConnected? : " + Quik.Functions.Service.IsConnectedAsync().Result);
         }
 
         [Test]
         public void GetWorkingFolder()
         {
-            Console.WriteLine("GetWorkingFolder: " + Quik.Functions.Service.GetWorkingFolder().Result);
+            Console.WriteLine("GetWorkingFolder: " + Quik.Functions.Service.GetWorkingFolderAsync().Result);
         }
 
         [Test]
         public void GetScriptPath()
         {
-            Console.WriteLine("GetScriptPath: " + Quik.Functions.Service.GetScriptPath().Result);
+            Console.WriteLine("GetScriptPath: " + Quik.Functions.Service.GetScriptPathAsync().Result);
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace QuikSharp.Tests
             foreach (var value in values)
             {
                 Console.WriteLine(value
-                    + " : " + Quik.Functions.Service.GetInfoParam(value).Result);
+                    + " : " + Quik.Functions.Service.GetInfoParamAsync(value).Result);
             }
         }
 
@@ -49,24 +49,24 @@ namespace QuikSharp.Tests
         public void Message()
         {
             Console.WriteLine("This is a message: " +
-                Quik.Functions.Service.Message("This is a message", NotificationType.Info).Result);
+                Quik.Functions.Service.MessageAsync("This is a message", NotificationType.Info).Result);
             Console.WriteLine("This is a warning: " +
-                Quik.Functions.Service.Message("This is a warning", NotificationType.Warning).Result);
+                Quik.Functions.Service.MessageAsync("This is a warning", NotificationType.Warning).Result);
             Console.WriteLine("This is an error: " +
-                Quik.Functions.Service.Message("This is an error", NotificationType.Error).Result);
+                Quik.Functions.Service.MessageAsync("This is an error", NotificationType.Error).Result);
         }
 
         [Test]
         public void PrintDbgStr()
         {
             Console.WriteLine("Debug: " +
-                Quik.Functions.Service.PrintDbgStr("This is debug info").Result);
+                Quik.Functions.Service.PrintDbgStrAsync("This is debug info").Result);
         }
 
         [Test]
         public void AddLabel()
         {
-            var res = Quik.Functions.Service.AddLabel(61000, "20170105", "100000", "1", "C:\\ClassesC\\Labels\\buy.bmp", "si", "BOTTOM", 0);
+            var res = Quik.Functions.Service.AddLabelAsync(61000, "20170105", "100000", "1", "C:\\ClassesC\\Labels\\buy.bmp", "si", "BOTTOM", 0);
             Console.WriteLine("AddLabel: "
                     + String.Join(",", Convert.ToString(res.Result)));
         }
@@ -75,7 +75,7 @@ namespace QuikSharp.Tests
         public void DelLabel()
         {
             double tagId = 13;
-            var res = Quik.Functions.Service.DelLabel("si", tagId);
+            var res = Quik.Functions.Service.DelLabelAsync("si", tagId);
 
             Console.WriteLine("delLabel: "
                     + String.Join(",", Convert.ToString(res.Result)));
@@ -84,7 +84,7 @@ namespace QuikSharp.Tests
         [Test]
         public void DelAllLabels()
         {
-            var res = Quik.Functions.Service.DelAllLabels("si").Result;
+            var res = Quik.Functions.Service.DelAllLabelsAsync("si").Result;
 
             Console.WriteLine("delAllLabels: "
                   + String.Join(",", Convert.ToString(res)));

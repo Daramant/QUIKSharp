@@ -16,48 +16,48 @@ namespace QuikSharp.QuikFunctions.Classes
         /// Функция предназначена для получения списка кодов классов, переданных с сервера в ходе сеанса связи.
         /// </summary>
         /// <returns></returns>
-        Task<string[]> GetClassesList();
+        Task<string[]> GetClassesListAsync();
 
         /// <summary>
         /// Функция предназначена для получения информации о классе.
         /// </summary>
         /// <param name="classID"></param>
-        Task<ClassInfo> GetClassInfo(string classID);
+        Task<ClassInfo> GetClassInfoAsync(string classID);
 
         /// <summary>
         /// Функция предназначена для получения информации по бумаге.
         /// </summary>
-        Task<SecurityInfo> GetSecurityInfo(string classCode, string secCode);
+        Task<SecurityInfo> GetSecurityInfoAsync(string classCode, string secCode);
 
         /// <summary>
         /// Функция предназначена для получения информации по бумаге.
         /// </summary>
-        Task<SecurityInfo> GetSecurityInfo(ISecurity security);
+        Task<SecurityInfo> GetSecurityInfoAsync(ISecurity security);
 
         /// <summary>
         /// Функция предназначена для получения списка кодов бумаг для списка классов, заданного списком кодов.
         /// </summary>
-        Task<string[]> GetClassSecurities(string classID);
+        Task<string[]> GetClassSecuritiesAsync(string classID);
 
         /// <summary>
         /// Функция предназначена для определения класса по коду инструмента из заданного списка классов.
         /// </summary>
-        Task<string> GetSecurityClass(string classesList, string secCode);
+        Task<string> GetSecurityClassAsync(string classesList, string secCode);
 
         /// <summary>
         /// Функция возвращает код клиента.
         /// </summary>
-        Task<string> GetClientCode();
+        Task<string> GetClientCodeAsync();
 
         /// <summary>
         /// Функция возвращает таблицу с описанием торгового счета для запрашиваемого кода класса.
         /// </summary>
-        Task<string> GetTradeAccount(string classCode);
+        Task<string> GetTradeAccountAsync(string classCode);
 
         /// <summary>
         /// Функция возвращает таблицу всех счетов в торговой системе.
         /// </summary>
         /// <returns></returns>
-        Task<List<TradesAccounts>> GetTradeAccounts();
+        Task<List<TradesAccounts>> GetTradeAccountsAsync();
     }
 }

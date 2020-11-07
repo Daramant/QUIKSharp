@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QuikSharp.Messages
 {
-    public interface IRequest: IMessage
+    public interface ICommand: IMessage
     {
         /// <summary>
         /// Unique correlation id to match requests and responses
@@ -22,7 +22,7 @@ namespace QuikSharp.Messages
         DateTime? ValidUntil { get; set; }
     }
 
-    public interface IRequest<T> : IMessage<T>, IRequest
+    public interface ICommand<T> : IMessage<T>, ICommand
     {
     }
 }

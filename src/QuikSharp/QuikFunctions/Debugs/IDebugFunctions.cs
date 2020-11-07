@@ -15,17 +15,17 @@ namespace QuikSharp.QuikFunctions.Debugs
         /// <param name="msg"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<T> Echo<T>(T msg);
+        Task<T> EchoAsync<T>(T msg);
 
         /// <summary>
         /// This method returns LuaException and demonstrates how Lua errors are caught
         /// </summary>
         /// <returns></returns>
-        Task<string> DivideStringByZero();
+        Task<string> DivideStringByZeroAsync();
 
         /// <summary>
         /// Check if running inside Quik
         /// </summary>
-        Task<bool> IsQuik();
+        Task<bool> IsQuikAsync();
     }
 }

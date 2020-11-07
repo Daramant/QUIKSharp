@@ -14,36 +14,36 @@ namespace QuikSharp.QuikFunctions.OrderBooks
         /// <summary>
         /// Функция заказывает на сервер получение стакана по указанному классу и бумаге.
         /// </summary>
-        Task<bool> Subscribe(string class_code, string sec_code);
+        Task<bool> SubscribeAsync(string class_code, string sec_code);
 
         /// <summary>
         /// Функция заказывает на сервер получение стакана
         /// </summary>
-        Task<bool> Subscribe(ISecurity security);
+        Task<bool> SubscribeAsync(ISecurity security);
 
         /// <summary>
         /// Функция отменяет заказ на получение с сервера стакана по указанному классу и бумаге.
         /// </summary>
-        Task<bool> Unsubscribe(string class_code, string sec_code);
+        Task<bool> UnsubscribeAsync(string class_code, string sec_code);
 
         /// <summary>
         /// Функция отменяет заказ на получение с сервера стакана
         /// </summary>
-        Task<bool> Unsubscribe(ISecurity security);
+        Task<bool> UnsubscribeAsync(ISecurity security);
 
         /// <summary>
         /// Функция позволяет узнать, заказан ли с сервера стакан по указанному классу и бумаге.
         /// </summary>
-        Task<bool> IsSubscribed(string class_code, string sec_code);
+        Task<bool> IsSubscribedAsync(string class_code, string sec_code);
 
         /// <summary>
         /// Функция позволяет узнать, заказан ли с сервера стакан
         /// </summary>
-        Task<bool> IsSubscribed(ISecurity security);
+        Task<bool> IsSubscribedAsync(ISecurity security);
 
         /// <summary>
         /// Функция предназначена для получения стакана по указанному классу и инструменту
         /// </summary>
-        Task<OrderBook> GetQuoteLevel2(string class_code, string sec_code);
+        Task<OrderBook> GetQuoteLevel2Async(string class_code, string sec_code);
     }
 }

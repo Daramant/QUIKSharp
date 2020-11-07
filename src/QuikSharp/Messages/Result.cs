@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuikSharp.Messages
 {
-    internal class Response<T>: Message<T>, IResponse<T>
+    internal class Result<T>: Message<T>, IResult<T>
     {
         /// <summary>
         /// Unique correlation id to match requests and responses
@@ -13,12 +13,12 @@ namespace QuikSharp.Messages
         [JsonProperty(PropertyName = "id")]
         public long Id { get; set; }
 
-        public Response()
+        public Result()
             : base()
         {
         }
 
-        public Response(T data)
+        public Result(T data)
             : base(data)
         {
         }

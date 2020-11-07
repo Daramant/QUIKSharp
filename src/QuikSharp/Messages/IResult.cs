@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QuikSharp.Messages
 {
-    public interface IResponse : IMessage
+    public interface IResult : IMessage
     {
         /// <summary>
         /// Unique correlation id to match requests and responses
@@ -12,7 +12,7 @@ namespace QuikSharp.Messages
         long Id { get; set; }
     }
 
-    public interface IResponse<T> : IMessage<T>, IResponse
+    public interface IResult<T> : IMessage<T>, IResult
     {
     }
 }

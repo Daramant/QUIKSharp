@@ -102,7 +102,7 @@ namespace QuikSharp.QuikService
         /// <summary>
         /// IQuickCalls functions enqueue a message and return a task from TCS
         /// </summary>
-        private readonly BlockingCollection<IRequest> RequestQueue = new BlockingCollection<IRequest>();
+        private readonly BlockingCollection<ICommand> RequestQueue = new BlockingCollection<ICommand>();
 
         /// <summary>
         /// If received message has a correlation id then use its Data to SetResult on TCS and remove the TCS from the dic
@@ -168,7 +168,7 @@ namespace QuikSharp.QuikService
                                 var writer = new StreamWriter(stream);
                                 while (!_cancellationTokenSource.IsCancellationRequested)
                                 {
-                                    IRequest request = null;
+                                    ICommand request = null;
                                     try
                                     {
                                         // BLOCKING
@@ -287,7 +287,7 @@ namespace QuikSharp.QuikService
                                         //Trace.WriteLine("Response:" + response);
                                         try
                                         {
-                                            var response = _jsonSerializer.Deserialize<IResponse>((string)serializedResponseObj);
+                                            var response = _jsonSerializer.Deserialize<IResult>((string)serializedResponseObj);
                                             Trace.Assert(response.Id > 0);
                                             // it is a response message
                                             if (!PendingResponses.ContainsKey(response.Id))
@@ -800,8 +800,8 @@ namespace QuikSharp.QuikService
         /// </summary>
         public TimeSpan DefaultSendTimeout { get; set; } = Timeout.InfiniteTimeSpan;
 
-        public async Task<TResponse> Send<TResponse>(IRequest request, int timeout = 0)
-            where TResponse : class, IResponse, new()
+        public async Task<TResponse> SendAsync<TResponse>(ICommand request, int timeout = 0)
+            where TResponse : class, IResult, new()
         {
             // use DefaultSendTimeout for default calls
             if (timeout == 0)
@@ -825,7 +825,7 @@ namespace QuikSharp.QuikService
                 await task.ConfigureAwait(false);
             }
 
-            var tcs = new TaskCompletionSource<IResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource<IResult>(TaskCreationOptions.RunContinuationsAsynchronously);
             var ctRegistration = default(CancellationTokenRegistration);
 
             request.Id = GetNewUniqueId();
@@ -845,7 +845,7 @@ namespace QuikSharp.QuikService
             PendingResponses[request.Id] = new PendingResponse(request, typeof(TResponse), tcs);
             // add to queue after responses dictionary
             RequestQueue.Add(request);
-            IResponse response;
+            IResult response;
 
             try
             {

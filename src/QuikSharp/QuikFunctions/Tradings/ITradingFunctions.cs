@@ -35,56 +35,56 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <summary>
         /// Функция для получения информации по бумажным лимитам
         /// </summary>
-        Task<DepoLimit> GetDepo(string clientCode, string firmId, string secCode, string account);
+        Task<DepoLimit> GetDepoAsync(string clientCode, string firmId, string secCode, string account);
 
         /// <summary>
         /// Функция для получения информации по бумажным лимитам указанного типа
         /// </summary>
-        Task<DepoLimitEx> GetDepoEx(string firmId, string clientCode, string secCode, string accID, int limitKind);
+        Task<DepoLimitEx> GetDepoExAsync(string firmId, string clientCode, string secCode, string accID, int limitKind);
 
         /// <summary>
         /// Возвращает список записей из таблицы 'Лимиты по бумагам'.
         /// </summary>
-        Task<List<DepoLimitEx>> GetDepoLimits();
+        Task<List<DepoLimitEx>> GetDepoLimitsAsync();
 
         /// <summary>
         /// Возвращает список записей из таблицы 'Лимиты по бумагам', отфильтрованных по коду инструмента.
         /// </summary>
         /// <param name="secCode">Код инструментаю</param>
         /// <returns></returns>
-        Task<List<DepoLimitEx>> GetDepoLimits(string secCode);
+        Task<List<DepoLimitEx>> GetDepoLimitsAsync(string secCode);
 
         /// <summary>
         /// Функция для получения информации по денежным лимитам
         /// </summary>
         ///
-        Task<MoneyLimit> GetMoney(string clientCode, string firmId, string tag, string currCode);
+        Task<MoneyLimit> GetMoneyAsync(string clientCode, string firmId, string tag, string currCode);
 
         /// <summary>
         ///  функция для получения информации по денежным лимитам указанного типа
         /// </summary>
-        Task<MoneyLimitEx> GetMoneyEx(string firmId, string clientCode, string tag, string currCode, int limitKind);
+        Task<MoneyLimitEx> GetMoneyExAsync(string firmId, string clientCode, string tag, string currCode, int limitKind);
 
         /// <summary>
         ///  функция для получения информации по денежным лимитам всех торговых счетов (кроме фьючерсных) и валют
         ///  Лучшее место для получения связки clientCode + firmid
         /// </summary>
-        Task<List<MoneyLimitEx>> GetMoneyLimits();
+        Task<List<MoneyLimitEx>> GetMoneyLimitsAsync();
 
         /// <summary>
         ///  функция для получения информации по фьючерсным лимитам
         /// </summary>
-        Task<FuturesLimits> GetFuturesLimit(string firmId, string accId, int limitType, string currCode);
+        Task<FuturesLimits> GetFuturesLimitAsync(string firmId, string accId, int limitType, string currCode);
 
         /// <summary>
         ///  функция для получения информации по фьючерсным лимитам всех клиентских счетов
         /// </summary>
-        Task<List<FuturesLimits>> GetFuturesClientLimits();
+        Task<List<FuturesLimits>> GetFuturesClientLimitsAsync();
 
         /// <summary>
         ///  функция для получения информации по фьючерсным позициям
         /// </summary>
-        Task<FuturesClientHolding> GetFuturesHolding(string firmId, string accId, string secCode, int posType);
+        Task<FuturesClientHolding> GetFuturesHoldingAsync(string firmId, string accId, string secCode, int posType);
 
         /// <summary>
         /// Функция получения доски опционов
@@ -92,7 +92,7 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="classCode"></param>
         /// <param name="secCode"></param>
         /// <returns></returns>
-        Task<List<OptionBoard>> GetOptionBoard(string classCode, string secCode);
+        Task<List<OptionBoard>> GetOptionBoardAsync(string classCode, string secCode);
 
         /// <summary>
         /// Функция заказывает получение параметров Таблицы текущих торгов
@@ -101,9 +101,9 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="secCode"></param>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        Task<bool> ParamRequest(string classCode, string secCode, string paramName);
+        Task<bool> ParamRequestAsync(string classCode, string secCode, string paramName);
 
-        Task<bool> ParamRequest(string classCode, string secCode, ParamName paramName);
+        Task<bool> ParamRequestAsync(string classCode, string secCode, ParamName paramName);
 
         /// <summary>
         /// Функция отменяет заказ на получение параметров Таблицы текущих торгов
@@ -112,9 +112,9 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="secCode"></param>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        Task<bool> CancelParamRequest(string classCode, string secCode, string paramName);
+        Task<bool> CancelParamRequestAsync(string classCode, string secCode, string paramName);
 
-        Task<bool> CancelParamRequest(string classCode, string secCode, ParamName paramName);
+        Task<bool> CancelParamRequestAsync(string classCode, string secCode, ParamName paramName);
 
         /// <summary>
         /// Функция для получения значений Таблицы текущих значений параметров
@@ -124,9 +124,9 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="paramName"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        Task<ParamTable> GetParamEx(string classCode, string secCode, string paramName, int timeout = Timeout.Infinite);
+        Task<ParamTable> GetParamExAsync(string classCode, string secCode, string paramName, int timeout = Timeout.Infinite);
 
-        Task<ParamTable> GetParamEx(string classCode, string secCode, ParamName paramName, int timeout = Timeout.Infinite);
+        Task<ParamTable> GetParamExAsync(string classCode, string secCode, ParamName paramName, int timeout = Timeout.Infinite);
 
         /// <summary>
         /// Функция для получения всех значений Таблицы текущих значений параметров
@@ -135,14 +135,14 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="secCode"></param>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        Task<ParamTable> GetParamEx2(string classCode, string secCode, string paramName);
+        Task<ParamTable> GetParamEx2Async(string classCode, string secCode, string paramName);
 
-        Task<ParamTable> GetParamEx2(string classCode, string secCode, ParamName paramName);
+        Task<ParamTable> GetParamEx2Async(string classCode, string secCode, ParamName paramName);
 
         /// <summary>
         /// функция для получения таблицы сделок по заданному инструменту
         /// </summary>
-        Task<List<Trade>> GetTrades();
+        Task<List<Trade>> GetTradesAsync();
 
         /// <summary>
         /// функция для получения таблицы сделок по заданному инструменту
@@ -150,14 +150,14 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="classCode"></param>
         /// <param name="secCode"></param>
         /// <returns></returns>
-        Task<List<Trade>> GetTrades(string classCode, string secCode);
+        Task<List<Trade>> GetTradesAsync(string classCode, string secCode);
 
         /// <summary>
         /// функция для получения таблицы сделок номеру заявки
         /// </summary>
         /// <param name="orderNum"></param>
         /// <returns></returns>
-        Task<List<Trade>> GetTrades_by_OdrerNumber(long orderNum);
+        Task<List<Trade>> GetTradesByOrderNumberAsync(long orderNum);
 
         ///// <summary>
         /////  функция для получения информации по инструменту
@@ -175,7 +175,7 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// умноженный на -1 (-trans_id) (негативное число) в случае ошибки. Также в случае
         /// ошибки функция созраняет текст ошибки в свойтво ErrorMessage транзакции.
         /// </summary>
-        Task<long> SendTransaction(Transaction transaction);
+        Task<long> SendTransactionAsync(Transaction transaction);
 
         ///// <summary>
         /////  функция для расчета максимально возможного количества лотов в заявке
@@ -184,14 +184,14 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <summary>
         ///  функция для получения значений параметров таблицы «Клиентский портфель»
         /// </summary>
-        Task<PortfolioInfo> GetPortfolioInfo(string firmId, string clientCode);
+        Task<PortfolioInfo> GetPortfolioInfoAsync(string firmId, string clientCode);
 
         /// <summary>
         ///  функция для получения значений параметров таблицы «Клиентский портфель» с учетом вида лимита
         ///  Для получения значений параметров таблицы «Клиентский портфель» для клиентов срочного рынка без единой денежной позиции
         ///  необходимо указать в качестве «clientCode» – торговый счет на срочном рынке, а в качестве «limitKind» – 0.
         /// </summary>
-        Task<PortfolioInfoEx> GetPortfolioInfoEx(string firmId, string clientCode, int limitKind);
+        Task<PortfolioInfoEx> GetPortfolioInfoExAsync(string firmId, string clientCode, int limitKind);
 
         ///// <summary>
         /////  функция для получения параметров таблицы «Купить/Продать»
@@ -208,7 +208,7 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="firmId"></param>
         /// <param name="clientCode"></param>
         /// <returns></returns>
-        Task<string> GetTrdAccByClientCode(string firmId, string clientCode);
+        Task<string> GetTrdAccByClientCodeAsync(string firmId, string clientCode);
 
         /// <summary>
         /// Функция возвращает код клиента фондового рынка с единой денежной позицией, соответствующий торговому счету срочного рынка
@@ -216,7 +216,7 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="firmId"></param>
         /// <param name="trdAccId"></param>
         /// <returns></returns>
-        Task<string> GetClientCodeByTrdAcc(string firmId, string trdAccId);
+        Task<string> GetClientCodeByTrdAccAsync(string firmId, string trdAccId);
 
         /// <summary>
         /// Функция предназначена для получения признака, указывающего имеет ли клиент единую денежную позицию
@@ -224,6 +224,6 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="firmId">идентификатор фирмы фондового рынка</param>
         /// <param name="client">код клиента фондового рынка или торговый счет срочного рынка</param>
         /// <returns></returns>
-        Task<bool> IsUcpClient(string firmId, string client);
+        Task<bool> IsUcpClientAsync(string firmId, string client);
     }
 }

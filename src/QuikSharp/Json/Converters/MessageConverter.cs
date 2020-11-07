@@ -51,7 +51,7 @@ namespace QuikSharp.Json.Converters
                 // Если есть id, значит пришел ответ на запрос (IRespose).
                 var id = jObject.GetValue("id").Value<long>();
                 objectType = _service.PendingResponses[id].ResponseType;
-                return (IResponse)Activator.CreateInstance(objectType);
+                return (IResult)Activator.CreateInstance(objectType);
             }
             else if (FieldExists("cmd", jObject))
             {
@@ -64,13 +64,13 @@ namespace QuikSharp.Json.Converters
                     switch (eventName)
                     {
                         case EventName.AccountBalance:
-                            return new Response<AccountBalance> { Data = new AccountBalance() };
+                            return new Result<AccountBalance> { Data = new AccountBalance() };
 
                         case EventName.AccountPosition:
-                            return new Response<AccountPosition> { Data = new AccountPosition() };
+                            return new Result<AccountPosition> { Data = new AccountPosition() };
 
                         case EventName.AllTrade:
-                            return new Response<AllTrade> { Data = new AllTrade() };
+                            return new Result<AllTrade> { Data = new AllTrade() };
 
                         case EventName.CleanUp:
                         case EventName.Close:
@@ -79,31 +79,31 @@ namespace QuikSharp.Json.Converters
                         case EventName.Init:
 
                         case EventName.Stop:
-                            return new Response<string>();
+                            return new Result<string>();
 
                         case EventName.DepoLimit:
-                            return new Response<DepoLimitEx> { Data = new DepoLimitEx() };
+                            return new Result<DepoLimitEx> { Data = new DepoLimitEx() };
 
                         case EventName.DepoLimitDelete:
-                            return new Response<DepoLimitDelete> { Data = new DepoLimitDelete() };
+                            return new Result<DepoLimitDelete> { Data = new DepoLimitDelete() };
 
                         case EventName.Firm:
-                            return new Response<Firm> { Data = new Firm() };
+                            return new Result<Firm> { Data = new Firm() };
 
                         case EventName.FuturesClientHolding:
-                            return new Response<FuturesClientHolding> { Data = new FuturesClientHolding() };
+                            return new Result<FuturesClientHolding> { Data = new FuturesClientHolding() };
 
                         case EventName.FuturesLimitChange:
-                            return new Response<FuturesLimits> { Data = new FuturesLimits() };
+                            return new Result<FuturesLimits> { Data = new FuturesLimits() };
 
                         case EventName.FuturesLimitDelete:
-                            return new Response<FuturesLimitDelete> { Data = new FuturesLimitDelete() };
+                            return new Result<FuturesLimitDelete> { Data = new FuturesLimitDelete() };
 
                         case EventName.MoneyLimit:
-                            return new Response<MoneyLimitEx> { Data = new MoneyLimitEx() };
+                            return new Result<MoneyLimitEx> { Data = new MoneyLimitEx() };
 
                         case EventName.MoneyLimitDelete:
-                            return new Response<MoneyLimitDelete> { Data = new MoneyLimitDelete() };
+                            return new Result<MoneyLimitDelete> { Data = new MoneyLimitDelete() };
 
                         case EventName.NegDeal:
                             break;
@@ -112,25 +112,25 @@ namespace QuikSharp.Json.Converters
                             break;
 
                         case EventName.Order:
-                            return new Response<Order> { Data = new Order() };
+                            return new Result<Order> { Data = new Order() };
 
                         case EventName.Param:
-                            return new Response<Param> { Data = new Param() };
+                            return new Result<Param> { Data = new Param() };
 
                         case EventName.Quote:
-                            return new Response<OrderBook> { Data = new OrderBook() };
+                            return new Result<OrderBook> { Data = new OrderBook() };
 
                         case EventName.StopOrder:
-                            return new Response<StopOrder> { Data = new StopOrder() };
+                            return new Result<StopOrder> { Data = new StopOrder() };
 
                         case EventName.Trade:
-                            return new Response<Trade> { Data = new Trade() };
+                            return new Result<Trade> { Data = new Trade() };
 
                         case EventName.TransReply:
-                            return new Response<TransactionReply> { Data = new TransactionReply() };
+                            return new Result<TransactionReply> { Data = new TransactionReply() };
 
                         case EventName.NewCandle:
-                            return new Response<Candle> { Data = new Candle() };
+                            return new Result<Candle> { Data = new Candle() };
 
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -142,7 +142,7 @@ namespace QuikSharp.Json.Converters
                     switch (cmd)
                     {
                         case "lua_error":
-                            return new Response<string>();
+                            return new Result<string>();
 
                         default:
                             //return (IMessage)Activator.CreateInstance(typeof(Message<string>));

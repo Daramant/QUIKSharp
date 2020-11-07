@@ -8,13 +8,13 @@ namespace QuikSharp.QuikService
 {
     public struct PendingResponse
     {
-        public IRequest Request { get; set; }
+        public ICommand Request { get; set; }
 
         public Type ResponseType { get; set; }
 
-        public TaskCompletionSource<IResponse> TaskCompletionSource { get; set; }
+        public TaskCompletionSource<IResult> TaskCompletionSource { get; set; }
 
-        public PendingResponse(IRequest request, Type responseType, TaskCompletionSource<IResponse> taskCompletionSource)
+        public PendingResponse(ICommand request, Type responseType, TaskCompletionSource<IResult> taskCompletionSource)
         {
             Request = request;
             ResponseType = responseType;

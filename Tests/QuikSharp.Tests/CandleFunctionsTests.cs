@@ -22,10 +22,10 @@ namespace QuikSharp.Tests
             //Quik quik = new Quik();
             string graphicTag = "RIU5M1";//В квике должен быть открыт график с этим (SBER2M) идентификатором.
 
-            List<Candle> allCandles = Quik.Functions.Candles.GetAllCandles(graphicTag).Result;
+            List<Candle> allCandles = Quik.Functions.Candles.GetAllCandlesAsync(graphicTag).Result;
             Console.WriteLine("All candles count: " + allCandles.Count);
 
-            List<Candle> partCandles = Quik.Functions.Candles.GetCandles(graphicTag, 0, 100, 250).Result;
+            List<Candle> partCandles = Quik.Functions.Candles.GetCandlesAsync(graphicTag, 0, 100, 250).Result;
             Console.WriteLine("Part candles count:" + partCandles.Count);
         }
 
@@ -33,7 +33,7 @@ namespace QuikSharp.Tests
         public void GetAllCandlesTest()
         {
             //Получаем месячные свечки по инструменту "Северсталь"
-            List<Candle> candles = Quik.Functions.Candles.GetAllCandles("TQBR", "CHMF", CandleInterval.MN).Result;
+            List<Candle> candles = Quik.Functions.Candles.GetAllCandlesAsync("TQBR", "CHMF", CandleInterval.MN).Result;
             Trace.WriteLine("Candles count: " + candles.Count);
         }
 
@@ -41,15 +41,15 @@ namespace QuikSharp.Tests
         public void GetLastCandlesTest()
         {
             int Days = 7;
-            List<Candle> candles = Quik.Functions.Candles.GetLastCandles("TQBR", "SBER", CandleInterval.D1, Days).Result;
+            List<Candle> candles = Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days).Result;
             Assert.AreEqual(Days, candles.Count);
 
             Days = 77;
-            candles = Quik.Functions.Candles.GetLastCandles("TQBR", "SBER", CandleInterval.D1, Days).Result;
+            candles = Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days).Result;
             Assert.AreEqual(Days, candles.Count);
 
             Days = 1;
-            candles = Quik.Functions.Candles.GetLastCandles("TQBR", "SBER", CandleInterval.D1, Days).Result;
+            candles = Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days).Result;
             Assert.AreEqual(Days, candles.Count);
         }
 
@@ -62,23 +62,23 @@ namespace QuikSharp.Tests
             // TODO: Вообще у библиотеки огромная проблема - Lua скрипт не отписывается от того к чему он подписался при отключении клиента.
             // В результате при следующем подключении клиент начинает получать сразу кучу CallBack'ов, на которые он не подписывался в текущей сессии.
             // По большому счету сейчас клиент должен сам заботаться о том, что бы гарантированно отписываться от всего к чему подписался при выходе.
-            bool isSubscribed = Quik.Functions.Candles.IsSubscribed("TQBR", "SBER", CandleInterval.M1).Result;
+            bool isSubscribed = Quik.Functions.Candles.IsSubscribedAsync("TQBR", "SBER", CandleInterval.M1).Result;
             if (isSubscribed)
-                Quik.Functions.Candles.Unsubscribe("TQBR", "SBER", CandleInterval.M1).Wait();
+                Quik.Functions.Candles.UnsubscribeAsync("TQBR", "SBER", CandleInterval.M1).Wait();
 
             // Проверяем что мы действительно отписались
-            isSubscribed = Quik.Functions.Candles.IsSubscribed("TQBR", "SBER", CandleInterval.M1).Result;
+            isSubscribed = Quik.Functions.Candles.IsSubscribedAsync("TQBR", "SBER", CandleInterval.M1).Result;
             Assert.AreEqual(false, isSubscribed);
 
-            Quik.Functions.Candles.Subscribe("TQBR", "SBER", CandleInterval.M1).Wait();
-            isSubscribed = Quik.Functions.Candles.IsSubscribed("TQBR", "SBER", CandleInterval.M1).Result;
+            Quik.Functions.Candles.SubscribeAsync("TQBR", "SBER", CandleInterval.M1).Wait();
+            isSubscribed = Quik.Functions.Candles.IsSubscribedAsync("TQBR", "SBER", CandleInterval.M1).Result;
             Assert.AreEqual(true, isSubscribed);
 
             // Раскомментарить если необходимо получать данные в функции OnNewCandle 2 минуты. В течении этих двух минут должна прийти еще одна свечка
             //Thread.Sleep(120000);//must get at leat one candle as use minute timeframe
 
-            Quik.Functions.Candles.Unsubscribe("TQBR", "SBER", CandleInterval.M1).Wait();
-            isSubscribed = Quik.Functions.Candles.IsSubscribed("TQBR", "SBER", CandleInterval.M1).Result;
+            Quik.Functions.Candles.UnsubscribeAsync("TQBR", "SBER", CandleInterval.M1).Wait();
+            isSubscribed = Quik.Functions.Candles.IsSubscribedAsync("TQBR", "SBER", CandleInterval.M1).Result;
             Assert.AreEqual(false, isSubscribed);
 
 

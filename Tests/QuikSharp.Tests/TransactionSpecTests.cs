@@ -142,7 +142,7 @@ namespace QuikSharp.Tests
         public void CouldEchoTransactionSpec()
         {
             var t = new Transaction();
-            var echoed = Quik.Functions.Debug.Echo(t).Result;
+            var echoed = Quik.Functions.Debug.EchoAsync(t).Result;
             Console.WriteLine(JsonSerializer.Serialize(t));
             Console.WriteLine(JsonSerializer.Serialize(echoed));
             Assert.AreEqual(JsonSerializer.Serialize(t), JsonSerializer.Serialize(echoed));
@@ -165,7 +165,7 @@ namespace QuikSharp.Tests
                 var array = new Task<Transaction>[count];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = Quik.Functions.Debug.Echo(t);
+                    array[i] = Quik.Functions.Debug.EchoAsync(t);
                 }
                 for (int i = 0; i < array.Length; i++)
                 {
@@ -183,7 +183,7 @@ namespace QuikSharp.Tests
         public void CouldSendEmptyTransactionSpec()
         {
             var t = new Transaction();
-            var result = Quik.Functions.Trading.SendTransaction(t).Result;
+            var result = Quik.Functions.Trading.SendTransactionAsync(t).Result;
 
             Console.WriteLine("Sent Id: " + t.TRANS_ID);
             Console.WriteLine("Result Id: " + result);

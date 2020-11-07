@@ -1,4 +1,5 @@
 ﻿using QuikSharp.DataStructures;
+using QuikSharp.Messages;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,15 +13,15 @@ namespace QuikSharp.QuikFunctions.StopOrders
         /// Возвращает список всех стоп-заявок.
         /// </summary>
         /// <returns></returns>
-        Task<List<StopOrder>> GetStopOrders();
+        Task<List<StopOrder>> GetStopOrdersAsync();
 
         /// <summary>
         /// Возвращает список стоп-заявок для заданного инструмента.
         /// </summary>
-        Task<List<StopOrder>> GetStopOrders(string classCode, string securityCode);
+        Task<List<StopOrder>> GetStopOrdersAsync(string classCode, string securityCode);
 
-        Task<long> CreateStopOrder(StopOrder stopOrder);
+        Task<long> CreateStopOrderAsync(StopOrder stopOrder);
 
-        Task<long> KillStopOrder(StopOrder stopOrder);
+        Task<long> KillStopOrderAsync(StopOrder stopOrder);
     }
 }

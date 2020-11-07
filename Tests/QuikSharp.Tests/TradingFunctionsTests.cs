@@ -40,13 +40,13 @@ namespace QuikSharp.Tests
 		public void GetDepoLimitsTest()
 		{
 			// Получаем информацию по всем лимитам со всех доступных счетов.
-			List<DepoLimitEx> depoLimits = Quik.Functions.Trading.GetDepoLimits().Result;
+			List<DepoLimitEx> depoLimits = Quik.Functions.Trading.GetDepoLimitsAsync().Result;
 			Console.WriteLine($"Все лимиты со всех доступных счетов {depoLimits.Count}");
 			if (depoLimits.Count > 0)
 				PrintDepoLimits(depoLimits);
 
 			// Получаем информацию по лимитам инструмента "Сбербанк"
-			depoLimits = Quik.Functions.Trading.GetDepoLimits("SBER").Result;
+			depoLimits = Quik.Functions.Trading.GetDepoLimitsAsync("SBER").Result;
 			Console.WriteLine($"Лимиты инструмента сбербанк {depoLimits.Count}");
 			if (depoLimits.Count > 0)
 				PrintDepoLimits(depoLimits);

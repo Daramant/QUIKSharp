@@ -23,14 +23,14 @@ namespace QuikSharp.Tests
         [Test]
         public void EchoWorks()
         {
-            var echo = Quik.Functions.Debug.Echo("echo").Result;
+            var echo = Quik.Functions.Debug.EchoAsync("echo").Result;
             Assert.AreEqual("echo", echo);
         }
 
         [Test]
         public void IsQuik()
         {
-            Console.WriteLine(Quik.Functions.Debug.IsQuik().Result);
+            Console.WriteLine(Quik.Functions.Debug.IsQuikAsync().Result);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace QuikSharp.Tests
         {
             Assert.Throws<AggregateException>(() =>
             {
-                var x = Quik.Functions.Debug.DivideStringByZero().Result;
+                var x = Quik.Functions.Debug.DivideStringByZeroAsync().Result;
             });
         }
 

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuikSharp.Messages
 {
-    internal class Request<T>: Message<T>, IRequest<T>
+    internal class Command<T>: Message<T>, ICommand<T>
     {
         /// <summary>
         /// Unique correlation id to match requests and responses
@@ -25,12 +25,12 @@ namespace QuikSharp.Messages
         [JsonProperty(PropertyName = "v")]
         public DateTime? ValidUntil { get; set; }
 
-        public Request()
+        public Command()
             : base()
         {
         }
 
-        public Request(T data, string name, DateTime? validUntil = null)
+        public Command(T data, string name, DateTime? validUntil = null)
             : base(data)
         {
             Name = name;

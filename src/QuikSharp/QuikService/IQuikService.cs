@@ -11,8 +11,8 @@ namespace QuikSharp.QuikService
         void Start();
         void Stop();
 
-        Task<TResponse> Send<TResponse>(IRequest request, int timeout = 0)
-            where TResponse : class, IResponse, new();
+        Task<TResult> SendAsync<TResult>(ICommand request, int timeout = 0)
+            where TResult : class, IResult, new();
 
         int GetUniqueTransactionId();
     }

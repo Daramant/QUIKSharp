@@ -60,57 +60,57 @@ namespace QuikSharp.QuikFunctions.Tradings
         //        ? new string[0]
         //        : response.Data.TrimEnd(',').Split(new[] { "," }, StringSplitOptions.None);
         //}
-        public async Task<DepoLimit> GetDepo(string clientCode, string firmId, string secCode, string account)
+        public async Task<DepoLimit> GetDepoAsync(string clientCode, string firmId, string secCode, string account)
         {
-            var response = await _quikService.Send<Response<DepoLimit>>(
-                (new Request<string>(clientCode + "|" + firmId + "|" + secCode + "|" + account, "getDepo"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<DepoLimit>>(
+                (new Command<string>(clientCode + "|" + firmId + "|" + secCode + "|" + account, "getDepo"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<DepoLimitEx> GetDepoEx(string firmId, string clientCode, string secCode, string accID, int limitKind)
+        public async Task<DepoLimitEx> GetDepoExAsync(string firmId, string clientCode, string secCode, string accID, int limitKind)
         {
-            var response = await _quikService.Send<Response<DepoLimitEx>>(
-                (new Request<string>(firmId + "|" + clientCode + "|" + secCode + "|" + accID + "|" + limitKind, "getDepoEx"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<DepoLimitEx>>(
+                (new Command<string>(firmId + "|" + clientCode + "|" + secCode + "|" + accID + "|" + limitKind, "getDepoEx"))).ConfigureAwait(false);
             return response.Data;
         }
 
         /// <summary>
         /// Возвращает список всех записей из таблицы 'Лимиты по бумагам'.
         /// </summary>
-        public async Task<List<DepoLimitEx>> GetDepoLimits()
+        public async Task<List<DepoLimitEx>> GetDepoLimitsAsync()
         {
-            var message = new Request<string>("", "get_depo_limits");
-            Message<List<DepoLimitEx>> response = await _quikService.Send<Response<List<DepoLimitEx>>>(message).ConfigureAwait(false);
+            var message = new Command<string>("", "get_depo_limits");
+            Message<List<DepoLimitEx>> response = await _quikService.SendAsync<Result<List<DepoLimitEx>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
         /// <summary>
         /// Возвращает список записей из таблицы 'Лимиты по бумагам', отфильтрованных по коду инструмента.
         /// </summary>
-        public async Task<List<DepoLimitEx>> GetDepoLimits(string secCode)
+        public async Task<List<DepoLimitEx>> GetDepoLimitsAsync(string secCode)
         {
-            var message = new Request<string>(secCode, "get_depo_limits");
-            Message<List<DepoLimitEx>> response = await _quikService.Send<Response<List<DepoLimitEx>>>(message).ConfigureAwait(false);
+            var message = new Command<string>(secCode, "get_depo_limits");
+            Message<List<DepoLimitEx>> response = await _quikService.SendAsync<Result<List<DepoLimitEx>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
         /// <summary>
         /// Функция для получения информации по денежным лимитам.
         /// </summary>
-        public async Task<MoneyLimit> GetMoney(string clientCode, string firmId, string tag, string currCode)
+        public async Task<MoneyLimit> GetMoneyAsync(string clientCode, string firmId, string tag, string currCode)
         {
-            var response = await _quikService.Send<Response<MoneyLimit>>(
-                (new Request<string>(clientCode + "|" + firmId + "|" + tag + "|" + currCode, "getMoney"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<MoneyLimit>>(
+                (new Command<string>(clientCode + "|" + firmId + "|" + tag + "|" + currCode, "getMoney"))).ConfigureAwait(false);
             return response.Data;
         }
 
         /// <summary>
         /// Функция для получения информации по денежным лимитам указанного типа.
         /// </summary>
-        public async Task<MoneyLimitEx> GetMoneyEx(string firmId, string clientCode, string tag, string currCode, int limitKind)
+        public async Task<MoneyLimitEx> GetMoneyExAsync(string firmId, string clientCode, string tag, string currCode, int limitKind)
         {
-            var response = await _quikService.Send<Response<MoneyLimitEx>>(
-                (new Request<string>(firmId + "|" + clientCode + "|" + tag + "|" + currCode + "|" + limitKind, "getMoneyEx"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<MoneyLimitEx>>(
+                (new Command<string>(firmId + "|" + clientCode + "|" + tag + "|" + currCode + "|" + limitKind, "getMoneyEx"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -118,10 +118,10 @@ namespace QuikSharp.QuikFunctions.Tradings
         ///  функция для получения информации по денежным лимитам всех торговых счетов (кроме фьючерсных) и валют.
         ///  Лучшее место для получения связки clientCode + firmid
         /// </summary>
-        public async Task<List<MoneyLimitEx>> GetMoneyLimits()
+        public async Task<List<MoneyLimitEx>> GetMoneyLimitsAsync()
         {
-            var response = await _quikService.Send<Response<List<MoneyLimitEx>>>(
-                (new Request<string>("", "getMoneyLimits"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<List<MoneyLimitEx>>>(
+                (new Command<string>("", "getMoneyLimits"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -132,17 +132,17 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="secCode"></param>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        public async Task<bool> ParamRequest(string classCode, string secCode, string paramName)
+        public async Task<bool> ParamRequestAsync(string classCode, string secCode, string paramName)
         {
-            var response = await _quikService.Send<Response<bool>>(
-                (new Request<string>(classCode + "|" + secCode + "|" + paramName, "paramRequest"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<bool>>(
+                (new Command<string>(classCode + "|" + secCode + "|" + paramName, "paramRequest"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<bool> ParamRequest(string classCode, string secCode, ParamName paramName)
+        public async Task<bool> ParamRequestAsync(string classCode, string secCode, ParamName paramName)
         {
-            var response = await _quikService.Send<Response<bool>>(
-                (new Request<string>(classCode + "|" + secCode + "|" + paramName, "paramRequest"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<bool>>(
+                (new Command<string>(classCode + "|" + secCode + "|" + paramName, "paramRequest"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -153,17 +153,17 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="secCode"></param>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        public async Task<bool> CancelParamRequest(string classCode, string secCode, string paramName)
+        public async Task<bool> CancelParamRequestAsync(string classCode, string secCode, string paramName)
         {
-            var response = await _quikService.Send<Response<bool>>(
-                (new Request<string>(classCode + "|" + secCode + "|" + paramName, "cancelParamRequest"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<bool>>(
+                (new Command<string>(classCode + "|" + secCode + "|" + paramName, "cancelParamRequest"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<bool> CancelParamRequest(string classCode, string secCode, ParamName paramName)
+        public async Task<bool> CancelParamRequestAsync(string classCode, string secCode, ParamName paramName)
         {
-            var response = await _quikService.Send<Response<bool>>(
-                (new Request<string>(classCode + "|" + secCode + "|" + paramName, "cancelParamRequest"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<bool>>(
+                (new Command<string>(classCode + "|" + secCode + "|" + paramName, "cancelParamRequest"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -175,17 +175,17 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="paramName"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public async Task<ParamTable> GetParamEx(string classCode, string secCode, string paramName, int timeout = Timeout.Infinite)
+        public async Task<ParamTable> GetParamExAsync(string classCode, string secCode, string paramName, int timeout = Timeout.Infinite)
         {
-            var response = await _quikService.Send<Response<ParamTable>>(
-                (new Request<string>(classCode + "|" + secCode + "|" + paramName, "getParamEx")), timeout).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<ParamTable>>(
+                (new Command<string>(classCode + "|" + secCode + "|" + paramName, "getParamEx")), timeout).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<ParamTable> GetParamEx(string classCode, string secCode, ParamName paramName, int timeout = Timeout.Infinite)
+        public async Task<ParamTable> GetParamExAsync(string classCode, string secCode, ParamName paramName, int timeout = Timeout.Infinite)
         {
-            var response = await _quikService.Send<Response<ParamTable>>(
-                (new Request<string>(classCode + "|" + secCode + "|" + paramName, "getParamEx")), timeout).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<ParamTable>>(
+                (new Command<string>(classCode + "|" + secCode + "|" + paramName, "getParamEx")), timeout).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -196,17 +196,17 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="secCode"></param>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        public async Task<ParamTable> GetParamEx2(string classCode, string secCode, string paramName)
+        public async Task<ParamTable> GetParamEx2Async(string classCode, string secCode, string paramName)
         {
-            var response = await _quikService.Send<Response<ParamTable>>(
-                (new Request<string>(classCode + "|" + secCode + "|" + paramName, "getParamEx2"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<ParamTable>>(
+                (new Command<string>(classCode + "|" + secCode + "|" + paramName, "getParamEx2"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<ParamTable> GetParamEx2(string classCode, string secCode, ParamName paramName)
+        public async Task<ParamTable> GetParamEx2Async(string classCode, string secCode, ParamName paramName)
         {
-            var response = await _quikService.Send<Response<ParamTable>>(
-                (new Request<string>(classCode + "|" + secCode + "|" + paramName, "getParamEx2"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<ParamTable>>(
+                (new Command<string>(classCode + "|" + secCode + "|" + paramName, "getParamEx2"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -218,20 +218,20 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="limitType"></param>
         /// <param name="currCode"></param>
         /// <returns></returns>
-        public async Task<FuturesLimits> GetFuturesLimit(string firmId, string accId, int limitType, string currCode)
+        public async Task<FuturesLimits> GetFuturesLimitAsync(string firmId, string accId, int limitType, string currCode)
         {
-            var response = await _quikService.Send<Response<FuturesLimits>>(
-                (new Request<string>(firmId + "|" + accId + "|" + limitType + "|" + currCode, "getFuturesLimit"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<FuturesLimits>>(
+                (new Command<string>(firmId + "|" + accId + "|" + limitType + "|" + currCode, "getFuturesLimit"))).ConfigureAwait(false);
             return response.Data;
         }
 
         /// <summary>
         ///  функция для получения информации по фьючерсным лимитам всех клиентских счетов
         /// </summary>
-        public async Task<List<FuturesLimits>> GetFuturesClientLimits()
+        public async Task<List<FuturesLimits>> GetFuturesClientLimitsAsync()
         {
-            var response = await _quikService.Send<Response<List<FuturesLimits>>>(
-                (new Request<string>("", "getFuturesClientLimits"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<List<FuturesLimits>>>(
+                (new Command<string>("", "getFuturesClientLimits"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -243,74 +243,74 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// <param name="secCode"></param>
         /// <param name="posType"></param>
         /// <returns></returns>
-        public async Task<FuturesClientHolding> GetFuturesHolding(string firmId, string accId, string secCode, int posType)
+        public async Task<FuturesClientHolding> GetFuturesHoldingAsync(string firmId, string accId, string secCode, int posType)
         {
-            var response = await _quikService.Send<Response<FuturesClientHolding>>(
-                (new Request<string>(firmId + "|" + accId + "|" + secCode + "|" + posType, "getFuturesHolding"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<FuturesClientHolding>>(
+                (new Command<string>(firmId + "|" + accId + "|" + secCode + "|" + posType, "getFuturesHolding"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<List<OptionBoard>> GetOptionBoard(string classCode, string secCode)
+        public async Task<List<OptionBoard>> GetOptionBoardAsync(string classCode, string secCode)
         {
-            var message = new Request<string>(classCode + "|" + secCode, "getOptionBoard");
+            var message = new Command<string>(classCode + "|" + secCode, "getOptionBoard");
             Message<List<OptionBoard>> response =
-                await _quikService.Send<Response<List<OptionBoard>>>(message).ConfigureAwait(false);
+                await _quikService.SendAsync<Result<List<OptionBoard>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<List<Trade>> GetTrades()
+        public async Task<List<Trade>> GetTradesAsync()
         {
-            var response = await _quikService.Send<Response<List<Trade>>>(
-                (new Request<string>("", "get_trades"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<List<Trade>>>(
+                (new Command<string>("", "get_trades"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<List<Trade>> GetTrades(string classCode, string secCode)
+        public async Task<List<Trade>> GetTradesAsync(string classCode, string secCode)
         {
-            var response = await _quikService.Send<Response<List<Trade>>>(
-                (new Request<string>(classCode + "|" + secCode, "get_trades"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<List<Trade>>>(
+                (new Command<string>(classCode + "|" + secCode, "get_trades"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<List<Trade>> GetTrades_by_OdrerNumber(long orderNum)
+        public async Task<List<Trade>> GetTradesByOrderNumberAsync(long orderNum)
         {
-            var response = await _quikService.Send<Response<List<Trade>>>(
-                (new Request<string>(orderNum.ToString(), "get_Trades_by_OrderNumber"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<List<Trade>>>(
+                (new Command<string>(orderNum.ToString(), "get_Trades_by_OrderNumber"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<PortfolioInfo> GetPortfolioInfo(string firmId, string clientCode)
+        public async Task<PortfolioInfo> GetPortfolioInfoAsync(string firmId, string clientCode)
         {
-            var response = await _quikService.Send<Response<PortfolioInfo>>(
-                (new Request<string>(firmId + "|" + clientCode, "getPortfolioInfo"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<PortfolioInfo>>(
+                (new Command<string>(firmId + "|" + clientCode, "getPortfolioInfo"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<PortfolioInfoEx> GetPortfolioInfoEx(string firmId, string clientCode, int limitKind)
+        public async Task<PortfolioInfoEx> GetPortfolioInfoExAsync(string firmId, string clientCode, int limitKind)
         {
-            var response = await _quikService.Send<Response<PortfolioInfoEx>>(
-                (new Request<string>(firmId + "|" + clientCode + "|" + limitKind, "getPortfolioInfoEx"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<PortfolioInfoEx>>(
+                (new Command<string>(firmId + "|" + clientCode + "|" + limitKind, "getPortfolioInfoEx"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<string> GetTrdAccByClientCode(string firmId, string clientCode)
+        public async Task<string> GetTrdAccByClientCodeAsync(string firmId, string clientCode)
         {
-            var response = await _quikService.Send<Response<string>>(
-                (new Request<string>(firmId + "|" + clientCode, "GetTrdAccByClientCode"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<string>>(
+                (new Command<string>(firmId + "|" + clientCode, "GetTrdAccByClientCode"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<string> GetClientCodeByTrdAcc(string firmId, string trdAccId)
+        public async Task<string> GetClientCodeByTrdAccAsync(string firmId, string trdAccId)
         {
-            var response = await _quikService.Send<Response<string>>(
-                (new Request<string>(firmId + "|" + trdAccId, "GetClientCodeByTrdAcc"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<string>>(
+                (new Command<string>(firmId + "|" + trdAccId, "GetClientCodeByTrdAcc"))).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<bool> IsUcpClient(string firmId, string client)
+        public async Task<bool> IsUcpClientAsync(string firmId, string client)
         {
-            var response = await _quikService.Send<Response<bool>>(
-                (new Request<string>(firmId + "|" + client, "IsUcpClient"))).ConfigureAwait(false);
+            var response = await _quikService.SendAsync<Result<bool>>(
+                (new Command<string>(firmId + "|" + client, "IsUcpClient"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -325,7 +325,7 @@ namespace QuikSharp.QuikFunctions.Tradings
         /// </summary>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public async Task<long> SendTransaction(Transaction transaction)
+        public async Task<long> SendTransactionAsync(Transaction transaction)
         {
             Trace.Assert(!transaction.TRANS_ID.HasValue, "TRANS_ID should be assigned automatically in SendTransaction functions");
 
@@ -349,8 +349,8 @@ namespace QuikSharp.QuikFunctions.Tradings
 
             try
             {
-                var response = await _quikService.Send<Response<bool>>(
-                    (new Request<Transaction>(transaction, "sendTransaction"))).ConfigureAwait(false);
+                var response = await _quikService.SendAsync<Result<bool>>(
+                    (new Command<Transaction>(transaction, "sendTransaction"))).ConfigureAwait(false);
                 Trace.Assert(response.Data);
 
                 // store transaction

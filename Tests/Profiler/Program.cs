@@ -72,7 +72,7 @@ namespace Profiler
                 var array = new Task<Transaction>[count];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = quik.Functions.Debug.Echo(t);
+                    array[i] = quik.Functions.Debug.EchoAsync(t);
                 }
                 for (int i = 0; i < array.Length; i++)
                 {
