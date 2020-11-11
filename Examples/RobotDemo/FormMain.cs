@@ -9,7 +9,7 @@ using QuikSharp;
 using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Quik;
-using QuikSharp.QuikService;
+using QuikSharp.QuikClient;
 
 namespace RobotDemo
 {
@@ -82,7 +82,7 @@ namespace RobotDemo
                 textBoxLogs.AppendText("Подключаемся к терминалу Quik..." + Environment.NewLine);
 
                 var quikFactory = new QuikFactory();
-                var options = QuikServiceOptions.GetDefault();
+                var options = QuikClientOptions.GetDefault();
                 _quik = quikFactory.Create(options);    // инициализируем объект Quik
                 //_quik = new Quik(34136, new InMemoryStorage());    // отладочный вариант
             }
@@ -247,7 +247,7 @@ namespace RobotDemo
                 if (toolCandles.Tables[tool.ClassCode + "|" + tool.SecurityCode + "|" + settings.TF] != null && toolCandles.Tables[tool.ClassCode + "|" + tool.SecurityCode + "|" + settings.TF] != null)
                 {
                     statusQuotation = true;
-                    _quik.Events.NewCandle += OnNewCandle;
+                    _quik.Events.Candle += OnCandle;
                 }
             }
         }
@@ -288,7 +288,7 @@ namespace RobotDemo
                         textBoxLogs.AppendText("Не удалось сформировать таблицу котировок для: " + InstrID + "..." + Environment.NewLine);
                     }
                 }
-                _quik.Events.NewCandle += OnNewCandle;
+                _quik.Events.Candle += OnCandle;
             }
             catch
             {
@@ -360,7 +360,7 @@ namespace RobotDemo
                 }
             }
         }
-        void OnNewCandle(Candle candle)
+        void OnCandle(Candle candle)
         {
             if (toolCandles != null) NewCandle_to_Table(ref toolCandles, candle);
         }

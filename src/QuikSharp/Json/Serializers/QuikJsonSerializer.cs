@@ -8,24 +8,24 @@ using System.Text;
 
 namespace QuikSharp.Json.Serializers
 {
-    public class JsonSerializer : IJsonSerializer
+    public class QuikJsonSerializer : IQuikJsonSerializer
     {
-        private readonly Newtonsoft.Json.JsonSerializer _serializer;
+        private readonly JsonSerializer _serializer;
 
         [ThreadStatic]
         private static StringBuilder _stringBuilder;
 
-        public QuikService.QuikService QuikService { get; set; } // TODO: Убрать.
+        public QuikClient.QuikClient QuikService { get; set; } // TODO: Убрать.
 
-        public JsonSerializer()
+        public QuikJsonSerializer()
         {
-            _serializer = new Newtonsoft.Json.JsonSerializer
+            _serializer = new JsonSerializer
             {
                 TypeNameHandling = TypeNameHandling.None,
                 NullValueHandling = NullValueHandling.Ignore
             };
 
-            //_serializer.Converters.Add(new MessageConverter(quikService));
+            //_serializer.Converters.Add(new MessageConverter(quikClient));
         }
 
         public void AddConverter(JsonConverter jsonConverter)

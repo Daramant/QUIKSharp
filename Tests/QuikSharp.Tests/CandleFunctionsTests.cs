@@ -56,7 +56,7 @@ namespace QuikSharp.Tests
         [Test]
         public void CandlesSubscriptionTest()
         {
-            Quik.Events.NewCandle += OnNewCandle;
+            Quik.Events.Candle += OnCandle;
 
             // На всякий случай вначале нужно отписатся (иначе может вылететь Assert)
             // TODO: Вообще у библиотеки огромная проблема - Lua скрипт не отписывается от того к чему он подписался при отключении клиента.
@@ -84,7 +84,7 @@ namespace QuikSharp.Tests
 
         }
 
-        private void OnNewCandle(Candle candle)
+        private void OnCandle(Candle candle)
         {
             if (candle.SecCode == "SBER" && candle.ClassCode == "TQBR" && candle.Interval == CandleInterval.M1)
             {

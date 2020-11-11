@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.QuikService
+namespace QuikSharp.QuikClient
 {
-    public class QuikServiceOptions
+    public class QuikClientOptions
     {
         public string Host { get; set; }
 
@@ -12,9 +12,9 @@ namespace QuikSharp.QuikService
 
         public int CallbackPort { get; set; }
 
-        public static QuikServiceOptions GetDefault()
+        public static QuikClientOptions GetDefault()
         {
-            return new QuikServiceOptions
+            return new QuikClientOptions
             {
                 Host = "127.0.0.1",
                 ResponsePort = 34130,

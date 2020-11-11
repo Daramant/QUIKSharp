@@ -18,33 +18,6 @@ namespace QuikSharp.QuikEvents
         }
 
         /// <summary>
-        /// Событие вызывается когда библиотека QuikSharp успешно подключилась к Quik'у
-        /// </summary>
-        public event InitHandler ConnectedToQuik;
-
-        public void OnConnectedToQuik(int port)
-        {
-            ConnectedToQuik?.Invoke(port);
-            Init?.Invoke(port);
-        }
-
-        /// <summary>
-        /// Событие вызывается когда библиотека QuikSharp была отключена от Quik'а
-        /// </summary>
-        public event VoidHandler DisconnectedFromQuik;
-
-        public void OnDisconnectedFromQuik()
-        {
-            DisconnectedFromQuik?.Invoke();
-        }
-
-        /// <summary>
-        /// Функция вызывается терминалом QUIK перед вызовом функции main().
-        /// В качестве параметра принимает значение полного пути к запускаемому скрипту.
-        /// </summary>
-        public event InitHandler Init;
-
-        /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений текущей позиции по счету.
         /// </summary>
         public event AccountBalanceHandler AccountBalance;
@@ -389,11 +362,21 @@ namespace QuikSharp.QuikEvents
         /// <summary>
         /// Событие получения новой свечи. Для срабатывания необходимо подписаться с помощью метода Subscribe.
         /// </summary>
-        public event CandleHandler NewCandle;
+        public event CandleHandler Candle;
 
-        public void OnNewCandle(Candle candle)
+        public void OnCandle(Candle candle)
         {
-            NewCandle?.Invoke(candle);
+            Candle?.Invoke(candle);
+        }
+
+        /// <summary>
+        /// Событие получения новой свечи. Для срабатывания необходимо подписаться с помощью метода Subscribe.
+        /// </summary>
+        public event EventHandler<string> Error;
+
+        public void OnError(string error)
+        {
+            Error?.Invoke(this, error);
         }
     }
 }

@@ -30,6 +30,7 @@ namespace QuikSharp.DataStructures
         StopOrder,
         Trade,
         TransReply,
-        NewCandle
+        Candle,
+        Error
     }
 }

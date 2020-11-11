@@ -43,18 +43,6 @@ namespace QuikSharp.QuikEvents
     public interface IQuikEvents
     {
         /// <summary>
-        /// Событие вызывается когда библиотека QuikSharp успешно подключилась к Quik'у
-        /// </summary>
-        event InitHandler ConnectedToQuik;
-        // quik
-
-        /// <summary>
-        /// Событие вызывается когда библиотека QuikSharp была отключена от Quik'а
-        /// </summary>
-        event VoidHandler DisconnectedFromQuik;
-        // quik
-
-        /// <summary>
         /// Событие вызывается при получении изменений текущей позиции по счету.
         /// </summary>
         event AccountBalanceHandler AccountBalance;
@@ -68,25 +56,21 @@ namespace QuikSharp.QuikEvents
         /// Новая обезличенная сделка
         /// </summary>
         event AllTradeHandler AllTrade;
-        // trading
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при смене сессии и при выгрузке файла qlua.dll
         /// </summary>
         event VoidHandler CleanUp;
-        // service
 
         /// <summary>
         /// Функция вызывается перед закрытием терминала QUIK.
         /// </summary>
         event VoidHandler Close;
-        // service
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при установлении связи с сервером QUIK.
         /// </summary>
         event VoidHandler Connected;
-        // service
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений лимита по бумагам.
@@ -102,7 +86,6 @@ namespace QuikSharp.QuikEvents
         /// Функция вызывается терминалом QUIK при отключении от сервера QUIK.
         /// </summary>
         event VoidHandler Disconnected;
-        // service
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении описания новой фирмы от сервера.
@@ -113,24 +96,16 @@ namespace QuikSharp.QuikEvents
         /// Функция вызывается терминалом QUIK при изменении позиции по срочному рынку.
         /// </summary>
         event FuturesClientHoldingHandler FuturesClientHolding;
-        // trading
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений ограничений по срочному рынку.
         /// </summary>
         event FuturesLimitHandler FuturesLimitChange;
-        // trading
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении лимита по срочному рынку.
         /// </summary>
         event FuturesLimitDeleteHandler FuturesLimitDelete;
-        // trading
-
-        /// <summary>
-        /// Depricated
-        /// </summary>
-        event InitHandler Init;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений по денежному лимиту клиента.
@@ -156,7 +131,6 @@ namespace QuikSharp.QuikEvents
         /// Функция вызывается терминалом QUIK при получении новой заявки или при изменении параметров существующей заявки.
         /// </summary>
         event OrderHandler Order;
-        // orders
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при при изменении текущих параметров.
@@ -173,7 +147,6 @@ namespace QuikSharp.QuikEvents
         /// Примечание: Значение параметра «stop_flag» – «1».После окончания выполнения функции таймаут завершения работы скрипта 5 секунд. По истечении этого интервала функция main() завершается принудительно. При этом возможна потеря системных ресурсов.
         /// </summary>
         event StopHandler Stop;
-        // service
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении новой стоп-заявки или при изменении параметров существующей стоп-заявки.
@@ -184,7 +157,6 @@ namespace QuikSharp.QuikEvents
         /// Функция вызывается терминалом QUIK при получении сделки.
         /// </summary>
         event TradeHandler Trade;
-        // trading
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении ответа на транзакцию пользователя.
@@ -194,6 +166,11 @@ namespace QuikSharp.QuikEvents
         /// <summary>
         /// Событие получения новой свечи. Для срабатывания необходимо подписаться с помощью метода Subscribe.
         /// </summary>
-        event CandleHandler NewCandle;
+        event CandleHandler Candle;
+
+        /// <summary>
+        /// Событие получения новой свечи. Для срабатывания необходимо подписаться с помощью метода Subscribe.
+        /// </summary>
+        event EventHandler<string> Error;
     }
 }

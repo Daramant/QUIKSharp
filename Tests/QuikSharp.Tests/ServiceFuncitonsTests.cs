@@ -66,7 +66,7 @@ namespace QuikSharp.Tests
         [Test]
         public void AddLabel()
         {
-            var res = Quik.Functions.Service.AddLabelAsync(61000, "20170105", "100000", "1", "C:\\ClassesC\\Labels\\buy.bmp", "si", "BOTTOM", 0);
+            var res = Quik.Functions.Labels.AddLabelAsync(61000, "20170105", "100000", "1", "C:\\ClassesC\\Labels\\buy.bmp", "si", "BOTTOM", 0);
             Console.WriteLine("AddLabel: "
                     + String.Join(",", Convert.ToString(res.Result)));
         }
@@ -75,7 +75,7 @@ namespace QuikSharp.Tests
         public void DelLabel()
         {
             double tagId = 13;
-            var res = Quik.Functions.Service.DelLabelAsync("si", tagId);
+            var res = Quik.Functions.Labels.DelLabelAsync("si", tagId);
 
             Console.WriteLine("delLabel: "
                     + String.Join(",", Convert.ToString(res.Result)));
@@ -84,7 +84,7 @@ namespace QuikSharp.Tests
         [Test]
         public void DelAllLabels()
         {
-            var res = Quik.Functions.Service.DelAllLabelsAsync("si").Result;
+            var res = Quik.Functions.Labels.DelAllLabelsAsync("si").Result;
 
             Console.WriteLine("delAllLabels: "
                   + String.Join(",", Convert.ToString(res)));

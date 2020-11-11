@@ -1,7 +1,7 @@
 ﻿using QuikSharp.Json.Converters;
 using QuikSharp.Json.Serializers;
 using QuikSharp.Quik;
-using QuikSharp.QuikService;
+using QuikSharp.QuikClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,20 +16,20 @@ namespace QuikSharp.Tests
 
         protected IQuikFactory QuikFactory { get; private set; }
 
-        protected IJsonSerializer JsonSerializer { get; private set; }
+        protected IQuikJsonSerializer JsonSerializer { get; private set; }
 
         protected void SetUpQuik()
         {
             QuikFactory = new QuikFactory();
 
-            var options = QuikServiceOptions.GetDefault();
+            var options = QuikClientOptions.GetDefault();
             Quik = QuikFactory.Create(options);
 
-            Quik.Service.Start();
+            Quik.Client.Start();
 
-            JsonSerializer = new JsonSerializer();
+            JsonSerializer = new QuikJsonSerializer();
 
-            JsonSerializer.AddConverter(new MessageConverter((QuikService.QuikService)Quik.Service));
+            JsonSerializer.AddConverter(new MessageConverter((QuikClient.QuikClient)Quik.Client));
         }
     }
 }

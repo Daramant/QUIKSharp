@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Quik;
-using QuikSharp.QuikService;
+using QuikSharp.QuikClient;
 
 namespace Profiler
 {
@@ -13,14 +13,14 @@ namespace Profiler
         {
             var quikFactory = new QuikFactory();
 
-            var options = QuikServiceOptions.GetDefault();
+            var options = QuikClientOptions.GetDefault();
             return quikFactory.Create(options);
         }
 
         public static void Ping()
         {
             var quik = CreateQuik();
-            quik.Service.Start();
+            quik.Client.Start();
 
             var stopwatch = new Stopwatch();
             Console.WriteLine("Started");
@@ -33,7 +33,7 @@ namespace Profiler
                 var array = new Task<string>[count];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = quik.Functions.Debug.Ping();
+                    array[i] = quik.Functions.Debug.PingAsync();
                 }
                 for (int i = 0; i < array.Length; i++)
                 {
@@ -57,7 +57,7 @@ namespace Profiler
         public static void EchoTransaction()
         {
             var quik = CreateQuik();
-            quik.Service.Start();
+            quik.Client.Start();
 
             var stopwatch = new Stopwatch();
             Console.WriteLine("Started");

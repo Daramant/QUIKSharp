@@ -17,7 +17,7 @@ namespace QuikSharp.Tests
         [Test]
         public void PingWorks()
         {
-            var pong = Quik.Functions.Debug.Ping().Result;
+            var pong = Quik.Functions.Debug.PingAsync().Result;
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace QuikSharp.Tests
 				 }*/
 
                 for (var i = 0; i < count; i++)
-                    Quik.Functions.Debug.Ping().Wait();
+                    Quik.Functions.Debug.PingAsync().Wait();
 
                 sw.Stop();
                 Console.WriteLine("MultiPing takes msecs: " + sw.ElapsedMilliseconds);
@@ -96,7 +96,7 @@ namespace QuikSharp.Tests
                 var count = 10000;
                 var array = new Task<string>[count];
                 for (int i = 0; i < array.Length; i++)
-                    array[i] = Quik.Functions.Debug.Ping();
+                    array[i] = Quik.Functions.Debug.PingAsync();
 
                 // Чудесным образом данная конструкция работает чуточку быстрей (на 10% где то) чем _df.Ping ().Wait (); в функции MultiPing
                 await Task.WhenAll(array);
@@ -126,7 +126,7 @@ namespace QuikSharp.Tests
                 var array = new Task<string>[count];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = Quik.Functions.Debug.Ping();
+                    array[i] = Quik.Functions.Debug.PingAsync();
                 }
                 for (int i = 0; i < array.Length; i++)
                 {

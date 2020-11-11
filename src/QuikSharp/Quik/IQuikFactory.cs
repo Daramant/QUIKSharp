@@ -1,4 +1,4 @@
-﻿using QuikSharp.QuikService;
+﻿using QuikSharp.QuikClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,6 +7,6 @@ namespace QuikSharp.Quik
 {
     public interface IQuikFactory
     {
-        IQuik Create(QuikServiceOptions options);
+        IQuik Create(QuikClientOptions options);
     }
 }

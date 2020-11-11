@@ -8,7 +8,7 @@ using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Json.Converters;
 using QuikSharp.Json.Serializers;
 using QuikSharp.Quik;
-using QuikSharp.QuikService;
+using QuikSharp.QuikClient;
 
 namespace QuikSharp.Tests
 {

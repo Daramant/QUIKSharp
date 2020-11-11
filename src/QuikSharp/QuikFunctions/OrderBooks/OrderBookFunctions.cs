@@ -4,7 +4,7 @@
 using System.Threading.Tasks;
 using QuikSharp.DataStructures;
 using QuikSharp.Messages;
-using QuikSharp.QuikService;
+using QuikSharp.QuikClient;
 
 namespace QuikSharp.QuikFunctions.OrderBooks
 {
@@ -13,13 +13,13 @@ namespace QuikSharp.QuikFunctions.OrderBooks
     /// </summary>
     public class OrderBookFunctions : IOrderBookFunctions
     {
-        private readonly IQuikService _quikService;
+        private readonly IQuikClient _quikClient;
 
-        public OrderBookFunctions(IQuikService quikService)
+        public OrderBookFunctions(IQuikClient quikClient)
         {
-            _quikService = quikService;
+            _quikClient = quikClient;
         }
-
+        
         public async Task<bool> SubscribeAsync(ISecurity security)
         {
             return await SubscribeAsync(security.ClassCode, security.SecCode).ConfigureAwait(false);
@@ -27,7 +27,7 @@ namespace QuikSharp.QuikFunctions.OrderBooks
 
         public async Task<bool> SubscribeAsync(string class_code, string sec_code)
         {
-            var response = await _quikService.SendAsync<Result<bool>>(
+            var response = await _quikClient.SendAsync<Result<bool>>(
                 (new Command<string>(class_code + "|" + sec_code, "Subscribe_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -39,7 +39,7 @@ namespace QuikSharp.QuikFunctions.OrderBooks
 
         public async Task<bool> UnsubscribeAsync(string class_code, string sec_code)
         {
-            var response = await _quikService.SendAsync<Result<bool>>(
+            var response = await _quikClient.SendAsync<Result<bool>>(
                 (new Command<string>(class_code + "|" + sec_code, "Unsubscribe_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -51,14 +51,14 @@ namespace QuikSharp.QuikFunctions.OrderBooks
 
         public async Task<bool> IsSubscribedAsync(string class_code, string sec_code)
         {
-            var response = await _quikService.SendAsync<Result<bool>>(
+            var response = await _quikClient.SendAsync<Result<bool>>(
                 (new Command<string>(class_code + "|" + sec_code, "IsSubscribed_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<OrderBook> GetQuoteLevel2Async(string class_code, string sec_code)
         {
-            var response = await _quikService.SendAsync<Result<OrderBook>>(
+            var response = await _quikClient.SendAsync<Result<OrderBook>>(
                 (new Command<string>(class_code + "|" + sec_code, "GetQuoteLevel2"))).ConfigureAwait(false);
             return response.Data;
         }

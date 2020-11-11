@@ -14,7 +14,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using QuikSharp.Quik;
-using QuikSharp.QuikService;
+using QuikSharp.QuikClient;
 
 namespace QuikSharpDemo
 {
@@ -88,7 +88,7 @@ namespace QuikSharpDemo
             try
             {
                 var quikFactory = new QuikFactory();
-                var options = QuikServiceOptions.GetDefault();
+                var options = QuikClientOptions.GetDefault();
 
                 textBoxLogsWindow.AppendText("Подключаемся к терминалу Quik..." + Environment.NewLine);
                 if (checkBoxRemoteHost.Checked)
@@ -242,7 +242,7 @@ namespace QuikSharpDemo
                 AppendText2TextBox(textBoxLogsWindow, "Вызвано событие OnParam. Актуальное значение параметра 'BID' = " + bid + Environment.NewLine);
             }
         }
-        void OnNewCandleDo(Candle _candle)
+        void OnCandleDo(Candle _candle)
         {
             Trace.Assert(_candle != null, DateTime.Now + ": Trace: candle = NULL");
             Trace.WriteLine(DateTime.Now + ": Trace: OnNewCandleDo()");
@@ -375,7 +375,7 @@ namespace QuikSharpDemo
                             AppendText2TextBox(textBoxLogsWindow, "Выводим исторические данные в таблицу..." + Environment.NewLine);
                             toolCandlesTable = new FormOutputTable(toolCandles);
                             toolCandlesTable.Show();
-                            _quik.Events.NewCandle += OnNewCandleDo;
+                            _quik.Events.Candle += OnCandleDo;
                         }
                         else AppendText2TextBox(textBoxLogsWindow, "Неудачная попытка подписки на исторические данные." + Environment.NewLine);
                     }
@@ -729,7 +729,7 @@ namespace QuikSharpDemo
                             try
                             {
                                 var listStopOrders = _quik.Functions.StopOrders.GetStopOrdersAsync().Result;
-                                
+
                                 foreach (StopOrder stopOrder in listStopOrders)
                                 {
                                     if (stopOrder.TransId == transID && stopOrder.ClassCode == tool.ClassCode && stopOrder.SecCode == tool.SecurityCode)

@@ -1,4 +1,4 @@
-﻿using QuikSharp.QuikService;
+﻿using QuikSharp.QuikClient;
 using QuikSharp.QuikEvents;
 using QuikSharp.QuikFunctions;
 using System;
@@ -9,13 +9,10 @@ namespace QuikSharp.Quik
 {
     public interface IQuik
     {
-        IQuikService Service { get; }
+        IQuikClient Client { get; }
 
         IQuikFunctions Functions { get; }
 
-        /// <summary>
-        /// Функции обратного вызова
-        /// </summary>
         IQuikEvents Events { get; }
     }
 }

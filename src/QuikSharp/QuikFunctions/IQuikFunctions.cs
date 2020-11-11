@@ -1,11 +1,12 @@
 ﻿using QuikSharp.QuikFunctions.Candles;
 using QuikSharp.QuikFunctions.Classes;
-using QuikSharp.QuikFunctions.Debugs;
+using QuikSharp.QuikFunctions.Debug;
+using QuikSharp.QuikFunctions.Labels;
 using QuikSharp.QuikFunctions.OrderBooks;
 using QuikSharp.QuikFunctions.Orders;
 using QuikSharp.QuikFunctions.Services;
 using QuikSharp.QuikFunctions.StopOrders;
-using QuikSharp.QuikFunctions.Tradings;
+using QuikSharp.QuikFunctions.Trading;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -53,5 +54,10 @@ namespace QuikSharp.QuikFunctions
         /// Функции для работы со свечами
         /// </summary>
         ICandleFunctions Candles { get; }
+
+        /// <summary>
+        /// Функции для работы с метками
+        /// </summary>
+        ILabelFunctions Labels { get; }
     }
 }

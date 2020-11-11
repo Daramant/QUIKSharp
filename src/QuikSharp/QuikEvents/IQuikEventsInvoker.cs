@@ -6,10 +6,6 @@ namespace QuikSharp.QuikEvents
 {
     public interface IQuikEventsInvoker
     {
-        void OnConnectedToQuik(int port);
-
-        void OnDisconnectedFromQuik();
-
         void OnAccountBalance(AccountBalance accBal);
 
         void OnAccountPosition(AccountPosition accPos);
@@ -54,6 +50,8 @@ namespace QuikSharp.QuikEvents
 
         void OnTransReply(TransactionReply reply);
 
-        void OnNewCandle(Candle candle);
+        void OnCandle(Candle candle);
+
+        void OnError(string error);
     }
 }

@@ -3,7 +3,7 @@ using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Exceptions;
 using QuikSharp.Messages;
-using QuikSharp.QuikService;
+using QuikSharp.QuikClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,9 +13,9 @@ namespace QuikSharp.Json.Converters
 {
     public class MessageConverter : JsonCreationConverter<IMessage>
     {
-        private QuikService.QuikService _service; // TODO: Убрать использование.
+        private QuikClient.QuikClient _service; // TODO: Убрать использование.
 
-        public MessageConverter(QuikService.QuikService service)
+        public MessageConverter(QuikClient.QuikClient service)
         {
             _service = service;
         }
@@ -50,7 +50,7 @@ namespace QuikSharp.Json.Converters
             {
                 // Если есть id, значит пришел ответ на запрос (IRespose).
                 var id = jObject.GetValue("id").Value<long>();
-                objectType = _service.PendingResponses[id].ResponseType;
+                objectType = _service.PendingResponses[id].ResultType;
                 return (IResult)Activator.CreateInstance(objectType);
             }
             else if (FieldExists("cmd", jObject))
@@ -129,7 +129,7 @@ namespace QuikSharp.Json.Converters
                         case EventName.TransReply:
                             return new Result<TransactionReply> { Data = new TransactionReply() };
 
-                        case EventName.NewCandle:
+                        case EventName.Candle:
                             return new Result<Candle> { Data = new Candle() };
 
                         default:
