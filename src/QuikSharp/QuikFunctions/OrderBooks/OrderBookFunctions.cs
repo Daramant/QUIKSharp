@@ -28,7 +28,7 @@ namespace QuikSharp.QuikFunctions.OrderBooks
         public async Task<bool> SubscribeAsync(string class_code, string sec_code)
         {
             var response = await _quikClient.SendAsync<Result<bool>>(
-                (new Command<string>(class_code + "|" + sec_code, "Subscribe_Level_II_Quotes"))).ConfigureAwait(false);
+                (new Command<string[]>(new[] { class_code, sec_code }, "Subscribe_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -40,7 +40,7 @@ namespace QuikSharp.QuikFunctions.OrderBooks
         public async Task<bool> UnsubscribeAsync(string class_code, string sec_code)
         {
             var response = await _quikClient.SendAsync<Result<bool>>(
-                (new Command<string>(class_code + "|" + sec_code, "Unsubscribe_Level_II_Quotes"))).ConfigureAwait(false);
+                (new Command<string[]>(new[] { class_code, sec_code }, "Unsubscribe_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -52,14 +52,14 @@ namespace QuikSharp.QuikFunctions.OrderBooks
         public async Task<bool> IsSubscribedAsync(string class_code, string sec_code)
         {
             var response = await _quikClient.SendAsync<Result<bool>>(
-                (new Command<string>(class_code + "|" + sec_code, "IsSubscribed_Level_II_Quotes"))).ConfigureAwait(false);
+                (new Command<string[]>(new[] { class_code, sec_code }, "IsSubscribed_Level_II_Quotes"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<OrderBook> GetQuoteLevel2Async(string class_code, string sec_code)
         {
             var response = await _quikClient.SendAsync<Result<OrderBook>>(
-                (new Command<string>(class_code + "|" + sec_code, "GetQuoteLevel2"))).ConfigureAwait(false);
+                (new Command<string[]>(new[] { class_code, sec_code }, "GetQuoteLevel2"))).ConfigureAwait(false);
             return response.Data;
         }
     }

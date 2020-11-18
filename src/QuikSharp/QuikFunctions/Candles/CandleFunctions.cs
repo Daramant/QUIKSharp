@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using QuikSharp.DataStructures;
+using QuikSharp.Extensions;
 using QuikSharp.Messages;
 using QuikSharp.QuikClient;
 using System.Collections.Generic;
@@ -53,7 +54,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <returns></returns>
         public async Task<List<Candle>> GetCandlesAsync(string graphicTag, int line, int first, int count)
         {
-            var message = new Command<string>(graphicTag + "|" + line + "|" + first + "|" + count, "get_candles");
+            var message = new Command<string[]>(new[] { graphicTag, line.ToQuikStringLookup(), first.ToQuikStringLookup(), count.ToQuikStringLookup() }, "get_candles");
             var response = await _quikClient.SendAsync<Result<List<Candle>>>(message).ConfigureAwait(false);
             return response.Data;
         }
@@ -81,7 +82,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <returns>Список свечей.</returns>
         public async Task<List<Candle>> GetLastCandlesAsync(string classCode, string securityCode, CandleInterval interval, int count)
         {
-            var message = new Command<string>(classCode + "|" + securityCode + "|" + (int) interval + "|" + count, "get_candles_from_data_source");
+            var message = new Command<string[]>(new[] { classCode, securityCode, interval.ToQuikIntStringLookup(), count.ToQuikStringLookup() }, "get_candles_from_data_source");
             var response = await _quikClient.SendAsync<Result<List<Candle>>>(message).ConfigureAwait(false);
             return response.Data;
         }
@@ -94,7 +95,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <param name="interval">интервал свечей (тайм-фрейм).</param>
         public Task SubscribeAsync(string classCode, string securityCode, CandleInterval interval)
         {
-            var message = new Command<string>(classCode + "|" + securityCode + "|" + (int) interval, "subscribe_to_candles");
+            var message = new Command<string[]>(new[] { classCode, securityCode, interval.ToQuikIntStringLookup() }, "subscribe_to_candles");
             return _quikClient.SendAsync<Result<string>>(message);
         }
 
@@ -106,7 +107,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <param name="interval">интервал свечей (тайм-фрейм).</param>
         public Task UnsubscribeAsync(string classCode, string securityCode, CandleInterval interval)
         {
-            var message = new Command<string>(classCode + "|" + securityCode + "|" + (int) interval, "unsubscribe_from_candles");
+            var message = new Command<string[]>(new[] { classCode, securityCode, interval.ToQuikIntStringLookup() }, "unsubscribe_from_candles");
             return _quikClient.SendAsync<Result<string>>(message);
         }
 
@@ -118,7 +119,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <param name="interval">интервал свечей (тайм-фрейм).</param>
         public async Task<bool> IsSubscribedAsync(string classCode, string securityCode, CandleInterval interval)
         {
-            var message = new Command<string>(classCode + "|" + securityCode + "|" + (int) interval, "is_subscribed");
+            var message = new Command<string[]>(new[] { classCode, securityCode, interval.ToQuikIntStringLookup() }, "is_subscribed");
             var response = await _quikClient.SendAsync<Result<bool>>(message).ConfigureAwait(false);
             return response.Data;
         }

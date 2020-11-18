@@ -26,21 +26,21 @@ namespace QuikSharp.QuikFunctions.Services
         public async Task<string> GetWorkingFolderAsync()
         {
             var response = await _quikClient.SendAsync<Result<string>>(
-                (new Command<string>("", "getWorkingFolder"))).ConfigureAwait(false);
+                (new Command<string>(string.Empty, "getWorkingFolder"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<bool> IsConnectedAsync(int timeout = Timeout.Infinite)
         {
             var response = await _quikClient.SendAsync<Result<string>>(
-                (new Command<string>("", "isConnected")), timeout).ConfigureAwait(false);
+                (new Command<string>(string.Empty, "isConnected")), timeout).ConfigureAwait(false);
             return response.Data == "1";
         }
 
         public async Task<string> GetScriptPathAsync()
         {
             var response = await _quikClient.SendAsync<Result<string>>(
-                (new Command<string>("", "getScriptPath"))).ConfigureAwait(false);
+                (new Command<string>(string.Empty, "getScriptPath"))).ConfigureAwait(false);
             return response.Data;
         }
 

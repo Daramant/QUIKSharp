@@ -1,4 +1,5 @@
-﻿using QuikSharp.Messages;
+﻿using QuikSharp.Extensions;
+using QuikSharp.Messages;
 using QuikSharp.QuikClient;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace QuikSharp.QuikFunctions.Labels
         public async Task<double> AddLabelAsync(double price, string curDate, string curTime, string hint, string path, string tag, string alignment, double backgnd)
         {
             var response = await _quikClient.SendAsync<Result<double>>(
-                    (new Command<string>(price + "|" + curDate + "|" + curTime + "|" + hint + "|" + path + "|" + tag + "|" + alignment + "|" + backgnd, "addLabel")))
+                    (new Command<string[]>(new[] { price.ToQuikString(), curDate, curTime, hint, path, tag, alignment, backgnd.ToQuikString() }, "addLabel")))
                 .ConfigureAwait(false);
             return response.Data;
         }
@@ -27,7 +28,7 @@ namespace QuikSharp.QuikFunctions.Labels
         public async Task<bool> DelLabelAsync(string tag, double id)
         {
             await _quikClient.SendAsync<Result<string>>(
-                (new Command<string>(tag + "|" + id, "delLabel"))).ConfigureAwait(false);
+                (new Command<string[]>(new[] { tag, id.ToQuikString() }, "delLabel"))).ConfigureAwait(false);
             return true;
         }
 

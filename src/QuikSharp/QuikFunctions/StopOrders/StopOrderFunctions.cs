@@ -9,6 +9,7 @@ using QuikSharp.QuikClient;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using QuikSharp.Extensions;
 
 namespace QuikSharp.QuikFunctions.StopOrders
 {
@@ -34,7 +35,7 @@ namespace QuikSharp.QuikFunctions.StopOrders
         /// <returns></returns>
         public async Task<List<StopOrder>> GetStopOrdersAsync()
         {
-            var message = new Command<string>("", "get_stop_orders");
+            var message = new Command<string>(string.Empty, "get_stop_orders");
             var response = await _quikClient.SendAsync<Result<List<StopOrder>>>(message).ConfigureAwait(false);
             return response.Data;
         }
@@ -44,7 +45,7 @@ namespace QuikSharp.QuikFunctions.StopOrders
         /// </summary>
         public async Task<List<StopOrder>> GetStopOrdersAsync(string classCode, string securityCode)
         {
-            var message = new Command<string>(classCode + "|" + securityCode, "get_stop_orders");
+            var message = new Command<string[]>(new[] { classCode, securityCode }, "get_stop_orders");
             var response = await _quikClient.SendAsync<Result<List<StopOrder>>>(message).ConfigureAwait(false);
             return response.Data;
         }
@@ -115,7 +116,7 @@ namespace QuikSharp.QuikFunctions.StopOrders
                 ACTION = TransactionAction.KILL_STOP_ORDER,
                 CLASSCODE = stopOrder.ClassCode,
                 SECCODE = stopOrder.SecCode,
-                STOP_ORDER_KEY = stopOrder.OrderNum.ToString()
+                STOP_ORDER_KEY = stopOrder.OrderNum.ToQuikString()
             };
 
             return _trading.SendTransactionAsync(killStopOrderTransaction);

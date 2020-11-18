@@ -62,7 +62,7 @@ namespace QuikSharp.QuikFunctions.Debug
         public async Task<string> DivideStringByZeroAsync()
         {
             var response = await _quikClient.SendAsync<Result<string>>(
-                (new Command<string>("", "divide_string_by_zero"))).ConfigureAwait(false);
+                (new Command<string>(string.Empty, "divide_string_by_zero"))).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -72,7 +72,7 @@ namespace QuikSharp.QuikFunctions.Debug
         public async Task<bool> IsQuikAsync()
         {
             var response = await _quikClient.SendAsync<Result<string>>(
-                (new Command<string>("", "is_quik"))).ConfigureAwait(false);
+                (new Command<string>(string.Empty, "is_quik"))).ConfigureAwait(false);
             return response.Data == "1";
         }
     }

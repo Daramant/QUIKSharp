@@ -3,6 +3,7 @@
 
 using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
+using QuikSharp.Extensions;
 using System;
 using System.Diagnostics;
 
@@ -180,7 +181,7 @@ namespace QuikSharp.QuikEvents
         {
             Order?.Invoke(order);
             // invoke event specific for the transaction
-            string correlationId = order.TransID.ToString();
+            string correlationId = order.TransID.ToQuikString();
 
             #region Totally untested code or handling manual transactions
 
@@ -251,7 +252,7 @@ namespace QuikSharp.QuikEvents
             //if (OnStopOrder != null) OnStopOrder(stopOrder);
             StopOrder?.Invoke(stopOrder);
             // invoke event specific for the transaction
-            string correlationId = stopOrder.TransId.ToString();
+            string correlationId = stopOrder.TransId.ToQuikString();
 
             #region Totally untested code or handling manual transactions
 
