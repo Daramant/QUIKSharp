@@ -34,7 +34,7 @@ namespace QuikSharp.QuikFunctions.Orders
         /// Создание новой заявки.
         /// </summary>
         /// <param name="order">Инфомация о новой заявки, на основе которой будет сформирована транзакция.</param>
-        public async Task<long> CreateOrderAsync(Order order)
+        public Task<long> CreateOrderAsync(Order order)
         {
             Transaction newOrderTransaction = new Transaction
             {
@@ -47,7 +47,7 @@ namespace QuikSharp.QuikFunctions.Orders
                 PRICE = order.Price,
                 CLIENT_CODE = order.ClientCode
             };
-            return await _tradingFunctions.SendTransactionAsync(newOrderTransaction).ConfigureAwait(false);
+            return _tradingFunctions.SendTransactionAsync(newOrderTransaction);
         }
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace QuikSharp.QuikFunctions.Orders
         /// <param name="operation">Операция заявки (покупка/продажа)</param>
         /// <param name="price">Цена заявки</param>
         /// <param name="qty">Количество (в лотах)</param>
-        public async Task<Order> SendLimitOrderAsync(string classCode, string securityCode, string accountID, Operation operation, decimal price, int qty)
+        public Task<Order> SendLimitOrderAsync(string classCode, string securityCode, string accountID, Operation operation, decimal price, int qty)
         {
-            return await SendOrder(classCode, securityCode, accountID, operation, price, qty, TransactionType.L).ConfigureAwait(false);
+            return SendOrder(classCode, securityCode, accountID, operation, price, qty, TransactionType.L);
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace QuikSharp.QuikFunctions.Orders
         /// <param name="accountID">Счет клиента</param>
         /// <param name="operation">Операция заявки (покупка/продажа)</param>
         /// <param name="qty">Количество (в лотах)</param>
-        public async Task<Order> SendMarketOrderAsync(string classCode, string securityCode, string accountID, Operation operation, int qty)
+        public Task<Order> SendMarketOrderAsync(string classCode, string securityCode, string accountID, Operation operation, int qty)
         {
-            return await SendOrder(classCode, securityCode, accountID, operation, 0, qty, TransactionType.M).ConfigureAwait(false);
+            return SendOrder(classCode, securityCode, accountID, operation, 0, qty, TransactionType.M);
         }
 
         /// <summary>
@@ -143,16 +143,16 @@ namespace QuikSharp.QuikFunctions.Orders
         /// Отмена заявки.
         /// </summary>
         /// <param name="order">Информация по заявке, которую требуется отменить.</param>
-        public async Task<long> KillOrderAsync(Order order)
+        public Task<long> KillOrderAsync(Order order)
         {
-            Transaction killOrderTransaction = new Transaction
+            var killOrderTransaction = new Transaction
             {
                 ACTION = TransactionAction.KILL_ORDER,
                 CLASSCODE = order.ClassCode,
                 SECCODE = order.SecCode,
                 ORDER_KEY = order.OrderNum.ToString()
             };
-            return await _tradingFunctions.SendTransactionAsync(killOrderTransaction).ConfigureAwait(false);
+            return _tradingFunctions.SendTransactionAsync(killOrderTransaction);
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<Order> GetOrderAsync(string classCode, long orderId)
         {
             var message = new Command<string>(classCode + "|" + orderId, "get_order_by_number");
-            Message<Order> response = await _quikClient.SendAsync<Result<Order>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<Result<Order>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -176,7 +176,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<List<Order>> GetOrdersAsync()
         {
             var message = new Command<string>("", "get_orders");
-            Message<List<Order>> response = await _quikClient.SendAsync<Result<List<Order>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<Result<List<Order>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -186,7 +186,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<List<Order>> GetOrdersAsync(string classCode, string securityCode)
         {
             var message = new Command<string>(classCode + "|" + securityCode, "get_orders");
-            Message<List<Order>> response = await _quikClient.SendAsync<Result<List<Order>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<Result<List<Order>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -196,7 +196,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<Order> GetOrderByTransactionIdAsync(string classCode, string securityCode, long trans_id)
         {
             var message = new Command<string>(classCode + "|" + securityCode + "|" + trans_id, "getOrder_by_ID");
-            Message<Order> response = await _quikClient.SendAsync<Result<Order>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<Result<Order>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -206,7 +206,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<Order> GetOrderByNumberAsync(long order_num)
         {
             var message = new Command<string>(order_num.ToString(), "getOrder_by_Number");
-            Message<Order> response = await _quikClient.SendAsync<Result<Order>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<Result<Order>>(message).ConfigureAwait(false);
             return response.Data;
         }
     }

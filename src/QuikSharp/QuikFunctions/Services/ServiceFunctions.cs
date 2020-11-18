@@ -74,14 +74,14 @@ namespace QuikSharp.QuikFunctions.Services
                     throw new ArgumentOutOfRangeException("iconType");
             }
 
-            return true;
+            return true; // TODO: Возвращать результат из Quik.
         }
 
         public async Task<bool> PrintDbgStrAsync(string message)
         {
             await _quikClient.SendAsync<Result<string>>(
                 (new Command<string>(message, "PrintDbgStr"))).ConfigureAwait(false);
-            return true;
+            return true; // TODO: Возвращать результат из Quik.
         }
     }
 }

@@ -26,8 +26,9 @@ namespace QuikSharp.QuikFunctions.Classes
         {
             var response = await _quikClient.SendAsync<Result<string>>(
                 (new Command<string>("", "getClassesList"))).ConfigureAwait(false);
+
             return response.Data == null
-                ? new string[0]
+                ? Array.Empty<string>()
                 : response.Data.TrimEnd(',').Split(new[] {","}, StringSplitOptions.None);
         }
 
@@ -45,9 +46,9 @@ namespace QuikSharp.QuikFunctions.Classes
             return response.Data;
         }
 
-        public async Task<SecurityInfo> GetSecurityInfoAsync(ISecurity security)
+        public Task<SecurityInfo> GetSecurityInfoAsync(ISecurity security)
         {
-            return await GetSecurityInfoAsync(security.ClassCode, security.SecCode).ConfigureAwait(false);
+            return GetSecurityInfoAsync(security.ClassCode, security.SecCode);
         }
 
         public async Task<string[]> GetClassSecuritiesAsync(string classID)
@@ -55,7 +56,7 @@ namespace QuikSharp.QuikFunctions.Classes
             var response = await _quikClient.SendAsync<Result<string>>(
                 (new Command<string>(classID, "getClassSecurities"))).ConfigureAwait(false);
             return response.Data == null
-                ? new string[0]
+                ? Array.Empty<string>()
                 : response.Data.TrimEnd(',').Split(new[] {","}, StringSplitOptions.None);
         }
 

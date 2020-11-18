@@ -20,9 +20,9 @@ namespace QuikSharp.QuikFunctions.OrderBooks
             _quikClient = quikClient;
         }
         
-        public async Task<bool> SubscribeAsync(ISecurity security)
+        public Task<bool> SubscribeAsync(ISecurity security)
         {
-            return await SubscribeAsync(security.ClassCode, security.SecCode).ConfigureAwait(false);
+            return SubscribeAsync(security.ClassCode, security.SecCode);
         }
 
         public async Task<bool> SubscribeAsync(string class_code, string sec_code)
@@ -32,9 +32,9 @@ namespace QuikSharp.QuikFunctions.OrderBooks
             return response.Data;
         }
 
-        public async Task<bool> UnsubscribeAsync(ISecurity security)
+        public Task<bool> UnsubscribeAsync(ISecurity security)
         {
-            return await UnsubscribeAsync(security.ClassCode, security.SecCode).ConfigureAwait(false);
+            return UnsubscribeAsync(security.ClassCode, security.SecCode);
         }
 
         public async Task<bool> UnsubscribeAsync(string class_code, string sec_code)
@@ -44,9 +44,9 @@ namespace QuikSharp.QuikFunctions.OrderBooks
             return response.Data;
         }
 
-        public async Task<bool> IsSubscribedAsync(ISecurity security)
+        public Task<bool> IsSubscribedAsync(ISecurity security)
         {
-            return await IsSubscribedAsync(security.ClassCode, security.SecCode).ConfigureAwait(false);
+            return IsSubscribedAsync(security.ClassCode, security.SecCode);
         }
 
         public async Task<bool> IsSubscribedAsync(string class_code, string sec_code)

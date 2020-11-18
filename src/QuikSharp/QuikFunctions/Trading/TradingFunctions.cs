@@ -30,37 +30,6 @@ namespace QuikSharp.QuikFunctions.Trading
             _persistentStorage = persistentStorage;
         }
 
-        //public async Task<string[]> GetClassesList() {
-        //    var response = await _quikClient.Send<Response<string>>(
-        //        (new Request<string>("", "getClassesList")));
-        //    return response.Data == null
-        //        ? new string[0]
-        //        : response.Data.TrimEnd(',').Split(new[] { "," }, StringSplitOptions.None);
-        //}
-
-        //public async Task<ClassInfo> GetClassInfo(string classID) {
-        //    var response = await _quikClient.Send<Response<ClassInfo>>(
-        //        (new Request<string>(classID, "getClassInfo")));
-        //    return response.Data;
-        //}
-
-        //public async Task<SecurityInfo> GetSecurityInfo(string classCode, string secCode) {
-        //    var response = await _quikClient.Send<Response<SecurityInfo>>(
-        //        (new Request<string>(classCode + "|" + secCode, "getSecurityInfo")));
-        //    return response.Data;
-        //}
-
-        //public async Task<SecurityInfo> GetSecurityInfo(ISecurity security) {
-        //    return await GetSecurityInfo(security.ClassCode, security.SecCode);
-        //}
-
-        //public async Task<string[]> GetClassSecurities(string classID) {
-        //    var response = await _quikClient.Send<Response<string>>(
-        //        (new Request<string>(classID, "getClassSecurities")));
-        //    return response.Data == null
-        //        ? new string[0]
-        //        : response.Data.TrimEnd(',').Split(new[] { "," }, StringSplitOptions.None);
-        //}
         public async Task<DepoLimit> GetDepoAsync(string clientCode, string firmId, string secCode, string account)
         {
             var response = await _quikClient.SendAsync<Result<DepoLimit>>(
@@ -254,8 +223,7 @@ namespace QuikSharp.QuikFunctions.Trading
         public async Task<List<OptionBoard>> GetOptionBoardAsync(string classCode, string secCode)
         {
             var message = new Command<string>(classCode + "|" + secCode, "getOptionBoard");
-            Message<List<OptionBoard>> response =
-                await _quikClient.SendAsync<Result<List<OptionBoard>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<Result<List<OptionBoard>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -314,12 +282,6 @@ namespace QuikSharp.QuikFunctions.Trading
                 (new Command<string>(firmId + "|" + client, "IsUcpClient"))).ConfigureAwait(false);
             return response.Data;
         }
-
-        /*public async Task<ClassInfo> GetClassInfo(string classID) {
-            var response = await _quikClient.Send<Response<ClassInfo>>(
-                (new Request<string>(classID, "getClassInfo")));
-            return response.Data;
-        }*/
 
         /// <summary>
         /// Send a single transaction to Quik server

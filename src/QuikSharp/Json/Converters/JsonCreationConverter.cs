@@ -8,6 +8,8 @@ namespace QuikSharp.Json.Converters
 {
     public abstract class JsonCreationConverter<T> : JsonConverter
     {
+        public override bool CanWrite => false;
+
         /// <summary>
         /// Create an instance of objectType, based properties in the JSON object
         /// </summary>
@@ -44,7 +46,7 @@ namespace QuikSharp.Json.Converters
             object value,
             JsonSerializer serializer)
         {
-            serializer.Serialize(writer, value);
+            throw new NotSupportedException("CustomCreationConverter should only be used while deserializing.");
         }
     }
 }

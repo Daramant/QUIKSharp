@@ -215,7 +215,7 @@ namespace QuikSharp.QuikClient
                                         // then we will iterate over messages and cancel expired ones
                                         if (!request.ValidUntil.HasValue || request.ValidUntil >= DateTime.UtcNow)
                                         {
-                                            writer.WriteLine(request);
+                                            writer.WriteLine(serializedRequest);
                                             writer.Flush();
                                         }
                                         else

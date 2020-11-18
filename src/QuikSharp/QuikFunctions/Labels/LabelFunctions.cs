@@ -35,7 +35,7 @@ namespace QuikSharp.QuikFunctions.Labels
         {
             await _quikClient.SendAsync<Result<string>>(
                 (new Command<string>(tag, "delAllLabels"))).ConfigureAwait(false);
-            return true;
+            return true; // TODO: Возвращать результат из quik.
         }
     }
 }
