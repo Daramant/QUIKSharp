@@ -17,7 +17,7 @@ function OnError(message)
 	if is_connected then
 		local msg = {}
 		msg.t = timemsec()
-		msg.cmd = "lua_error"
+		msg.cmd = "Error"
 		msg.data = "Lua error: " .. message
 		sendCallback(msg)
 	end

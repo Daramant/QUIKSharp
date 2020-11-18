@@ -24,11 +24,11 @@ namespace QuikSharp.Json.Converters
         // ReSharper disable once RedundantAssignment
         protected override IMessage Create(Type objectType, JObject jObject)
         {
-            if (FieldExists("lua_error", jObject))
+            if (FieldExists("Error", jObject))
             {
                 var id = jObject.GetValue("id").Value<long>();
                 var cmd = jObject.GetValue("cmd").Value<string>();
-                var message = jObject.GetValue("lua_error").Value<string>();
+                var message = jObject.GetValue("Error").Value<string>();
                 LuaException exception;
                 switch (cmd)
                 {
@@ -141,7 +141,7 @@ namespace QuikSharp.Json.Converters
                     // if we have a custom event (e.g. add some processing  of standard Quik event) then we must process it here
                     switch (cmd)
                     {
-                        case "lua_error":
+                        case "Error":
                             return new Result<string>();
 
                         default:
@@ -151,7 +151,7 @@ namespace QuikSharp.Json.Converters
                 }
             }
 
-            throw new ArgumentException("Bad message format: no cmd or lua_error fields");
+            throw new ArgumentException("Bad message format: no cmd or Error fields");
         }
 
         private static bool FieldExists(string fieldName, JObject jObject)

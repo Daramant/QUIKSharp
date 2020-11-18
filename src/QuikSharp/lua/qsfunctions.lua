@@ -12,14 +12,14 @@ function qsfunctions.dispatch_and_process(msg)
         if status then
             return result
         else
-            msg.cmd = "lua_error"
-            msg.lua_error = "Lua error: " .. result
+            msg.cmd = "Error"
+            msg.error = "Lua error: " .. result
             return msg
         end
     else
 		log(to_json(msg), 3)
-		msg.lua_error = "Command not implemented in Lua qsfunctions module: " .. msg.cmd
-        msg.cmd = "lua_error"
+		msg.error = "Command not implemented in Lua qsfunctions module: " .. msg.cmd
+        msg.cmd = "Error"
         return msg
     end
 end
@@ -341,7 +341,7 @@ function qsfunctions.sendTransaction(msg)
     if res~="" then
         -- error handling
         msg.cmd = "lua_transaction_error"
-        msg.lua_error = res
+        msg.error = res
         return msg
     else
         -- transaction sent
@@ -774,11 +774,11 @@ function create_data_source(msg)
 	local is_error = false
 	if(error_descr ~= nil) then
 		msg.cmd = "lua_create_data_source_error"
-		msg.lua_error = error_descr
+		msg.error = error_descr
 		is_error = true
 	elseif ds == nil then
 		msg.cmd = "lua_create_data_source_error"
-		msg.lua_error = "Can't create data source for " .. class .. ", " .. sec .. ", " .. tostring(interval)
+		msg.error = "Can't create data source for " .. class .. ", " .. sec .. ", " .. tostring(interval)
 		is_error = true
 	end
 	return ds, is_error
