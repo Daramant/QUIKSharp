@@ -10,16 +10,11 @@ using System.Threading.Tasks;
 namespace Profiler.QuikTypeConverter
 {
     [MemoryDiagnoser]
-    //[Config("columns=Max")]
     public class QuikTypeConverterBenchmarks
     {
         private int _startIndex = 0;
         private int _endIndex = 100;
         private int _roundCount = 10;
-
-        public QuikTypeConverterBenchmarks()
-        {
-        }
 
         [Benchmark(Description = "IntToString ToString(CurrentCulture)")]
         public void IntToString_ToString_CurrentCulture()

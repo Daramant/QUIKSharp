@@ -16,18 +16,21 @@ namespace Profiler.EchoTransaction
             var quik = PingProfiler.CreateQuik();
             quik.Client.Start();
 
+            const int roundCount = 10;
+            var iterationCount = 10000;
+            double avarage = 0d;
+
             var stopwatch = new Stopwatch();
             Console.WriteLine("EchoTransaction started.");
 
-            for (int round = 0; round < 10; round++)
+            for (int round = 0; round < roundCount; round++)
             {
                 stopwatch.Reset();
                 stopwatch.Start();
 
-                var count = 10000;
                 var t = new Transaction();
 
-                var array = new Task<Transaction>[count];
+                var array = new Task<Transaction>[iterationCount];
                 for (int i = 0; i < array.Length; i++)
                 {
                     array[i] = quik.Functions.Debug.EchoAsync(t);
@@ -39,8 +42,12 @@ namespace Profiler.EchoTransaction
                 }
 
                 stopwatch.Stop();
-                Console.WriteLine("MultiPing takes msecs: " + stopwatch.ElapsedMilliseconds);
+                Console.WriteLine($"[{round}] MultiPing takes msecs: {stopwatch.ElapsedMilliseconds}; average: {(double)stopwatch.ElapsedMilliseconds * 1000 / iterationCount} microsec.");
+                avarage += stopwatch.ElapsedMilliseconds;
             }
+
+            avarage /= roundCount;
+            Console.WriteLine($"[Total] MultiPing takes msecs: {avarage}; average: {(double)avarage * 1000 / iterationCount} microsec.");
 
             Console.WriteLine("EchoTransaction finished.");
             Console.WriteLine();

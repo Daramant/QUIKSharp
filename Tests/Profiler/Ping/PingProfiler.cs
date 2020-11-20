@@ -27,6 +27,7 @@ namespace Profiler.Ping
             const int roundCount = 10;
             var iterationCount = 10000;
             double avarage = 0d;
+
             var stopwatch = new Stopwatch();
             Console.WriteLine("Ping started.");
             for (int round = 0; round < roundCount; round++)

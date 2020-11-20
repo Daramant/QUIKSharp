@@ -37,7 +37,7 @@ namespace QuikSharp.Quik
                 quikClient,
                 new QuikFunctions.QuikFunctions(
                     new DebugFunctions(quikClient),
-                    new ServiceFunctions(quikClient),
+                    new ServiceFunctions(quikClient, typeConverter),
                     new ClassFunctions(quikClient),
                     new OrderFunctions(quikClient, tradingFunctions, typeConverter),
                     new OrderBookFunctions(quikClient),

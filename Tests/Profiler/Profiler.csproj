@@ -264,6 +264,7 @@
     <Compile Include="Ping\PingProfiler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuikJsonSerializer\QuikJsonSerializerBenchmarks.cs" />
     <Compile Include="QuikTypeConverter\QuikTypeConverterBenchmarks.cs" />
   </ItemGroup>
   <ItemGroup>

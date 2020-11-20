@@ -32,7 +32,7 @@ namespace QuikSharp.QuikClient
         private readonly AsyncManualResetEvent _connectedMre = new AsyncManualResetEvent();
 
         private readonly IQuikEventHandler _quikEventHandler;
-        private readonly IQuikJsonSerializer _quikJsonSerializer;
+        private readonly IJsonSerializer _jsonSerializer;
 
         private readonly IPAddress _host;
         private readonly int _responsePort;
@@ -45,11 +45,11 @@ namespace QuikSharp.QuikClient
 
         public QuikClient(
             IQuikEventHandler quikEventHandler, 
-            IQuikJsonSerializer quikJsonSerializer,
+            IJsonSerializer jsonSerializer,
             QuikClientOptions options)
         {
             _quikEventHandler = quikEventHandler;
-            _quikJsonSerializer = quikJsonSerializer;
+            _jsonSerializer = jsonSerializer;
 
             _host = IPAddress.Parse(options.Host);
             _responsePort = options.ResponsePort;
@@ -135,12 +135,12 @@ namespace QuikSharp.QuikClient
         /// <summary>
         /// IQuickCalls functions enqueue a message and return a task from TCS
         /// </summary>
-        private readonly BlockingCollection<ICommand> RequestQueue = new BlockingCollection<ICommand>();
+        private readonly BlockingCollection<ICommand> CommandQueue = new BlockingCollection<ICommand>();
 
         /// <summary>
         /// If received message has a correlation id then use its Data to SetResult on TCS and remove the TCS from the dic
         /// </summary>
-        internal readonly ConcurrentDictionary<long, PendingResult> PendingResponses = new ConcurrentDictionary<long, PendingResult>();
+        internal readonly ConcurrentDictionary<long, PendingResult> PendingResults = new ConcurrentDictionary<long, PendingResult>();
 
         /// <summary>
         ///
@@ -161,9 +161,9 @@ namespace QuikSharp.QuikClient
             finally
             {
                 // cancel responses to release waiters
-                foreach (var responseKey in PendingResponses.Keys.ToList())
+                foreach (var responseKey in PendingResults.Keys.ToList())
                 {
-                    if (PendingResponses.TryRemove(responseKey, out var pendingResponse))
+                    if (PendingResults.TryRemove(responseKey, out var pendingResponse))
                     {
                         pendingResponse.TaskCompletionSource.TrySetCanceled();
                     }
@@ -203,29 +203,29 @@ namespace QuikSharp.QuikClient
                                 var writer = new StreamWriter(stream);
                                 while (!_cancellationTokenSource.IsCancellationRequested)
                                 {
-                                    ICommand request = null;
+                                    ICommand command = null;
                                     try
                                     {
                                         // BLOCKING
-                                        request = RequestQueue.Take(_cancellationTokenSource.Token);
-                                        var serializedRequest = _quikJsonSerializer.Serialize(request);
+                                        command = CommandQueue.Take(_cancellationTokenSource.Token);
+                                        var serializedRequest = _jsonSerializer.Serialize(command);
                                         //Trace.WriteLine("Request: " + request);
                                         // scenario: Quik is restarted or script is stopped
                                         // then writer must throw and we will add a message back
                                         // then we will iterate over messages and cancel expired ones
-                                        if (!request.ValidUntil.HasValue || request.ValidUntil >= DateTime.UtcNow)
+                                        if (!command.ValidUntil.HasValue || command.ValidUntil >= DateTime.UtcNow)
                                         {
                                             writer.WriteLine(serializedRequest);
                                             writer.Flush();
                                         }
                                         else
                                         {
-                                            Trace.Assert(request.Id > 0, "All requests must have correlation id");
-                                            PendingResponses[request.Id]
+                                            Trace.Assert(command.Id > 0, "All requests must have correlation id");
+                                            PendingResults[command.Id]
                                                 .TaskCompletionSource.SetException(
                                                     new TimeoutException("ValidUntilUTC is less than current time"));
                                             
-                                            PendingResponses.TryRemove(request.Id, out var _);
+                                            PendingResults.TryRemove(command.Id, out var _);
                                         }
                                     }
                                     catch (OperationCanceledException)
@@ -236,9 +236,9 @@ namespace QuikSharp.QuikClient
                                     {
                                         // this catch is for unexpected and unchecked connection termination
                                         // add back, there was an error while writing
-                                        if (request != null)
+                                        if (command != null)
                                         {
-                                            RequestQueue.Add(request);
+                                            CommandQueue.Add(command);
                                         }
 
                                         break;
@@ -322,13 +322,13 @@ namespace QuikSharp.QuikClient
                                         //Trace.WriteLine("Response:" + response);
                                         try
                                         {
-                                            var response = _quikJsonSerializer.Deserialize<IResult>((string)serializedResponseObj);
+                                            var response = _jsonSerializer.Deserialize<IResult>((string)serializedResponseObj);
                                             Trace.Assert(response.Id > 0);
                                             // it is a response message
-                                            if (!PendingResponses.ContainsKey(response.Id))
+                                            if (!PendingResults.ContainsKey(response.Id))
                                                 throw new ApplicationException("Unexpected correlation ID");
                                             
-                                            PendingResponses.TryRemove(response.Id, out var pendingResponse);
+                                            PendingResults.TryRemove(response.Id, out var pendingResponse);
                                             if (!pendingResponse.Command.ValidUntil.HasValue || pendingResponse.Command.ValidUntil >= DateTime.UtcNow)
                                             {
                                                 pendingResponse.TaskCompletionSource.SetResult(response);
@@ -422,7 +422,7 @@ namespace QuikSharp.QuikClient
 
                                     try
                                     {
-                                        var @event = _quikJsonSerializer.Deserialize<IEvent>(callback);
+                                        var @event = _jsonSerializer.Deserialize<IEvent>(callback);
                                         // it is a callback message
                                         await _receivedCallbacksChannel.Writer.WriteAsync(@event);
                                     }
@@ -652,8 +652,8 @@ namespace QuikSharp.QuikClient
         /// </summary>
         public TimeSpan DefaultSendTimeout { get; set; } = Timeout.InfiniteTimeSpan;
 
-        public async Task<TResponse> SendAsync<TResponse>(ICommand request, int timeout = 0)
-            where TResponse : class, IResult, new()
+        public async Task<TResult> SendAsync<TResult>(ICommand command, int timeout = 0)
+            where TResult : class, IResult, new()
         {
             // use DefaultSendTimeout for default calls
             if (timeout == 0)
@@ -680,7 +680,7 @@ namespace QuikSharp.QuikClient
             var tcs = new TaskCompletionSource<IResult>(TaskCreationOptions.RunContinuationsAsynchronously);
             var ctRegistration = default(CancellationTokenRegistration);
 
-            request.Id = GetNewUniqueId();
+            command.Id = GetNewUniqueId();
 
             if (timeout > 0)
             {
@@ -688,20 +688,20 @@ namespace QuikSharp.QuikClient
                 ctRegistration = ct.Token.Register(() =>
                 {
                     tcs.TrySetException(new TimeoutException("Send operation timed out"));
-                    PendingResponses.TryRemove(request.Id, out var pendingResponse);
+                    PendingResults.TryRemove(command.Id, out var pendingResponse);
                 }, false);
 
                 ct.CancelAfter(timeout);
             }
 
-            PendingResponses[request.Id] = new PendingResult(request, typeof(TResponse), tcs);
+            PendingResults[command.Id] = new PendingResult(command, typeof(TResult), tcs);
             // add to queue after responses dictionary
-            RequestQueue.Add(request);
-            IResult response;
+            CommandQueue.Add(command);
+            IResult result;
 
             try
             {
-                response = await tcs.Task.ConfigureAwait(false);
+                result = await tcs.Task.ConfigureAwait(false);
             }
             finally
             {
@@ -709,7 +709,7 @@ namespace QuikSharp.QuikClient
                     ctRegistration.Dispose();
             }
 
-            return (response as TResponse);
+            return (result as TResult);
         }
     }
 }

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace QuikSharp.Json.Serializers
 {
-    public class QuikJsonSerializer : IQuikJsonSerializer
+    public class QuikJsonSerializer : IJsonSerializer
     {
         private readonly JsonSerializer _serializer;
 
@@ -26,7 +26,7 @@ namespace QuikSharp.Json.Serializers
             //_serializer.Converters.Add(new MessageConverter(quikClient));
         }
 
-        public void AddConverter(JsonConverter jsonConverter)
+        public void AddConverter(JsonConverter jsonConverter) // TODO: Удалить.
         {
             _serializer.Converters.Add(jsonConverter);
         }

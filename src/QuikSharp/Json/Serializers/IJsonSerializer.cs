@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuikSharp.Json.Serializers
 {
-    public interface IQuikJsonSerializer
+    public interface IJsonSerializer
     {
         /// <summary>
         ///

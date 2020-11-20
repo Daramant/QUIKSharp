@@ -16,7 +16,7 @@ namespace QuikSharp.Tests
 
         protected IQuikFactory QuikFactory { get; private set; }
 
-        protected IQuikJsonSerializer JsonSerializer { get; private set; }
+        protected IJsonSerializer JsonSerializer { get; private set; }
 
         protected void SetUpQuik()
         {

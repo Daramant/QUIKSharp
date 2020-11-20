@@ -41,7 +41,7 @@ namespace QuikSharp.Json.Converters
                         break;
                 }
 
-                _service.PendingResponses.TryRemove(id, out var pendingResponse);
+                _service.PendingResults.TryRemove(id, out var pendingResponse);
                 pendingResponse.TaskCompletionSource.SetException(exception);
                 // terminate listener task that was processing this task
                 throw exception;
@@ -50,7 +50,7 @@ namespace QuikSharp.Json.Converters
             {
                 // Если есть id, значит пришел ответ на запрос (IRespose).
                 var id = jObject.GetValue("id").Value<long>();
-                objectType = _service.PendingResponses[id].ResultType;
+                objectType = _service.PendingResults[id].ResultType;
                 return (IResult)Activator.CreateInstance(objectType);
             }
             else if (FieldExists("cmd", jObject))
