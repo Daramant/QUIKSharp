@@ -44,7 +44,6 @@
         <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
     </ItemGroup>
     <ItemGroup>
-        <Folder Include="Json\Extensions\" />
         <Folder Include="lua\logs" />
     </ItemGroup>
 </Project>

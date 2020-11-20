@@ -1,6 +1,7 @@
 ﻿using QuikSharp.Extensions;
 using QuikSharp.Messages;
 using QuikSharp.QuikClient;
+using QuikSharp.TypeConverters;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,24 +12,28 @@ namespace QuikSharp.QuikFunctions.Labels
     public class LabelFunctions : ILabelFunctions
     {
         private readonly IQuikClient _quikClient;
+        private readonly ITypeConverter _typeConverter;
 
-        public LabelFunctions(IQuikClient quikClient)
+        public LabelFunctions(
+            IQuikClient quikClient,
+            ITypeConverter typeConverter)
         {
             _quikClient = quikClient;
+            _typeConverter = typeConverter;
         }
 
-        public async Task<double> AddLabelAsync(double price, string curDate, string curTime, string hint, string path, string tag, string alignment, double backgnd)
+        public async Task<decimal> AddLabelAsync(decimal price, string curDate, string curTime, string hint, string path, string tag, string alignment, decimal backgnd)
         {
-            var response = await _quikClient.SendAsync<Result<double>>(
-                    (new Command<string[]>(new[] { price.ToQuikString(), curDate, curTime, hint, path, tag, alignment, backgnd.ToQuikString() }, "addLabel")))
+            var response = await _quikClient.SendAsync<Result<decimal>>(
+                    (new Command<string[]>(new[] { _typeConverter.ToString(price), curDate, curTime, hint, path, tag, alignment, _typeConverter.ToString(backgnd) }, "addLabel")))
                 .ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<bool> DelLabelAsync(string tag, double id)
+        public async Task<bool> DelLabelAsync(string tag, decimal id)
         {
             await _quikClient.SendAsync<Result<string>>(
-                (new Command<string[]>(new[] { tag, id.ToQuikString() }, "delLabel"))).ConfigureAwait(false);
+                (new Command<string[]>(new[] { tag, _typeConverter.ToString(id) }, "delLabel"))).ConfigureAwait(false);
             return true;
         }
 

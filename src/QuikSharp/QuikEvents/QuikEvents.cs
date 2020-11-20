@@ -4,6 +4,7 @@
 using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Extensions;
+using QuikSharp.TypeConverters;
 using System;
 using System.Diagnostics;
 
@@ -12,10 +13,14 @@ namespace QuikSharp.QuikEvents
     public class QuikEvents : IQuikEvents, IQuikEventsInvoker
     {
         private readonly IPersistentStorage _persistentStorage;
+        private readonly ITypeConverter _typeConverter;
 
-        public QuikEvents(IPersistentStorage persistentStorage)
+        public QuikEvents(
+            IPersistentStorage persistentStorage,
+            ITypeConverter typeConverter)
         {
             _persistentStorage = persistentStorage;
+            _typeConverter = typeConverter;
         }
 
         /// <summary>
@@ -181,7 +186,7 @@ namespace QuikSharp.QuikEvents
         {
             Order?.Invoke(order);
             // invoke event specific for the transaction
-            string correlationId = order.TransID.ToQuikString();
+            string correlationId = _typeConverter.ToString(order.TransID);
 
             #region Totally untested code or handling manual transactions
 
@@ -252,7 +257,7 @@ namespace QuikSharp.QuikEvents
             //if (OnStopOrder != null) OnStopOrder(stopOrder);
             StopOrder?.Invoke(stopOrder);
             // invoke event specific for the transaction
-            string correlationId = stopOrder.TransId.ToQuikString();
+            string correlationId = _typeConverter.ToString(stopOrder.TransId);
 
             #region Totally untested code or handling manual transactions
 

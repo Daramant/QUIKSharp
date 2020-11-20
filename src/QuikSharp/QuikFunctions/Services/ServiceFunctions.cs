@@ -5,6 +5,7 @@ using QuikSharp.DataStructures;
 using QuikSharp.Messages;
 using QuikSharp.QuikClient;
 using QuikSharp.QuikFunctions.Services;
+using QuikSharp.TypeConverters;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,10 +18,14 @@ namespace QuikSharp.QuikFunctions.Services
     public class ServiceFunctions : IServiceFunctions
     {
         private readonly IQuikClient _quikClient;
+        private readonly ITypeConverter _typeConverter;
 
-        public ServiceFunctions(IQuikClient quikClient)
+        public ServiceFunctions(
+            IQuikClient quikClient,
+            ITypeConverter typeConverter)
         {
             _quikClient = quikClient;
+            _typeConverter = typeConverter;
         }
 
         public async Task<string> GetWorkingFolderAsync()
@@ -47,7 +52,7 @@ namespace QuikSharp.QuikFunctions.Services
         public async Task<string> GetInfoParamAsync(InfoParams param)
         {
             var response = await _quikClient.SendAsync<Result<string>>(
-                (new Command<string>(param.ToString(), "getInfoParam"))).ConfigureAwait(false);
+                (new Command<string>(_typeConverter.ToString(param), "getInfoParam"))).ConfigureAwait(false);
             return response.Data;
         }
 

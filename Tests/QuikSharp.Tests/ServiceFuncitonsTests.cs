@@ -74,7 +74,7 @@ namespace QuikSharp.Tests
         [Test]
         public void DelLabel()
         {
-            double tagId = 13;
+            decimal tagId = 13;
             var res = Quik.Functions.Labels.DelLabelAsync("si", tagId);
 
             Console.WriteLine("delLabel: "

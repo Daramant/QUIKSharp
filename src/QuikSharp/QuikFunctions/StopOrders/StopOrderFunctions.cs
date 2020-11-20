@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using QuikSharp.Extensions;
+using QuikSharp.TypeConverters;
 
 namespace QuikSharp.QuikFunctions.StopOrders
 {
@@ -20,13 +21,16 @@ namespace QuikSharp.QuikFunctions.StopOrders
     {
         private readonly IQuikClient _quikClient;
         private readonly ITradingFunctions _trading;
+        private readonly ITypeConverter _typeConverter;
 
         public StopOrderFunctions(
             IQuikClient quikClient,
-            ITradingFunctions trading)
+            ITradingFunctions trading,
+            ITypeConverter typeConverter)
         {
             _quikClient = quikClient;
             _trading = trading;
+            _typeConverter = typeConverter;
         }
 
         /// <summary>
@@ -116,7 +120,7 @@ namespace QuikSharp.QuikFunctions.StopOrders
                 ACTION = TransactionAction.KILL_STOP_ORDER,
                 CLASSCODE = stopOrder.ClassCode,
                 SECCODE = stopOrder.SecCode,
-                STOP_ORDER_KEY = stopOrder.OrderNum.ToQuikString()
+                STOP_ORDER_KEY = _typeConverter.ToString(stopOrder.OrderNum)
             };
 
             return _trading.SendTransactionAsync(killStopOrderTransaction);

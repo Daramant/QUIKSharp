@@ -15,8 +15,6 @@ namespace QuikSharp.Json.Serializers
         [ThreadStatic]
         private static StringBuilder _stringBuilder;
 
-        public QuikClient.QuikClient QuikService { get; set; } // TODO: Убрать.
-
         public QuikJsonSerializer()
         {
             _serializer = new JsonSerializer

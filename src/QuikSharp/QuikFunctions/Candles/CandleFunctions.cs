@@ -5,6 +5,7 @@ using QuikSharp.DataStructures;
 using QuikSharp.Extensions;
 using QuikSharp.Messages;
 using QuikSharp.QuikClient;
+using QuikSharp.TypeConverters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -16,10 +17,14 @@ namespace QuikSharp.QuikFunctions.Candles
     public class CandleFunctions : ICandleFunctions
     {
         private readonly IQuikClient _quikClient;
+        private readonly ITypeConverter _typeConverter;
 
-        public CandleFunctions(IQuikClient quikClient)
+        public CandleFunctions(
+            IQuikClient quikClient,
+            ITypeConverter typeConverter)
         {
             _quikClient = quikClient;
+            _typeConverter = typeConverter;
         }
 
         /// <summary>
@@ -54,7 +59,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <returns></returns>
         public async Task<List<Candle>> GetCandlesAsync(string graphicTag, int line, int first, int count)
         {
-            var message = new Command<string[]>(new[] { graphicTag, line.ToQuikStringLookup(), first.ToQuikStringLookup(), count.ToQuikStringLookup() }, "get_candles");
+            var message = new Command<string[]>(new[] { graphicTag, _typeConverter.ToStringLookup(line), _typeConverter.ToStringLookup(first), _typeConverter.ToStringLookup(count) }, "get_candles");
             var response = await _quikClient.SendAsync<Result<List<Candle>>>(message).ConfigureAwait(false);
             return response.Data;
         }
@@ -82,7 +87,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <returns>Список свечей.</returns>
         public async Task<List<Candle>> GetLastCandlesAsync(string classCode, string securityCode, CandleInterval interval, int count)
         {
-            var message = new Command<string[]>(new[] { classCode, securityCode, interval.ToQuikIntStringLookup(), count.ToQuikStringLookup() }, "get_candles_from_data_source");
+            var message = new Command<string[]>(new[] { classCode, securityCode, _typeConverter.ToString((int)interval), _typeConverter.ToStringLookup(count) }, "get_candles_from_data_source");
             var response = await _quikClient.SendAsync<Result<List<Candle>>>(message).ConfigureAwait(false);
             return response.Data;
         }
@@ -95,7 +100,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <param name="interval">интервал свечей (тайм-фрейм).</param>
         public Task SubscribeAsync(string classCode, string securityCode, CandleInterval interval)
         {
-            var message = new Command<string[]>(new[] { classCode, securityCode, interval.ToQuikIntStringLookup() }, "subscribe_to_candles");
+            var message = new Command<string[]>(new[] { classCode, securityCode, _typeConverter.ToString((int)interval) }, "subscribe_to_candles");
             return _quikClient.SendAsync<Result<string>>(message);
         }
 
@@ -107,7 +112,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <param name="interval">интервал свечей (тайм-фрейм).</param>
         public Task UnsubscribeAsync(string classCode, string securityCode, CandleInterval interval)
         {
-            var message = new Command<string[]>(new[] { classCode, securityCode, interval.ToQuikIntStringLookup() }, "unsubscribe_from_candles");
+            var message = new Command<string[]>(new[] { classCode, securityCode, _typeConverter.ToString((int)interval) }, "unsubscribe_from_candles");
             return _quikClient.SendAsync<Result<string>>(message);
         }
 
@@ -119,7 +124,7 @@ namespace QuikSharp.QuikFunctions.Candles
         /// <param name="interval">интервал свечей (тайм-фрейм).</param>
         public async Task<bool> IsSubscribedAsync(string classCode, string securityCode, CandleInterval interval)
         {
-            var message = new Command<string[]>(new[] { classCode, securityCode, interval.ToQuikIntStringLookup() }, "is_subscribed");
+            var message = new Command<string[]>(new[] { classCode, securityCode, _typeConverter.ToString((int)interval) }, "is_subscribed");
             var response = await _quikClient.SendAsync<Result<bool>>(message).ConfigureAwait(false);
             return response.Data;
         }

@@ -19,7 +19,7 @@ namespace QuikSharp.QuikFunctions.Labels
         /// <param name="alignment">LEFT, RIGHT, TOP, BOTTOM</param>
         /// <param name="backgnd"> On = 1, Off = 0</param>
         /// <returns>Возвращает Id метки</returns>
-        Task<double> AddLabelAsync(double price, string curDate, string curTime, string hint, string path, string tag, string alignment, double backgnd);
+        Task<decimal> AddLabelAsync(decimal price, string curDate, string curTime, string hint, string path, string tag, string alignment, decimal backgnd);
 
         /// <summary>
         /// Удаляет метку по ее Id
@@ -27,7 +27,7 @@ namespace QuikSharp.QuikFunctions.Labels
         /// <param name="tag"></param>
         /// <param name="id">Id метки</param>
         /// <returns></returns>
-        Task<bool> DelLabelAsync(string tag, double id);
+        Task<bool> DelLabelAsync(string tag, decimal id);
 
         /// <summary>
         /// Удаляет все метки с графика

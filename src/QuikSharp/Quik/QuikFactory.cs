@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using QuikSharp.QuikFunctions.Labels;
+using QuikSharp.TypeConverters;
 
 namespace QuikSharp.Quik
 {
@@ -23,11 +24,12 @@ namespace QuikSharp.Quik
         {
             var jsonSerializer = new QuikJsonSerializer();
             var persistentStorage = new InMemoryPersistantStorage();
+            var typeConverter = new QuikTypeConverter();
 
-            var quikEvents = new QuikEvents.QuikEvents(persistentStorage);
+            var quikEvents = new QuikEvents.QuikEvents(persistentStorage, typeConverter);
             var quikEventHandler = new QuikEventHandler(quikEvents);
             var quikClient = new QuikClient.QuikClient(quikEventHandler, jsonSerializer, options);
-            var tradingFunctions = new TradingFunctions(quikClient, persistentStorage);
+            var tradingFunctions = new TradingFunctions(quikClient, persistentStorage, typeConverter);
 
             jsonSerializer.AddConverter(new MessageConverter(quikClient));
 
@@ -37,13 +39,13 @@ namespace QuikSharp.Quik
                     new DebugFunctions(quikClient),
                     new ServiceFunctions(quikClient),
                     new ClassFunctions(quikClient),
-                    new OrderFunctions(quikClient, tradingFunctions),
+                    new OrderFunctions(quikClient, tradingFunctions, typeConverter),
                     new OrderBookFunctions(quikClient),
-                    new StopOrderFunctions(quikClient, tradingFunctions),
+                    new StopOrderFunctions(quikClient, tradingFunctions, typeConverter),
                     tradingFunctions,
-                    new CandleFunctions(quikClient),
-                    new LabelFunctions(quikClient)),
-                new QuikEvents.QuikEvents(persistentStorage));
+                    new CandleFunctions(quikClient, typeConverter),
+                    new LabelFunctions(quikClient, typeConverter)),
+                new QuikEvents.QuikEvents(persistentStorage, typeConverter));
         }
     }
 }

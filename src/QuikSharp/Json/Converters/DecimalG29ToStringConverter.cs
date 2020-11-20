@@ -29,7 +29,7 @@ namespace QuikSharp.Json.Converters
             object value,
             JsonSerializer serializer)
         {
-            decimal d = (decimal)value;
+            var d = (decimal)value;
             var t = JToken.FromObject(d.ToString("G29"));
             t.WriteTo(writer);
         }
