@@ -3,6 +3,7 @@ using QuikSharp.Json.Converters;
 using QuikSharp.Json.Tools;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -19,6 +20,7 @@ namespace QuikSharp.Json.Serializers
         {
             _serializer = new JsonSerializer
             {
+                Culture = CultureInfo.InvariantCulture,
                 TypeNameHandling = TypeNameHandling.None,
                 NullValueHandling = NullValueHandling.Ignore
             };

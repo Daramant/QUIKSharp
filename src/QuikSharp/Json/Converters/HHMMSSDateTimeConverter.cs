@@ -37,8 +37,7 @@ namespace QuikSharp.Json.Converters
             object value,
             JsonSerializer serializer)
         {
-            var t = JToken.FromObject(((DateTime)value).ToString("HHmmss"));
-            t.WriteTo(writer);
+            writer.WriteValue(((DateTime)value).ToString("HHmmss"));
         }
     }
 }

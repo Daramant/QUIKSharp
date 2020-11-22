@@ -21,17 +21,16 @@ namespace QuikSharp.Json.Converters
             object existingValue,
             JsonSerializer serializer)
         {
-            var t = JToken.Load(reader);
-            T target = t.Value<T>();
-            return target;
+            var underType = Nullable.GetUnderlyingType(objectType);
+            var baseType = underType ?? objectType;
+            return Convert.ChangeType(reader.Value, baseType, serializer.Culture);
         }
 
         public override void WriteJson(JsonWriter writer,
             object value,
             JsonSerializer serializer)
         {
-            var t = JToken.FromObject(value.ToString());
-            t.WriteTo(writer);
+            writer.WriteValue(Convert.ToString(value, serializer.Culture));
         }
     }
 }

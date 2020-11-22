@@ -15,6 +15,7 @@ namespace Profiler.QuikTypeConverter
         private int _startIndex = 0;
         private int _endIndex = 100;
         private int _roundCount = 10;
+        private int _enumCheckCount = 1000;
 
         [Benchmark(Description = "IntToString ToString(CurrentCulture)")]
         public void IntToString_ToString_CurrentCulture()
@@ -30,11 +31,11 @@ namespace Profiler.QuikTypeConverter
             }
         }
 
-        [Benchmark(Description = "IntToString ITypeConverter.ToString()")]
-        public void IntToString_ITypeConverter_ToString()
+        [Benchmark(Description = "IntToString QuikTypeConverter.ToString()")]
+        public void IntToString_QuikTypeConverter_ToString()
         {
             var results = new List<string>(_roundCount * (_endIndex - _startIndex + 1));
-            var typeConverter = new QuikSharp.TypeConverters.QuikTypeConverter();
+            var typeConverter = new CachingQuikTypeConverter();
 
             for (var r = 0; r < _roundCount; r++)
             {
@@ -45,11 +46,11 @@ namespace Profiler.QuikTypeConverter
             }
         }
 
-        [Benchmark(Description = "IntToString ITypeConverter.ToStringLookup()")]
-        public void IntToString_ITypeConverter_ToStringLookup()
+        [Benchmark(Description = "IntToString QuikTypeConverter.ToStringLookup()")]
+        public void IntToString_QuikTypeConverter_ToStringLookup()
         {
             var results = new List<string>(_roundCount * (_endIndex - _startIndex + 1));
-            var typeConverter = new QuikSharp.TypeConverters.QuikTypeConverter();
+            var typeConverter = new CachingQuikTypeConverter();
 
             for (var r = 0; r < _roundCount; r++)
             {
@@ -75,13 +76,13 @@ namespace Profiler.QuikTypeConverter
             }
         }
 
-        [Benchmark(Description = "EnumToString ITypeConverter.ToString()")]
-        public void EnumToString_ITypeConverter_ToString()
+        [Benchmark(Description = "EnumToString QuikTypeConverter.ToString()")]
+        public void EnumToString_QuikTypeConverter_ToString()
         {
             var values = (TransactionAction[])Enum.GetValues(typeof(TransactionAction));
             var results = new List<string>(_roundCount * values.Length);
 
-            var typeConverter = new QuikSharp.TypeConverters.QuikTypeConverter();
+            var typeConverter = new CachingQuikTypeConverter();
 
             for (var r = 0; r < _roundCount; r++)
             {
@@ -107,13 +108,13 @@ namespace Profiler.QuikTypeConverter
             }
         }
 
-        [Benchmark(Description = "EnumToStringAsInt ITypeConverter.ToStringLookup((int)enum)")]
-        public void EnumToStringAsInt_ITypeConverter_ToStringLookup_int_enum()
+        [Benchmark(Description = "EnumToStringAsInt QuikTypeConverter.ToStringLookup((int)enum)")]
+        public void EnumToStringAsInt_QuikTypeConverter_ToStringLookup_int_enum()
         {
             var values = (TransactionAction[])Enum.GetValues(typeof(TransactionAction));
             var results = new List<string>(_roundCount * values.Length);
 
-            var typeConverter = new QuikSharp.TypeConverters.QuikTypeConverter();
+            var typeConverter = new CachingQuikTypeConverter();
 
             for (var r = 0; r < _roundCount; r++)
             {
@@ -121,6 +122,32 @@ namespace Profiler.QuikTypeConverter
                 {
                     results.Add(typeConverter.ToStringLookup((int)values[i]));
                 }
+            }
+        }
+
+        [Benchmark(Description = "IsEnumDefined Enum.IsDefined()")]
+        public void IsEnumDefined_Enum_IsDefined()
+        {
+            object value = TransactionAction.KILL_ALL_ORDERS;
+            var results = new List<bool>(_enumCheckCount);
+
+            for (var r = 0; r < _enumCheckCount; r++)
+            {
+                results.Add(Enum.IsDefined(typeof(TransactionAction), value));
+            }
+        }
+
+        [Benchmark(Description = "IsEnumDefined QuikTypeConverter.IsEnumDefined")]
+        public void IsEnumDefined_QuikTypeConverter_IsEnumDefined()
+        {
+            var value = TransactionAction.KILL_ALL_ORDERS;
+            var results = new List<bool>(_enumCheckCount);
+
+            var typeConverter = new CachingQuikTypeConverter();
+
+            for (var r = 0; r < _enumCheckCount; r++)
+            {
+                results.Add(typeConverter.IsEnumDefined(value));
             }
         }
     }

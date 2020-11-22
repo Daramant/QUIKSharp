@@ -16,5 +16,8 @@ namespace QuikSharp.TypeConverters
 
         string ToString<TEnum>(TEnum value)
             where TEnum : Enum;
+
+        bool IsEnumDefined<TEnum>(TEnum value)
+            where TEnum : Enum;
     }
 }

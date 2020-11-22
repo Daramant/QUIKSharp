@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace QuikSharp.Json.Converters
@@ -21,17 +22,14 @@ namespace QuikSharp.Json.Converters
             object existingValue,
             JsonSerializer serializer)
         {
-            var t = JToken.Load(reader);
-            return t.Value<decimal>();
+            return decimal.Parse((string)reader.Value, serializer.Culture);
         }
 
         public override void WriteJson(JsonWriter writer,
             object value,
             JsonSerializer serializer)
         {
-            var d = (decimal)value;
-            var t = JToken.FromObject(d.ToString("G29"));
-            t.WriteTo(writer);
+            writer.WriteValue(((decimal)value).ToString("G29", serializer.Culture));
         }
     }
 }

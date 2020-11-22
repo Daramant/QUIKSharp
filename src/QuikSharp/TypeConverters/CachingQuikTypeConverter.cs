@@ -6,17 +6,13 @@ using System.Text;
 
 namespace QuikSharp.TypeConverters
 {
-    public class QuikTypeConverter : ITypeConverter
+    public class CachingQuikTypeConverter : ITypeConverter
     {
         private readonly CultureInfo _cultureInfo = CultureInfo.InvariantCulture;
 
         private readonly ConcurrentDictionary<int, string> _intToStringDictionary = new ConcurrentDictionary<int, string>();
         private readonly ConcurrentDictionary<Enum, string> _enumToStringDictionary = new ConcurrentDictionary<Enum, string>();
-
-        public QuikTypeConverter()
-        {
-
-        }
+        private readonly ConcurrentDictionary<Type, HashSet<Enum>> _definedEnumsDictionary = new ConcurrentDictionary<Type, HashSet<Enum>>();
 
         public string ToString(int value)
         {
@@ -60,6 +56,31 @@ namespace QuikSharp.TypeConverters
                 _enumToStringDictionary[value] = stringValue;
                 return stringValue;
             }
+        }
+
+        public bool IsEnumDefined<TEnum>(TEnum value)
+            where TEnum : Enum
+        {
+            var enumType = typeof(TEnum);
+
+            if (!_definedEnumsDictionary.TryGetValue(enumType, out var values))
+            {
+                lock (_definedEnumsDictionary)
+                {
+                    if (!_definedEnumsDictionary.TryGetValue(enumType, out values))
+                    {
+                        values = new HashSet<Enum>();
+                        foreach (TEnum @enum in Enum.GetValues(enumType))
+                        {
+                            values.Add(@enum);
+                        }
+
+                        _definedEnumsDictionary[enumType] = values;
+                    }
+                }
+            }
+
+            return values.Contains(value);
         }
     }
 }

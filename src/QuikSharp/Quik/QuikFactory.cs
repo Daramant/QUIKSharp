@@ -24,7 +24,7 @@ namespace QuikSharp.Quik
         {
             var jsonSerializer = new QuikJsonSerializer();
             var persistentStorage = new InMemoryPersistantStorage();
-            var typeConverter = new QuikTypeConverter();
+            var typeConverter = new CachingQuikTypeConverter();
 
             var quikEvents = new QuikEvents.QuikEvents(persistentStorage, typeConverter);
             var quikEventHandler = new QuikEventHandler(quikEvents);

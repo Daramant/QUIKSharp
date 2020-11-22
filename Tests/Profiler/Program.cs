@@ -16,7 +16,7 @@ namespace Profiler
             //PingProfiler.Ping();
             //EchoTransactionpProfiler.EchoTransaction();
             BenchmarkRunner.Run<QuikTypeConverterBenchmarks>();
-            BenchmarkRunner.Run<QuikJsonSerializerBenchmarks>();
+            //BenchmarkRunner.Run<QuikJsonSerializerBenchmarks>();
 
             Console.WriteLine("Profiler finished.");
             Console.ReadKey();

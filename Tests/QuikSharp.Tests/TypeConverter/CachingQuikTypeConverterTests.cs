@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Running;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using QuikSharp.DataStructures;
 using QuikSharp.TypeConverters;
 using System;
@@ -8,17 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.Tests.QuikTypeConverter
+namespace QuikSharp.Tests.TypeConverter
 {
     [TestFixture]
-    public class QuikTypeConverterTests
+    public class CachingQuikTypeConverterTests
     {
         private ITypeConverter _typeConverter;
 
         [SetUp]
         public void SetUp()
         {
-            _typeConverter = new TypeConverters.QuikTypeConverter();
+            _typeConverter = new TypeConverters.CachingQuikTypeConverter();
         }
 
         private enum TestEnum1
@@ -57,18 +56,6 @@ namespace QuikSharp.Tests.QuikTypeConverter
             //}
 
             result += result;
-        }
-
-        [Test]
-        public void Test12()
-        {
-            int? a = null;
-            object aObj = a;
-
-            int? b = new int?();
-            object bObj = b;
-
-            Console.WriteLine(Object.ReferenceEquals(aObj, bObj)); // True or False?
         }
     }
 }

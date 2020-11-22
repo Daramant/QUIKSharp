@@ -15,13 +15,14 @@ namespace Profiler.QuikJsonSerializer
         private int _endIndex = 100;
         private int _roundCount = 10;
 
-        [Benchmark(Description = "IntToString ITypeConverter.ToString()")]
-        public void IntToString_ITypeConverter_ToString()
+        [Benchmark(Description = "Serialize & Deserialize QuikJsonSerializer")]
+        public void QuikJsonSerializer_Serialize_Deserialize()
         {
             var results = new List<string>(_roundCount * (_endIndex - _startIndex + 1));
             var jsonSerializer = new QuikSharp.Json.Serializers.QuikJsonSerializer();
 
             var t = new Transaction();
+            t.PRICE = 123.456m;
 
             for (var r = 0; r < _roundCount; r++)
             {
@@ -29,6 +30,11 @@ namespace Profiler.QuikJsonSerializer
                 {
                     var j = jsonSerializer.Serialize(t);
                     var t2 = jsonSerializer.Deserialize<Transaction>(j);
+                    
+                    //if (t.PRICE != t2.PRICE)
+                    //{
+                    //    throw new Exception("Deserialization problem with PRICE property!");
+                    //}
 
                     results.Add(j);
                 }
