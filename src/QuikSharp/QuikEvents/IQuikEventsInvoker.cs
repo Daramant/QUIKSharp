@@ -7,8 +7,6 @@ namespace QuikSharp.QuikEvents
 {
     public interface IQuikEventsInvoker
     {
-        void SetEventSender(IQuik quik);
-
         void OnAccountBalance(AccountBalance accBal);
 
         void OnAccountPosition(AccountPosition accPos);

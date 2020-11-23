@@ -21,6 +21,8 @@ using QuikSharp.Messages;
 using QuikSharp.Json.Serializers;
 using QuikSharp.Extensions;
 using QuikSharp.Exceptions;
+using QuikSharp.QuikEvents;
+using QuikSharp.Quik;
 
 namespace QuikSharp.QuikClient
 {
@@ -37,6 +39,8 @@ namespace QuikSharp.QuikClient
         private readonly IPAddress _host;
         private readonly int _responsePort;
         private readonly int _callbackPort;
+
+        private IQuik _quik;
 
         static QuikClient()
         {
@@ -61,34 +65,29 @@ namespace QuikSharp.QuikClient
         /// <summary>
         /// Событие вызывается когда библиотека QuikSharp успешно подключилась к Quik'у
         /// </summary>
-        public event InitHandler Connected;
+        public event QuikEventHandler<InitEventArgs> Connected;
 
         private void OnConnected(int port)
         {
-            Connected?.Invoke(port);
+            Connected?.Invoke(_quik, new InitEventArgs(port));
         }
 
         /// <summary>
         /// Событие вызывается когда библиотека QuikSharp была отключена от Quik'а
         /// </summary>
-        public event VoidHandler Disconnected;
+        public event QuikEventHandler<EventArgs> Disconnected;
 
         private void OnDisconnected()
         {
-            Disconnected?.Invoke();
-        }
-
-        /// <summary>
-        /// Функция вызывается терминалом QUIK при остановке скрипта из диалога управления и при закрытии терминала QUIK.
-        /// </summary>
-        public event StopHandler Stop;
-
-        private void OnStop(int signal)
-        {
-            Stop?.Invoke(signal);
+            Disconnected?.Invoke(_quik, EventArgs.Empty);
         }
 
         #endregion
+
+        public void SetEventSender(IQuik quik)
+        {
+            _quik = quik;
+        }
 
         /// <summary>
         ///
@@ -116,7 +115,7 @@ namespace QuikSharp.QuikClient
         private Task _callbackReceiverTask;
         private Task _callbackInvokerTask;
 
-        private Channel<IEvent> _receivedCallbacksChannel =
+        private Channel<IEvent> _eventChannel =
             Channel.CreateUnbounded<IEvent>(new UnboundedChannelOptions()
             {
                 SingleReader = true,
@@ -147,7 +146,9 @@ namespace QuikSharp.QuikClient
         /// </summary>
         public Task StopAsync()
         {
-            if (!IsStarted) return Task.CompletedTask;
+            if (!IsStarted) 
+                return Task.CompletedTask;
+
             IsStarted = false;
             _cancellationTokenSource.Cancel();
             _cancellationTokenRegistration.Dispose();
@@ -179,7 +180,9 @@ namespace QuikSharp.QuikClient
         /// <exception cref="ApplicationException">Response message id does not exists in results dictionary</exception>
         public void Start()
         {
-            if (IsStarted) return;
+            if (IsStarted) 
+                return;
+
             IsStarted = true;
             _cancellationTokenSource = new CancellationTokenSource();
             _taskCompletionSource = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -424,7 +427,7 @@ namespace QuikSharp.QuikClient
                                     {
                                         var @event = _jsonSerializer.Deserialize<IEvent>(callback);
                                         // it is a callback message
-                                        await _receivedCallbacksChannel.Writer.WriteAsync(@event);
+                                        await _eventChannel.Writer.WriteAsync(@event);
                                     }
                                     catch (Exception e) // deserialization exception is possible
                                     {
@@ -475,7 +478,7 @@ namespace QuikSharp.QuikClient
                     {
                         try
                         {
-                            var @event = await _receivedCallbacksChannel.Reader.ReadAsync(_cancellationTokenSource.Token);
+                            var @event = await _eventChannel.Reader.ReadAsync(_cancellationTokenSource.Token);
                             try
                             {
                                 _quikEventHandler.Handle(@event);

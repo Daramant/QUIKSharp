@@ -47,6 +47,7 @@ namespace QuikSharp.Quik
                     new LabelFunctions(quikClient, typeConverter)),
                 quikEvents);
 
+            quikClient.SetEventSender(quik);
             quikEvents.SetEventSender(quik);
 
             return quik;

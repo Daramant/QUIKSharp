@@ -1,4 +1,5 @@
 ﻿using QuikSharp.Messages;
+using QuikSharp.QuikEvents;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,18 +14,12 @@ namespace QuikSharp.QuikClient
         /// <summary>
         /// Событие вызывается когда библиотека QuikSharp успешно подключилась к Quik'у
         /// </summary>
-        event InitHandler Connected;
+        event QuikEventHandler<InitEventArgs> Connected;
 
         /// <summary>
         /// Событие вызывается когда библиотека QuikSharp была отключена от Quik'а
         /// </summary>
-        event VoidHandler Disconnected;
-
-        /// <summary>
-        /// Функция вызывается терминалом QUIK при остановке скрипта из диалога управления.
-        /// Примечание: Значение параметра «stop_flag» – «1».После окончания выполнения функции таймаут завершения работы скрипта 5 секунд. По истечении этого интервала функция main() завершается принудительно. При этом возможна потеря системных ресурсов.
-        /// </summary>
-        event StopHandler Stop;
+        event QuikEventHandler<EventArgs> Disconnected;
 
         #endregion Events
 
