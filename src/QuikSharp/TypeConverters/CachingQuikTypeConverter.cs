@@ -11,8 +11,7 @@ namespace QuikSharp.TypeConverters
         private readonly CultureInfo _cultureInfo = CultureInfo.InvariantCulture;
 
         private readonly ConcurrentDictionary<int, string> _intToStringDictionary = new ConcurrentDictionary<int, string>();
-        private readonly ConcurrentDictionary<Enum, string> _enumToStringDictionary = new ConcurrentDictionary<Enum, string>();
-        private readonly ConcurrentDictionary<Type, HashSet<Enum>> _enumsDictionary = new ConcurrentDictionary<Type, HashSet<Enum>>();
+        private readonly ConcurrentDictionary<Type, EnumData> _enumsDictionary = new ConcurrentDictionary<Type, EnumData>();
 
         public string ToString(int value)
         {
@@ -46,41 +45,57 @@ namespace QuikSharp.TypeConverters
         public string ToString<TEnum>(TEnum value)
             where TEnum : Enum
         {
-            if (_enumToStringDictionary.TryGetValue(value, out var stringValue))
-            {
-                return stringValue;
-            }
-            else
-            {
-                stringValue = value.ToString();
-                _enumToStringDictionary[value] = stringValue;
-                return stringValue;
-            }
+            var enumData = GetOrCreateEnumData(typeof(TEnum));
+            return enumData.EnumToStringDictionary[value];
         }
 
         public bool IsEnumDefined<TEnum>(TEnum value)
             where TEnum : Enum
         {
-            var enumType = typeof(TEnum);
+            var enumData = GetOrCreateEnumData(typeof(TEnum));
+            return enumData.Values.Contains(value);
+        }
 
-            if (!_enumsDictionary.TryGetValue(enumType, out var values))
+        public TEnum ParseEnum<TEnum>(string value)
+            where TEnum : Enum
+        {
+            var enumData = GetOrCreateEnumData(typeof(TEnum));
+            return (TEnum)enumData.StringToEnumDictionary[value];
+        }
+
+        public bool TryParseEnum<TEnum>(string stringValue, out TEnum enumValue)
+            where TEnum : struct, Enum
+        {
+            var enumData = GetOrCreateEnumData(typeof(TEnum));
+            var hasValue = enumData.StringToEnumDictionary.TryGetValue(stringValue, out var typedEnumValue);
+            enumValue = (TEnum)typedEnumValue;
+            return hasValue;
+        }
+
+        private EnumData GetOrCreateEnumData(Type enumType)
+        {
+            if (!_enumsDictionary.TryGetValue(enumType, out var enumData))
             {
                 lock (_enumsDictionary)
                 {
-                    if (!_enumsDictionary.TryGetValue(enumType, out values))
+                    if (!_enumsDictionary.TryGetValue(enumType, out enumData))
                     {
-                        values = new HashSet<Enum>();
-                        foreach (TEnum @enum in Enum.GetValues(enumType))
-                        {
-                            values.Add(@enum);
-                        }
+                        enumData = new EnumData();
 
-                        _enumsDictionary[enumType] = values;
+                        foreach (Enum @enum in Enum.GetValues(enumType))
+                        {
+                            var enumStringValue = @enum.ToString();
+                            enumData.Values.Add(@enum);
+                            enumData.EnumToStringDictionary[@enum] = enumStringValue;
+                            enumData.StringToEnumDictionary[enumStringValue] = @enum;
+                        };
+
+                        _enumsDictionary[enumType] = enumData;
                     }
                 }
             }
 
-            return values.Contains(value);
+            return enumData;
         }
     }
 }

@@ -41,5 +41,17 @@ namespace QuikSharp.TypeConverters
         {
             return Enum.IsDefined(typeof(TEnum), value);
         }
+
+        public TEnum ParseEnum<TEnum>(string value)
+            where TEnum : Enum
+        {
+            return (TEnum)Enum.Parse(typeof(TEnum), value);
+        }
+
+        public bool TryParseEnum<TEnum>(string stringValue, out TEnum enumValue)
+            where TEnum : struct, Enum
+        {
+            return Enum.TryParse<TEnum>(stringValue, out enumValue);
+        }
     }
 }

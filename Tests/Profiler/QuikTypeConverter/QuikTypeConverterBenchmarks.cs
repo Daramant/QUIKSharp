@@ -15,7 +15,7 @@ namespace Profiler.QuikTypeConverter
         private int _startIndex = 0;
         private int _endIndex = 100;
         private int _roundCount = 10;
-        private int _enumCheckCount = 1000;
+        private int _enumCheckCount = 2000;
 
         [Benchmark(Description = "IntToString ToString(CurrentCulture)")]
         public void IntToString_ToString_CurrentCulture()
@@ -125,8 +125,8 @@ namespace Profiler.QuikTypeConverter
             }
         }
 
-        [Benchmark(Description = "IsEnumDefined Enum.IsDefined()")]
-        public void IsEnumDefined_Enum_IsDefined()
+        [Benchmark(Description = "EnumIsDefined Enum.IsDefined()")]
+        public void EnumIsDefined_Enum_IsDefined()
         {
             object value = TransactionAction.KILL_ALL_ORDERS;
             var results = new List<bool>(_enumCheckCount);
@@ -137,8 +137,8 @@ namespace Profiler.QuikTypeConverter
             }
         }
 
-        [Benchmark(Description = "IsEnumDefined QuikTypeConverter.IsEnumDefined")]
-        public void IsEnumDefined_QuikTypeConverter_IsEnumDefined()
+        [Benchmark(Description = "EnumIsDefined QuikTypeConverter.IsEnumDefined")]
+        public void EnumIsDefined_QuikTypeConverter_IsEnumDefined()
         {
             var value = TransactionAction.KILL_ALL_ORDERS;
             var results = new List<bool>(_enumCheckCount);
@@ -148,6 +148,60 @@ namespace Profiler.QuikTypeConverter
             for (var r = 0; r < _enumCheckCount; r++)
             {
                 results.Add(typeConverter.IsEnumDefined(value));
+            }
+        }
+
+        [Benchmark(Description = "EnumParse Enum.Parse()")]
+        public void EnumParse_Enum_Parse()
+        {
+            var value = TransactionAction.KILL_ALL_ORDERS.ToString();
+            var results = new List<TransactionAction>(_enumCheckCount);
+
+            for (var r = 0; r < _enumCheckCount; r++)
+            {
+                results.Add((TransactionAction)Enum.Parse(typeof(TransactionAction), value));
+            }
+        }
+
+        [Benchmark(Description = "EnumParse QuikTypeConverter.ParseEnum")]
+        public void EnumParse_QuikTypeConverter_ParseEnum()
+        {
+            var value = TransactionAction.KILL_ALL_ORDERS.ToString();
+            var results = new List<TransactionAction>(_enumCheckCount);
+
+            var typeConverter = new CachingQuikTypeConverter();
+
+            for (var r = 0; r < _enumCheckCount; r++)
+            {
+                results.Add(typeConverter.ParseEnum<TransactionAction>(value));
+            }
+        }
+
+        [Benchmark(Description = "EnumTryParse Enum.Parse()")]
+        public void EnumTryParse_Enum_Parse()
+        {
+            var stringValue = TransactionAction.KILL_ALL_ORDERS.ToString();
+            var results = new List<TransactionAction>(_enumCheckCount);
+
+            for (var r = 0; r < _enumCheckCount; r++)
+            {
+                Enum.TryParse<TransactionAction>(stringValue, out var enumValue);
+                results.Add(enumValue);
+            }
+        }
+
+        [Benchmark(Description = "EnumTryParse QuikTypeConverter.ParseEnum")]
+        public void EnumTryParse_QuikTypeConverter_ParseEnum()
+        {
+            var stringValue = TransactionAction.KILL_ALL_ORDERS.ToString();
+            var results = new List<TransactionAction>(_enumCheckCount);
+
+            var typeConverter = new CachingQuikTypeConverter();
+
+            for (var r = 0; r < _enumCheckCount; r++)
+            {
+                typeConverter.TryParseEnum<TransactionAction>(stringValue, out var enumValue);
+                results.Add(enumValue);
             }
         }
     }

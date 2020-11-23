@@ -19,5 +19,11 @@ namespace QuikSharp.TypeConverters
 
         bool IsEnumDefined<TEnum>(TEnum value)
             where TEnum : Enum;
+
+        TEnum ParseEnum<TEnum>(string value)
+            where TEnum : Enum;
+
+        bool TryParseEnum<TEnum>(string stringValue, out TEnum enumValue)
+            where TEnum : struct, Enum;
     }
 }

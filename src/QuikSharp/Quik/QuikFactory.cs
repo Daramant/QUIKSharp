@@ -27,7 +27,7 @@ namespace QuikSharp.Quik
             var typeConverter = new CachingQuikTypeConverter();
 
             var quikEvents = new QuikEvents.QuikEvents();
-            var quikEventHandler = new QuikEventHandler(quikEvents);
+            var quikEventHandler = new QuikEventHandler(typeConverter, quikEvents);
             var quikClient = new QuikClient.QuikClient(quikEventHandler, jsonSerializer, options);
             var tradingFunctions = new TradingFunctions(quikClient, persistentStorage, typeConverter);
 
