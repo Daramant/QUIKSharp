@@ -26,14 +26,14 @@ namespace QuikSharp.Quik
             var persistentStorage = new InMemoryPersistantStorage();
             var typeConverter = new CachingQuikTypeConverter();
 
-            var quikEvents = new QuikEvents.QuikEvents(persistentStorage, typeConverter);
+            var quikEvents = new QuikEvents.QuikEvents();
             var quikEventHandler = new QuikEventHandler(quikEvents);
             var quikClient = new QuikClient.QuikClient(quikEventHandler, jsonSerializer, options);
             var tradingFunctions = new TradingFunctions(quikClient, persistentStorage, typeConverter);
 
             jsonSerializer.AddConverter(new MessageConverter(quikClient));
 
-            return new Quik(
+            var quik = new Quik(
                 quikClient,
                 new QuikFunctions.QuikFunctions(
                     new DebugFunctions(quikClient),
@@ -45,7 +45,11 @@ namespace QuikSharp.Quik
                     tradingFunctions,
                     new CandleFunctions(quikClient, typeConverter),
                     new LabelFunctions(quikClient, typeConverter)),
-                new QuikEvents.QuikEvents(persistentStorage, typeConverter));
+                quikEvents);
+
+            quikEvents.SetEventSender(quik);
+
+            return quik;
         }
     }
 }

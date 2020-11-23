@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using Newtonsoft.Json;
+using System;
 
 namespace QuikSharp.DataStructures
 {
     /// <summary>
     /// Описание параметров Таблицы позиций по клиентским счетам (фьючерсы):
     /// </summary>
-    public class FuturesClientHolding : IWithLuaTimeStamp
+    public class FuturesClientHolding : EventArgs, IWithLuaTimeStamp
     {
         /// <summary>
         /// Идентификатор фирмы

@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using Newtonsoft.Json;
+using System;
 
 namespace QuikSharp.DataStructures.Transaction
 {
     /// <summary>
     /// Описание параметров Таблицы сделок
     /// </summary>
-    public class Trade : IWithLuaTimeStamp
+    public class Trade : EventArgs, IWithLuaTimeStamp
     {
         [JsonProperty("lua_timestamp")]
         public long LuaTimeStamp { get; internal set; }

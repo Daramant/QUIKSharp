@@ -22,9 +22,10 @@ namespace QuikSharp.Json.Converters
             object existingValue,
             JsonSerializer serializer)
         {
-            var t = JToken.Load(reader);
-            var target = t.Value<string>();
-            if (target == null) return null;
+            var target = (string)reader.Value;
+            if (target == null) 
+                return null;
+
             var hh = int.Parse(target.Substring(0, 2));
             var mm = int.Parse(target.Substring(2, 2));
             var ss = int.Parse(target.Substring(4, 2));

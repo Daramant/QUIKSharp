@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using Newtonsoft.Json;
+using System;
 
 namespace QuikSharp.DataStructures
 {
@@ -9,7 +10,7 @@ namespace QuikSharp.DataStructures
     /// На основе: http://help.qlua.org/ch4_6_11.htm
     /// Запись, которую можно получить из таблицы "Лимиты по бумагам" (depo_limits)
     /// </summary>
-    public class DepoLimitEx
+    public class DepoLimitEx : EventArgs
     {
         /// <summary>
         /// Код бумаги

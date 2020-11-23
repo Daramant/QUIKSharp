@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using QuikSharp.DataStructures;
+using QuikSharp.Quik;
 
 namespace QuikSharp.Tests
 {
@@ -84,7 +85,7 @@ namespace QuikSharp.Tests
 
         }
 
-        private void OnCandle(Candle candle)
+        private void OnCandle(IQuik quik, Candle candle)
         {
             if (candle.SecCode == "SBER" && candle.ClassCode == "TQBR" && candle.Interval == CandleInterval.M1)
             {

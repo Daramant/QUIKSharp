@@ -4,9 +4,12 @@
 using Newtonsoft.Json;
 using QuikSharp.Json.Converters;
 using QuikSharp.QuikEvents;
+using QuikSharp.Transactions;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace QuikSharp.DataStructures.Transaction
 {
@@ -16,88 +19,57 @@ namespace QuikSharp.DataStructures.Transaction
     /// </summary>
     public class Transaction
     {
+        #region Events
+
         // ReSharper disable InconsistentNaming
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении ответа на транзакцию пользователя.
         /// </summary>
-        public event TransReplyHandler TransReply;
+        public event TransactionEventHandler<TransactionReply> TransReply;
 
         internal void OnTransReply(TransactionReply reply)
         {
-            TransReply?.Invoke(reply);
+            TransReply?.Invoke(this, reply);
             // this should happen only once per transaction id
             Trace.Assert(TransactionReply == null);
             TransactionReply = reply;
         }
 
         /// <summary>
-        /// TransactionReply
-        /// </summary>
-        public TransactionReply TransactionReply { get; set; }
-
-        /// <summary>
         /// Функция вызывается терминалом QUIK при получении новой заявки или при изменении параметров существующей заявки.
         /// </summary>
-        public event OrderHandler Order;
+        public event TransactionEventHandler<Order> Order;
 
         internal void OnOrder(Order order)
         {
-            Order?.Invoke(order);
-            if (Orders == null)
-            {
-                Orders = new List<Order>();
-            }
-
-            Orders.Add(order);
+            _orders.Add(order);
+            Order?.Invoke(this, order);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении новой стоп-заявки или при изменении параметров существующей стоп-заявки.
         /// </summary>
-        public event StopOrderHandler StopOrder;
+        public event TransactionEventHandler<StopOrder> StopOrder;
 
         internal void OnStopOrder(StopOrder stopOrder)
         {
-            StopOrder?.Invoke(stopOrder);
-            if (StopOrders == null)
-            {
-                StopOrders = new List<StopOrder>();
-            }
-
-            StopOrders.Add(stopOrder);
+            _stopOrders.Add(stopOrder);
+            StopOrder?.Invoke(this, stopOrder);
         }
-
-        /// <summary>
-        /// Orders
-        /// </summary>
-        public List<Order> Orders { get; set; }
-
-        /// <summary>
-        /// StopOrders
-        /// </summary>
-        public List<StopOrder> StopOrders { get; set; }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении сделки.
         /// </summary>
-        public event TradeHandler Trade;
+        public event TransactionEventHandler<Trade> Trade;
 
         internal void OnTrade(Trade trade)
         {
-            Trade?.Invoke(trade);
-            if (Trades == null)
-            {
-                Trades = new List<Trade>();
-            }
-
-            Trades.Add(trade);
+            _trades.Add(trade);
+            Trade?.Invoke(this, trade);
         }
 
-        /// <summary>
-        /// Trades
-        /// </summary>
-        public List<Trade> Trades { get; set; }
+        #endregion Events
 
         // TODO inspect with actual data
         /// <summary>
@@ -106,12 +78,39 @@ namespace QuikSharp.DataStructures.Transaction
         /// <returns></returns>
         public bool IsComepleted()
         {
-            if (Orders == null || Orders.Count == 0) return false;
-            var last = Orders[Orders.Count - 1];
-            return !last.Flags.HasFlag(OrderTradeFlags.Active)
-                   &&
-                   !last.Flags.HasFlag(OrderTradeFlags.Canceled);
+            var last = Orders?.LastOrDefault();
+            
+            return last != null
+                && !last.Flags.HasFlag(OrderTradeFlags.Active)
+                && !last.Flags.HasFlag(OrderTradeFlags.Canceled);
         }
+
+        /// <summary>
+        /// TransactionReply
+        /// </summary>
+        public TransactionReply TransactionReply { get; set; }
+
+
+        private readonly ConcurrentBag<Order> _orders = new ConcurrentBag<Order>();
+
+        /// <summary>
+        /// Orders
+        /// </summary>
+        public IReadOnlyCollection<Order> Orders => _orders;
+
+        private readonly ConcurrentBag<StopOrder> _stopOrders = new ConcurrentBag<StopOrder>();
+
+        /// <summary>
+        /// StopOrders
+        /// </summary>
+        public IReadOnlyCollection<StopOrder> StopOrders => _stopOrders;
+
+        private readonly ConcurrentBag<Trade> _trades = new ConcurrentBag<Trade>();
+
+        /// <summary>
+        /// Trades
+        /// </summary>
+        public IReadOnlyCollection<Trade> Trades => _trades;
 
         /// <summary>
         /// Error message returned by sendTransaction

@@ -49,6 +49,8 @@ namespace QuikSharp.Tests.JsonSerializer
             t.TYPE = TransactionType.M;
             t.MARKET_MAKER_ORDER = YesOrNo.NO;
             t.EXECUTION_CONDITION = ExecutionCondition.FILL_OR_KILL;
+            t.ACTIVE_FROM_TIME = DateTime.Now;
+            t.ACTIVE_TO_TIME = DateTime.Now.AddMinutes(10);
 
             var j = _jsonSerializer.Serialize(t);
             var t2 = _jsonSerializer.Deserialize<Transaction>(j);
@@ -56,6 +58,8 @@ namespace QuikSharp.Tests.JsonSerializer
             Assert.AreEqual(t.PRICE, t2.PRICE);
             Assert.AreEqual(t.QUANTITY, t2.QUANTITY);
             Assert.AreEqual(t.REFUNDRATE, t2.REFUNDRATE);
+            Assert.AreEqual(t.ACTIVE_FROM_TIME, t2.ACTIVE_FROM_TIME);
+            Assert.AreEqual(t.ACTIVE_TO_TIME, t2.ACTIVE_TO_TIME);
         }
     }
 }

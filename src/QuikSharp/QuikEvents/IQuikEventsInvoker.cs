@@ -1,11 +1,14 @@
 ﻿using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
+using QuikSharp.Quik;
 using System;
 
 namespace QuikSharp.QuikEvents
 {
     public interface IQuikEventsInvoker
     {
+        void SetEventSender(IQuik quik);
+
         void OnAccountBalance(AccountBalance accBal);
 
         void OnAccountPosition(AccountPosition accPos);

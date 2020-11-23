@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using Newtonsoft.Json;
+using System;
 
 namespace QuikSharp.DataStructures
 {
     /// <summary>
     /// При удалении лимита по срочному рынку функция возвращает таблицу Lua с параметрами
     /// </summary>
-    public class FuturesLimitDelete
+    public class FuturesLimitDelete : EventArgs
     {
         // ReSharper disable InconsistentNaming
         /// <summary>

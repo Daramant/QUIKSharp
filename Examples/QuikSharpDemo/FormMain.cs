@@ -215,7 +215,7 @@ namespace QuikSharpDemo
             throw new NotImplementedException();
         }
 
-        void OnQuoteDo(OrderBook quote)
+        void OnQuoteDo(IQuik quik, OrderBook quote)
         {
             if (quote.sec_code == tool.SecurityCode && quote.class_code == tool.ClassCode)
             {
@@ -225,16 +225,16 @@ namespace QuikSharpDemo
                 offer               = Convert.ToDecimal(toolOrderBook.offer[0].price);
             }
         }
-        void OnFuturesClientHoldingDo(FuturesClientHolding futPos)
+        void OnFuturesClientHoldingDo(IQuik quik, FuturesClientHolding futPos)
         {
             if (futPos.secCode == tool.SecurityCode) futuresPosition = futPos;
         }
-        void OnDepoLimitDo(DepoLimitEx depLimit)
+        void OnDepoLimitDo(IQuik quik, DepoLimitEx depLimit)
         {
             AppendText2TextBox(textBoxLogsWindow, "Вызвано событие OnDepoLimit (изменение бумажного лимита)..." + Environment.NewLine);
             AppendText2TextBox(textBoxLogsWindow, "Заблокировано на покупку количества лотов - " + depLimit.LockedBuy + Environment.NewLine);
         }
-        void OnParamDo(Param _param)
+        void OnParamDo(IQuik quik, Param _param)
         {
             if (_param.ClassCode == tool.ClassCode && _param.SecCode == tool.SecurityCode)
             {
@@ -242,7 +242,7 @@ namespace QuikSharpDemo
                 AppendText2TextBox(textBoxLogsWindow, "Вызвано событие OnParam. Актуальное значение параметра 'BID' = " + bid + Environment.NewLine);
             }
         }
-        void OnCandleDo(Candle _candle)
+        void OnCandleDo(IQuik quik, Candle _candle)
         {
             Trace.Assert(_candle != null, DateTime.Now + ": Trace: candle = NULL");
             Trace.WriteLine(DateTime.Now + ": Trace: OnNewCandleDo()");
@@ -259,7 +259,7 @@ namespace QuikSharpDemo
                 Trace.WriteLine("Trace: Ошибка в OnNewCandleDo() - " + er.ToString());
             }
         }
-        void OnStopOrderDo(StopOrder _stopOrder)
+        void OnStopOrderDo(IQuik quik, StopOrder _stopOrder)
         {
             Trace.Assert(_stopOrder != null, DateTime.Now + ": Trace: stopOrder = NULL");
             Trace.WriteLine(DateTime.Now + ": Trace: OnStopOrderDo()");

@@ -360,7 +360,7 @@ namespace RobotDemo
                 }
             }
         }
-        void OnCandle(Candle candle)
+        void OnCandle(IQuik quik, Candle candle)
         {
             if (toolCandles != null) NewCandle_to_Table(ref toolCandles, candle);
         }

@@ -4,6 +4,8 @@
 using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Extensions;
+using QuikSharp.Quik;
+using QuikSharp.Transactions;
 using QuikSharp.TypeConverters;
 using System;
 using System.Diagnostics;
@@ -12,377 +14,258 @@ namespace QuikSharp.QuikEvents
 {
     public class QuikEvents : IQuikEvents, IQuikEventsInvoker
     {
-        private readonly IPersistentStorage _persistentStorage;
-        private readonly ITypeConverter _typeConverter;
+        private IQuik _quik;
 
-        public QuikEvents(
-            IPersistentStorage persistentStorage,
-            ITypeConverter typeConverter)
+        public QuikEvents()
+        { }
+
+        public void SetEventSender(IQuik quik)
         {
-            _persistentStorage = persistentStorage;
-            _typeConverter = typeConverter;
+            _quik = quik;
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений текущей позиции по счету.
         /// </summary>
-        public event AccountBalanceHandler AccountBalance;
+        public event QuikEventHandler<AccountBalance> AccountBalance;
 
         public void OnAccountBalance(AccountBalance accBal)
         {
-            AccountBalance?.Invoke(accBal);
+            AccountBalance?.Invoke(_quik, accBal);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при изменении денежной позиции по счету.
         /// </summary>
-        public event AccountPositionHandler AccountPosition;
+        public event QuikEventHandler<AccountPosition> AccountPosition;
 
         public void OnAccountPosition(AccountPosition accPos)
         {
-            AccountPosition?.Invoke(accPos);
+            AccountPosition?.Invoke(_quik, accPos);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении обезличенной сделки.
         /// </summary>
-        public event AllTradeHandler AllTrade;
+        public event QuikEventHandler<AllTrade> AllTrade;
 
         public void OnAllTrade(AllTrade allTrade)
         {
-            AllTrade?.Invoke(allTrade);
+            AllTrade?.Invoke(_quik, allTrade);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при смене сессии и при выгрузке файла qlua.dll
         /// </summary>
-        public event VoidHandler CleanUp;
+        public event QuikEventHandler<EventArgs> CleanUp;
 
         public void OnCleanUp()
         {
-            CleanUp?.Invoke();
+            CleanUp?.Invoke(_quik, EventArgs.Empty);
         }
 
         /// <summary>
         /// Функция вызывается перед закрытием терминала QUIK.
         /// </summary>
-        public event VoidHandler Close;
+        public event QuikEventHandler<EventArgs> Close;
 
         public void OnClose()
         {
-            Close?.Invoke();
+            Close?.Invoke(_quik, EventArgs.Empty);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при установлении связи с сервером QUIK.
         /// </summary>
-        public event VoidHandler Connected;
+        public event QuikEventHandler<EventArgs> Connected;
 
         public void OnConnected()
         {
-            Connected?.Invoke();
+            Connected?.Invoke(_quik, EventArgs.Empty);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений лимита по бумагам.
         /// </summary>
-        public event DepoLimitHandler DepoLimit;
+        public event QuikEventHandler<DepoLimitEx> DepoLimit;
 
         public void OnDepoLimit(DepoLimitEx dLimit)
         {
-            DepoLimit?.Invoke(dLimit);
+            DepoLimit?.Invoke(_quik, dLimit);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении клиентского лимита по бумагам.
         /// </summary>
-        public event DepoLimitDeleteHandler DepoLimitDelete;
+        public event QuikEventHandler<DepoLimitDelete> DepoLimitDelete;
 
         public void OnDepoLimitDelete(DepoLimitDelete dLimitDel)
         {
-            DepoLimitDelete?.Invoke(dLimitDel);
+            DepoLimitDelete?.Invoke(_quik, dLimitDel);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при отключении от сервера QUIK.
         /// </summary>
-        public event VoidHandler Disconnected;
+        public event QuikEventHandler<EventArgs> Disconnected;
 
         public void OnDisconnected()
         {
-            Disconnected?.Invoke();
+            Disconnected?.Invoke(_quik, EventArgs.Empty);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении описания новой фирмы от сервера.
         /// </summary>
-        public event FirmHandler Firm;
+        public event QuikEventHandler<Firm> Firm;
 
         public void OnFirm(Firm frm)
         {
-            Firm?.Invoke(frm);
+            Firm?.Invoke(_quik, frm);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при изменении позиции по срочному рынку.
         /// </summary>
-        public event FuturesClientHoldingHandler FuturesClientHolding;
+        public event QuikEventHandler<FuturesClientHolding> FuturesClientHolding;
 
         public void OnFuturesClientHolding(FuturesClientHolding futPos)
         {
-            FuturesClientHolding?.Invoke(futPos);
+            FuturesClientHolding?.Invoke(_quik, futPos);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений ограничений по срочному рынку.
         /// </summary>
-        public event FuturesLimitHandler FuturesLimitChange;
+        public event QuikEventHandler<FuturesLimits> FuturesLimitChange;
 
         public void OnFuturesLimitChange(FuturesLimits futLimit)
         {
-            FuturesLimitChange?.Invoke(futLimit);
+            FuturesLimitChange?.Invoke(_quik, futLimit);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении лимита по срочному рынку.
         /// </summary>
-        public event FuturesLimitDeleteHandler FuturesLimitDelete;
+        public event QuikEventHandler<FuturesLimitDelete> FuturesLimitDelete;
 
         public void OnFuturesLimitDelete(FuturesLimitDelete limDel)
         {
-            FuturesLimitDelete?.Invoke(limDel);
+            FuturesLimitDelete?.Invoke(_quik, limDel);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменений по денежному лимиту клиента.
         /// </summary>
-        public event MoneyLimitHandler MoneyLimit;
+        public event QuikEventHandler<MoneyLimitEx> MoneyLimit;
 
         public void OnMoneyLimit(MoneyLimitEx mLimit)
         {
-            MoneyLimit?.Invoke(mLimit);
+            MoneyLimit?.Invoke(_quik, mLimit);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при удалении денежного лимита.
         /// </summary>
-        public event MoneyLimitDeleteHandler MoneyLimitDelete;
+        public event QuikEventHandler<MoneyLimitDelete> MoneyLimitDelete;
 
         public void OnMoneyLimitDelete(MoneyLimitDelete mLimitDel)
         {
-            MoneyLimitDelete?.Invoke(mLimitDel);
+            MoneyLimitDelete?.Invoke(_quik, mLimitDel);
         }
 
-        public event EventHandler NegDeal;
+        public event QuikEventHandler<EventArgs> NegDeal;
 
-        public event EventHandler NegTrade;
+        public event QuikEventHandler<EventArgs> NegTrade;
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении заявки или изменении параметров существующей заявки.
         /// </summary>
-        public event OrderHandler Order;
+        public event QuikEventHandler<Order> Order;
 
         public void OnOrder(Order order)
         {
-            Order?.Invoke(order);
-            // invoke event specific for the transaction
-            string correlationId = _typeConverter.ToString(order.TransID);
-
-            #region Totally untested code or handling manual transactions
-
-            if (!_persistentStorage.Contains(correlationId))
-            {
-                correlationId = "manual:" + order.OrderNum + ":" + correlationId;
-                var fakeTrans = new Transaction()
-                {
-                    Comment = correlationId,
-                    IsManual = true
-                    // TODO map order properties back to transaction
-                    // ideally, make C# property names consistent (Lua names are set as JSON.NET properties via an attribute)
-                };
-                _persistentStorage.Set<Transaction>(correlationId, fakeTrans);
-            }
-
-            #endregion Totally untested code or handling manual transactions
-
-            var tr = _persistentStorage.Get<Transaction>(correlationId);
-            if (tr != null)
-            {
-                lock (tr)
-                {
-                    tr.OnOrder(order);
-                }
-            }
-
-            Trace.Assert(tr != null, "Transaction must exist in persistent storage until it is completed and all order messages are recieved");
+            Order?.Invoke(_quik, order);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при при изменении текущих параметров.
         /// </summary>
-        public event ParamHandler Param;
+        public event QuikEventHandler<Param> Param;
 
         public void OnParam(Param par)
         {
-            Param?.Invoke(par);
+            Param?.Invoke(_quik, par);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении изменения стакана котировок.
         /// </summary>
-        public event QuoteHandler Quote;
+        public event QuikEventHandler<OrderBook> Quote;
 
         public void OnQuote(OrderBook orderBook)
         {
-            Quote?.Invoke(orderBook);
+            Quote?.Invoke(_quik, orderBook);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при остановке скрипта из диалога управления и при закрытии терминала QUIK.
         /// </summary>
-        public event StopHandler Stop;
+        public event QuikEventHandler<StopEventArgs> Stop;
 
         public void OnStop(int signal)
         {
-            Stop?.Invoke(signal);
+            Stop?.Invoke(_quik, new StopEventArgs(signal));
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении новой стоп-заявки или при изменении параметров существующей стоп-заявки.
         /// </summary>
-        public event StopOrderHandler StopOrder;
+        public event QuikEventHandler<StopOrder> StopOrder;
 
         public void OnStopOrder(StopOrder stopOrder)
         {
-            //if (OnStopOrder != null) OnStopOrder(stopOrder);
-            StopOrder?.Invoke(stopOrder);
-            // invoke event specific for the transaction
-            string correlationId = _typeConverter.ToString(stopOrder.TransId);
-
-            #region Totally untested code or handling manual transactions
-
-            if (!_persistentStorage.Contains(correlationId))
-            {
-                correlationId = "manual:" + stopOrder.OrderNum + ":" + correlationId;
-                var fakeTrans = new Transaction()
-                {
-                    Comment = correlationId,
-                    IsManual = true
-                    // TODO map order properties back to transaction
-                    // ideally, make C# property names consistent (Lua names are set as JSON.NET properties via an attribute)
-                };
-                _persistentStorage.Set<Transaction>(correlationId, fakeTrans);
-            }
-
-            #endregion Totally untested code or handling manual transactions
-
-            var tr = _persistentStorage.Get<Transaction>(correlationId);
-            if (tr != null)
-            {
-                lock (tr)
-                {
-                    tr.OnStopOrder(stopOrder);
-                }
-            }
-
-            Trace.Assert(tr != null, "Transaction must exist in persistent storage until it is completed and all order messages are recieved");
+            StopOrder?.Invoke(_quik, stopOrder);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении сделки.
         /// </summary>
-        public event TradeHandler Trade;
+        public event QuikEventHandler<Trade> Trade;
 
         public void OnTrade(Trade trade)
         {
-            Trade?.Invoke(trade);
-            // invoke event specific for the transaction
-            string correlationId = trade.Comment;
-
-            // ignore unknown transactions
-            if (string.IsNullOrWhiteSpace(correlationId))
-            {
-                return;
-            }
-
-            #region Totally untested code or handling manual transactions
-
-            if (!_persistentStorage.Contains(correlationId))
-            {
-                correlationId = "manual:" + trade.OrderNum + ":" + correlationId;
-                var fakeTrans = new Transaction()
-                {
-                    Comment = correlationId,
-                    IsManual = true
-                    // TODO map order properties back to transaction
-                    // ideally, make C# property names consistent (Lua names are set as JSON.NET properties via an attribute)
-                };
-                _persistentStorage.Set<Transaction>(correlationId, fakeTrans);
-            }
-
-            #endregion Totally untested code or handling manual transactions
-
-            var tr = _persistentStorage.Get<Transaction>(correlationId);
-            if (tr != null)
-            {
-                lock (tr)
-                {
-                    tr.OnTrade(trade);
-                    // persist transaction with added trade
-                    _persistentStorage.Set(correlationId, tr);
-                }
-            }
-
-            // ignore unknown transactions
-            //Trace.Assert(tr != null, "Transaction must exist in persistent storage until it is completed and all trades messages are recieved");
+            Trade?.Invoke(_quik, trade);
         }
 
         /// <summary>
         /// Функция вызывается терминалом QUIK при получении ответа на транзакцию пользователя.
         /// </summary>
-        public event TransReplyHandler TransReply;
+        public event QuikEventHandler<TransactionReply> TransReply;
 
         public void OnTransReply(TransactionReply reply)
         {
-            TransReply?.Invoke(reply);
-
-            // invoke event specific for the transaction
-            if (string.IsNullOrEmpty(reply.Comment)) //"Initialization user successful" transaction doesn't contain comment
-                return;
-
-            if (_persistentStorage.Contains(reply.Comment))
-            {
-                var tr = _persistentStorage.Get<Transaction>(reply.Comment);
-                lock (tr)
-                {
-                    tr.OnTransReply(reply);
-                }
-            }
-            else
-            {
-                // NB ignore unmatched transactions
-                //Trace.Fail("Transaction must exist in persistent storage until it is completed and its reply is recieved");
-            }
+            TransReply?.Invoke(_quik, reply);
         }
 
         /// <summary>
         /// Событие получения новой свечи. Для срабатывания необходимо подписаться с помощью метода Subscribe.
         /// </summary>
-        public event CandleHandler Candle;
+        public event QuikEventHandler<Candle> Candle;
 
         public void OnCandle(Candle candle)
         {
-            Candle?.Invoke(candle);
+            Candle?.Invoke(_quik, candle);
         }
 
         /// <summary>
         /// Событие получения новой свечи. Для срабатывания необходимо подписаться с помощью метода Subscribe.
         /// </summary>
-        public event EventHandler<string> Error;
+        public event QuikEventHandler<ErrorEventArgs> Error;
 
         public void OnError(string error)
         {
-            Error?.Invoke(this, error);
+            Error?.Invoke(_quik, new ErrorEventArgs(error));
         }
     }
 }

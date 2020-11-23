@@ -2,16 +2,8 @@
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Messages;
 using QuikSharp.QuikEvents;
-using QuikSharp.QuikFunctions.Candles;
-using QuikSharp.QuikFunctions.OrderBooks;
-using QuikSharp.QuikFunctions.Orders;
-using QuikSharp.QuikFunctions.Services;
-using QuikSharp.QuikFunctions.StopOrders;
-using QuikSharp.QuikFunctions.Trading;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 namespace QuikSharp.QuikClient
 {

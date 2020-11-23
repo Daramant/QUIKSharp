@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using Newtonsoft.Json;
+using System;
 
 namespace QuikSharp.DataStructures.Transaction
 {
     /// <summary>
     /// Результат OnTransReply
     /// </summary>
-    public class TransactionReply : IWithLuaTimeStamp
+    public class TransactionReply : EventArgs, IWithLuaTimeStamp
     {
         /// <summary>
         /// Пользовательский идентификатор транзакции

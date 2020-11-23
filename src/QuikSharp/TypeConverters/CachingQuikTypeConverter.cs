@@ -12,7 +12,7 @@ namespace QuikSharp.TypeConverters
 
         private readonly ConcurrentDictionary<int, string> _intToStringDictionary = new ConcurrentDictionary<int, string>();
         private readonly ConcurrentDictionary<Enum, string> _enumToStringDictionary = new ConcurrentDictionary<Enum, string>();
-        private readonly ConcurrentDictionary<Type, HashSet<Enum>> _definedEnumsDictionary = new ConcurrentDictionary<Type, HashSet<Enum>>();
+        private readonly ConcurrentDictionary<Type, HashSet<Enum>> _enumsDictionary = new ConcurrentDictionary<Type, HashSet<Enum>>();
 
         public string ToString(int value)
         {
@@ -63,11 +63,11 @@ namespace QuikSharp.TypeConverters
         {
             var enumType = typeof(TEnum);
 
-            if (!_definedEnumsDictionary.TryGetValue(enumType, out var values))
+            if (!_enumsDictionary.TryGetValue(enumType, out var values))
             {
-                lock (_definedEnumsDictionary)
+                lock (_enumsDictionary)
                 {
-                    if (!_definedEnumsDictionary.TryGetValue(enumType, out values))
+                    if (!_enumsDictionary.TryGetValue(enumType, out values))
                     {
                         values = new HashSet<Enum>();
                         foreach (TEnum @enum in Enum.GetValues(enumType))
@@ -75,7 +75,7 @@ namespace QuikSharp.TypeConverters
                             values.Add(@enum);
                         }
 
-                        _definedEnumsDictionary[enumType] = values;
+                        _enumsDictionary[enumType] = values;
                     }
                 }
             }

@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using Newtonsoft.Json;
+using System;
 
 namespace QuikSharp.DataStructures
 {
     /// <summary>
     /// При получении описания новой фирмы от сервера функция возвращает таблицу Lua с параметрами
     /// </summary>
-    public class Firm
+    public class Firm : EventArgs
     {
         // ReSharper disable InconsistentNaming
         /// <summary>

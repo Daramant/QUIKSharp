@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using Newtonsoft.Json;
+using System;
 
 namespace QuikSharp.DataStructures
 {
     /// <summary>
     /// Свеча
     /// </summary>
-    public class Candle
+    public class Candle : EventArgs
     {
         /// <summary>
         /// Минимальная цена сделки

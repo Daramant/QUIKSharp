@@ -10,7 +10,7 @@ namespace QuikSharp.DataStructures
     /// Стоп-заявка
     /// На основе http://help.qlua.org/ch4_6_6.htm
     /// </summary>
-    public class StopOrder
+    public class StopOrder : EventArgs
     {
         /// <summary>
         ///
