@@ -12,8 +12,8 @@ using System.Text;
 
 namespace QuikSharp.QuikClient
 {
-    public interface IQuikEventHandler
+    public interface IEventInvoker
     {
-        void Handle(IEvent @event);
+        void Invoke(IEvent @event);
     }
 }

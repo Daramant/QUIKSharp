@@ -5,6 +5,7 @@ using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Exceptions;
 using QuikSharp.Extensions;
+using QuikSharp.IdProviders;
 using QuikSharp.Messages;
 using QuikSharp.QuikClient;
 using QuikSharp.TypeConverters;
@@ -24,15 +25,18 @@ namespace QuikSharp.QuikFunctions.Trading
         private readonly IQuikClient _quikClient;
         private readonly IPersistentStorage _persistentStorage;
         private readonly ITypeConverter _typeConverter;
+        private readonly IIdProvider _idProvider;
 
         public TradingFunctions(
             IQuikClient quikClient,
             IPersistentStorage persistentStorage,
-            ITypeConverter typeConverter)
+            ITypeConverter typeConverter,
+            IIdProvider idProvider)
         {
             _quikClient = quikClient;
             _persistentStorage = persistentStorage;
             _typeConverter = typeConverter;
+            _idProvider = idProvider;
         }
 
         public async Task<DepoLimit> GetDepoAsync(string clientCode, string firmId, string secCode, string account)
@@ -150,14 +154,14 @@ namespace QuikSharp.QuikFunctions.Trading
         /// <param name="paramName"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public async Task<ParamTable> GetParamExAsync(string classCode, string secCode, string paramName, int timeout = Timeout.Infinite)
+        public async Task<ParamTable> GetParamExAsync(string classCode, string secCode, string paramName, TimeSpan? timeout = null)
         {
             var response = await _quikClient.SendAsync<Result<ParamTable>>(
                 (new Command<string[]>(new[] { classCode, secCode, paramName }, "getParamEx")), timeout).ConfigureAwait(false);
             return response.Data;
         }
 
-        public async Task<ParamTable> GetParamExAsync(string classCode, string secCode, ParamName paramName, int timeout = Timeout.Infinite)
+        public async Task<ParamTable> GetParamExAsync(string classCode, string secCode, ParamName paramName, TimeSpan? timeout = null)
         {
             var response = await _quikClient.SendAsync<Result<ParamTable>>(
                 (new Command<string[]>(new[] { classCode, secCode, _typeConverter.ToString(paramName) }, "getParamEx")), timeout).ConfigureAwait(false);
@@ -297,8 +301,8 @@ namespace QuikSharp.QuikFunctions.Trading
         {
             Trace.Assert(!transaction.TRANS_ID.HasValue, "TRANS_ID should be assigned automatically in SendTransaction functions");
 
-            //transaction.TRANS_ID = _quikClient.GetNewUniqueId();
-            transaction.TRANS_ID = _quikClient.GetUniqueTransactionId();
+            //transaction.TRANS_ID = _idProvider.GetNewUniqueId();
+            transaction.TRANS_ID = _idProvider.GetUniqueTransactionId();
 
             //    Console.WriteLine("Trans Id from function = {0}", transaction.TRANS_ID);
 

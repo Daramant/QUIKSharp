@@ -104,9 +104,9 @@ namespace QuikSharp.QuikFunctions.Trading
         /// <param name="paramName"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        Task<ParamTable> GetParamExAsync(string classCode, string secCode, string paramName, int timeout = Timeout.Infinite);
+        Task<ParamTable> GetParamExAsync(string classCode, string secCode, string paramName, TimeSpan? timeout = null);
 
-        Task<ParamTable> GetParamExAsync(string classCode, string secCode, ParamName paramName, int timeout = Timeout.Infinite);
+        Task<ParamTable> GetParamExAsync(string classCode, string secCode, ParamName paramName, TimeSpan? timeout = null);
 
         /// <summary>
         /// Функция для получения всех значений Таблицы текущих значений параметров

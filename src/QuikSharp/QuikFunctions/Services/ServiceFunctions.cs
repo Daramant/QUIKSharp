@@ -35,7 +35,7 @@ namespace QuikSharp.QuikFunctions.Services
             return response.Data;
         }
 
-        public async Task<bool> IsConnectedAsync(int timeout = Timeout.Infinite)
+        public async Task<bool> IsConnectedAsync(TimeSpan? timeout = null)
         {
             var response = await _quikClient.SendAsync<Result<string>>(
                 (new Command<string>(string.Empty, "isConnected")), timeout).ConfigureAwait(false);

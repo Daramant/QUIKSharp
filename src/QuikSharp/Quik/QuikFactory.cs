@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Text;
 using QuikSharp.QuikFunctions.Labels;
 using QuikSharp.TypeConverters;
+using QuikSharp.IdProviders;
 
 namespace QuikSharp.Quik
 {
@@ -25,11 +26,12 @@ namespace QuikSharp.Quik
             var jsonSerializer = new QuikJsonSerializer();
             var persistentStorage = new InMemoryPersistantStorage();
             var typeConverter = new CachingQuikTypeConverter();
+            var idProvider = new IdProvider();
 
             var quikEvents = new QuikEvents.QuikEvents();
-            var quikEventHandler = new QuikEventHandler(typeConverter, quikEvents);
-            var quikClient = new QuikClient.QuikClient(quikEventHandler, jsonSerializer, options);
-            var tradingFunctions = new TradingFunctions(quikClient, persistentStorage, typeConverter);
+            var quikEventHandler = new EventInvoker(typeConverter, quikEvents);
+            var quikClient = new QuikClient.QuikClient(quikEventHandler, jsonSerializer, idProvider, options);
+            var tradingFunctions = new TradingFunctions(quikClient, persistentStorage, typeConverter, idProvider);
 
             jsonSerializer.AddConverter(new MessageConverter(quikClient));
 

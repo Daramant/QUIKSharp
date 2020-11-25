@@ -16,7 +16,7 @@ namespace QuikSharp.Messages
         /// <summary>
         /// A name of a function to call for requests
         /// </summary>
-        [JsonProperty(PropertyName = "cmd")] // TODO: Переименовать в name (или n).
+        [JsonProperty(PropertyName = "n")]
         public string Name { get; set; }
 
         /// <summary>

@@ -9,12 +9,12 @@ using System.Diagnostics;
 
 namespace QuikSharp.QuikClient
 {
-    public class QuikEventHandler : IQuikEventHandler
+    public class EventInvoker : IEventInvoker
     {
         private readonly ITypeConverter _typeConverter;
         private readonly IQuikEventsInvoker _quikEventsInvoker;
 
-        public QuikEventHandler(
+        public EventInvoker(
             ITypeConverter typeConverter,
             IQuikEventsInvoker quikEventsInvoker)
         {
@@ -22,7 +22,7 @@ namespace QuikSharp.QuikClient
             _quikEventsInvoker = quikEventsInvoker;
         }
 
-        public void Handle(IEvent @event)
+        public void Invoke(IEvent @event)
         {
             if (@event == null)
             {
@@ -30,10 +30,9 @@ namespace QuikSharp.QuikClient
                 throw new ArgumentNullException(nameof(@event));
             }
 
-            var isParsed = _typeConverter.TryParseEnum(@event.Name, out EventName eventName);
+            var isParsed = _typeConverter.TryParseEnum<EventName>(@event.Name, out var eventName);
             if (!isParsed)
                 throw new QuikException($"Parse event name: '{@event.Name}' failed!");
-
 
             // TODO use as instead of assert+is+cast
             switch (eventName)

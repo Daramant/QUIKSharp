@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using QuikSharp.Quik;
 using QuikSharp.QuikClient;
+using System.Net;
 
 namespace QuikSharpDemo
 {
@@ -93,7 +94,7 @@ namespace QuikSharpDemo
                 textBoxLogsWindow.AppendText("Подключаемся к терминалу Quik..." + Environment.NewLine);
                 if (checkBoxRemoteHost.Checked)
                 {
-                    options.Host = textBoxHost.Text;
+                    options.Host = IPAddress.Parse(textBoxHost.Text);
                 }
 
                 _quik = quikFactory.Create(options);

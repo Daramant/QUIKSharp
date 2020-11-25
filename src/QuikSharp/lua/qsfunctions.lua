@@ -5,21 +5,21 @@ local json = require ("dkjson")
 local qsfunctions = {}
 
 function qsfunctions.dispatch_and_process(msg)
-    if qsfunctions[msg.cmd] then
+    if qsfunctions[msg.n] then
         -- dispatch a command simply by a table lookup
         -- in qsfunctions method names must match commands
-        local status, result = pcall(qsfunctions[msg.cmd], msg)
+        local status, result = pcall(qsfunctions[msg.n], msg)
         if status then
             return result
         else
-            msg.cmd = "Error"
+            msg.n = "Error"
             msg.error = "Lua error: " .. result
             return msg
         end
     else
 		log(to_json(msg), 3)
-		msg.error = "Command not implemented in Lua qsfunctions module: " .. msg.cmd
-        msg.cmd = "Error"
+		msg.error = "Command not implemented in Lua qsfunctions module: " .. msg.n
+        msg.n = "Error"
         return msg
     end
 end
@@ -337,7 +337,7 @@ function qsfunctions.sendTransaction(msg)
     local res = sendTransaction(msg.data)
     if res~="" then
         -- error handling
-        msg.cmd = "lua_transaction_error"
+        msg.n = "lua_transaction_error"
         msg.error = res
         return msg
     else
@@ -769,11 +769,11 @@ function create_data_source(msg)
 	local ds, error_descr = CreateDataSource(class, sec, interval)
 	local is_error = false
 	if(error_descr ~= nil) then
-		msg.cmd = "lua_create_data_source_error"
+		msg.n = "lua_create_data_source_error"
 		msg.error = error_descr
 		is_error = true
 	elseif ds == nil then
-		msg.cmd = "lua_create_data_source_error"
+		msg.n = "lua_create_data_source_error"
 		msg.error = "Can't create data source for " .. class .. ", " .. sec .. ", " .. tostring(interval)
 		is_error = true
 	end
@@ -823,7 +823,7 @@ function data_source_callback(index, class, sec, interval)
 
 		local msg = {}
         msg.t = timemsec()
-        msg.cmd = "NewCandle"
+        msg.n = "NewCandle"
         msg.data = candle
         sendCallback(msg)
 	end

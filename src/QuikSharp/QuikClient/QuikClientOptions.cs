@@ -1,24 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace QuikSharp.QuikClient
 {
     public class QuikClientOptions
     {
-        public string Host { get; set; }
+        public IPAddress Host { get; set; }
 
-        public int ResponsePort { get; set; }
+        public int CommandPort { get; set; }
 
-        public int CallbackPort { get; set; }
+        public int EventPort { get; set; }
+
+        public TimeSpan SendCommandTimeout { get; set; }
 
         public static QuikClientOptions GetDefault()
         {
             return new QuikClientOptions
             {
-                Host = "127.0.0.1",
-                ResponsePort = 34130,
-                CallbackPort = 34131
+                Host = IPAddress.Parse("127.0.0.1"),
+                CommandPort = 34130,
+                EventPort = 34131,
+                SendCommandTimeout = TimeSpan.Zero
             };
         }
     }

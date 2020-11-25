@@ -27,9 +27,7 @@ namespace QuikSharp.QuikClient
 
         Task StopAsync();
 
-        Task<TResult> SendAsync<TResult>(ICommand request, int timeout = 0)
-            where TResult : class, IResult, new();
-
-        int GetUniqueTransactionId();
+        Task<TResult> SendAsync<TResult>(ICommand request, TimeSpan? timeout = null)
+            where TResult : class, IResult;
     }
 }

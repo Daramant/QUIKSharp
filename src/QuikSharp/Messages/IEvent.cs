@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuikSharp.DataStructures;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,7 +10,7 @@ namespace QuikSharp.Messages
         /// <summary>
         /// A name of a function to call for requests
         /// </summary>
-        string Name { get; set; }
+        EventName Name { get; set; }
     }
 
     public interface IEvent<T> : IMessage<T>, IEvent

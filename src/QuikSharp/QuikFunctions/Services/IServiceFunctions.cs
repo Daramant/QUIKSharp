@@ -22,7 +22,7 @@ namespace QuikSharp.QuikFunctions.Services
         /// Функция предназначена для определения состояния подключения клиентского места к серверу. Возвращает «1», если клиентское место подключено и «0», если не подключено.
         /// </summary>
         /// <returns></returns>
-        Task<bool> IsConnectedAsync(int timeout = Timeout.Infinite);
+        Task<bool> IsConnectedAsync(TimeSpan? timeout = null);
 
         /// <summary>
         /// Функция возвращает путь, по которому находится запускаемый скрипт, без завершающего обратного слэша («\»). Например, C:\QuikFront\Scripts

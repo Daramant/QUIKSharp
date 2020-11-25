@@ -27,7 +27,7 @@ namespace QuikSharp.Json.Converters
             if (FieldExists("Error", jObject))
             {
                 var id = jObject.GetValue("id").Value<long>();
-                var cmd = jObject.GetValue("cmd").Value<string>();
+                var cmd = jObject.GetValue("n").Value<string>();
                 var message = jObject.GetValue("Error").Value<string>();
                 LuaException exception;
                 switch (cmd)
@@ -50,14 +50,14 @@ namespace QuikSharp.Json.Converters
             {
                 // Если есть id, значит пришел ответ на запрос (IRespose).
                 var id = jObject.GetValue("id").Value<long>();
-                objectType = _service.PendingResults[id].ResultType;
+                objectType = _service._pendingResults[id].ResultType;
                 return (IResult)Activator.CreateInstance(objectType);
             }
-            else if (FieldExists("cmd", jObject))
+            else if (FieldExists("n", jObject))
             {
                 // without id we have an event
                 EventName eventName;
-                string cmd = jObject.GetValue("cmd").Value<string>();
+                string cmd = jObject.GetValue("n").Value<string>();
                 var parsed = Enum.TryParse(cmd, true, out eventName);
                 if (parsed)
                 {
