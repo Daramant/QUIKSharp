@@ -5,7 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -18,7 +17,6 @@ using QuikSharp.QuikEvents;
 using QuikSharp.Quik;
 using QuikSharp.Providers;
 using QuikSharp.Serialization;
-using QuikSharp.TypeConverters;
 
 namespace QuikSharp.QuikClient
 {
@@ -187,7 +185,7 @@ namespace QuikSharp.QuikClient
                                             // then we will iterate over messages and cancel expired ones
                                             var utcNow = _dateTimeProvider.UtcNow;
 
-                                            if (commandEnvelope.Data.ValidUntil < utcNow)
+                                            if (commandEnvelope.Body.ValidUntil < utcNow)
                                             {
                                                 if (_pendingResultContainer.TryRemove(commandEnvelope.Header.CommandId, out var pendingResult))
                                                 {
@@ -385,7 +383,7 @@ namespace QuikSharp.QuikClient
 
                                         try
                                         {
-                                            await ProcessEventEnvelopeAsync(serializedEvent);
+                                            await ProcessEventEnvelopeAsync(serializedEvent).ConfigureAwait(false);
                                             //var @event = _serializer.Deserialize<IEvent>(serializedEvent);
                                             // it is a callback message
                                             //await _eventChannel.Writer.WriteAsync(@event, _cancellationTokenSource.Token);
@@ -440,7 +438,7 @@ namespace QuikSharp.QuikClient
                     {
                         try
                         {
-                            var @event = await _eventChannel.Reader.ReadAsync(_cancellationTokenSource.Token);
+                            var @event = await _eventChannel.Reader.ReadAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
                             try
                             {
                                 _eventInvoker.Invoke(@event);
@@ -479,20 +477,20 @@ namespace QuikSharp.QuikClient
                 }
                 else
                 {
-                    pendingResult.TaskCompletionSource.SetResult(envelope.Data);
+                    pendingResult.TaskCompletionSource.SetResult(envelope.Body);
                 }
             }
             else
             {
                 pendingResult.TaskCompletionSource.SetException(
-                    new LuaException($"Не удалось выполнить команду с идентификатором: {envelope.Header.CommandId}. Детали: '{((Result<string>)envelope.Data).Data}'."));
+                    new LuaException($"Не удалось выполнить команду с идентификатором: {envelope.Header.CommandId}. Детали: '{((Result<string>)envelope.Body).Data}'."));
             }
         }
 
         private ValueTask ProcessEventEnvelopeAsync(string data)
         {
             var envelope = _serializer.DeserializeEventEnvelope(data);
-            return _eventChannel.Writer.WriteAsync(envelope.Data, _cancellationTokenSource.Token);
+            return _eventChannel.Writer.WriteAsync(envelope.Body, _cancellationTokenSource.Token);
         }
 
         public bool IsConnected()
@@ -569,39 +567,39 @@ namespace QuikSharp.QuikClient
             {
                 var timeoutTask = Task.Delay(timeout.Value);
                 if (await Task.WhenAny(task, timeoutTask).ConfigureAwait(false) == timeoutTask)
-                    throw new TimeoutException("Send operation timed out");
+                    throw new CommandTimeoutException("Send operation timed out");
             }
             else
             {
                 await task.ConfigureAwait(false);
             }
 
-            var tcs = new TaskCompletionSource<IResult>(TaskCreationOptions.RunContinuationsAsynchronously);
-            var ctRegistration = default(CancellationTokenRegistration);
+            var taskCompletionSource = new TaskCompletionSource<IResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+            
+            CancellationTokenSource cancellationTokenSource = null;
+            var cancellationTokenRegistration = default(CancellationTokenRegistration);
 
             var commandId = _idProvider.GetUniqueCommandId();
-            var envelope = new Envelope<CommandHeader, ICommand>(
-                new CommandHeader(commandId),
-                command);
+            var envelope = new Envelope<CommandHeader, ICommand>(new CommandHeader(commandId), command);
 
             if (timeout > TimeSpan.Zero)
             {
-                var ct = new CancellationTokenSource();
-                ctRegistration = ct.Token.Register(() =>
+                cancellationTokenSource = new CancellationTokenSource();
+                cancellationTokenRegistration = cancellationTokenSource.Token.Register(() =>
                 {
-                    tcs.TrySetException(new TimeoutException("Send operation timed out"));
+                    taskCompletionSource.TrySetException(new CommandTimeoutException("Send operation timed out"));
                     _pendingResultContainer.Remove(commandId);
-                }, false);
+                }, useSynchronizationContext: false);
 
-                ct.CancelAfter(timeout.Value);
+                cancellationTokenSource.CancelAfter(timeout.Value);
             }
 
-            _pendingResultContainer.Add(commandId, new PendingResult(command, typeof(TResult), tcs));
+            _pendingResultContainer.Add(commandId, new PendingResult(command, typeof(TResult), taskCompletionSource));
             _commandEnvelopeQueue.Add(envelope);
 
             try
             {
-                var result = await tcs.Task.ConfigureAwait(false);
+                var result = await taskCompletionSource.Task.ConfigureAwait(false);
                 
                 if (result is TResult typedResult)
                 {
@@ -616,7 +614,8 @@ namespace QuikSharp.QuikClient
             {
                 if (timeout > TimeSpan.Zero)
                 {
-                    ctRegistration.Dispose();
+                    cancellationTokenSource?.Dispose();
+                    //cancellationTokenRegistration.Dispose();
                 }
             }
         }
