@@ -40,7 +40,7 @@ namespace QuikSharp.QuikFunctions.StopOrders
         public async Task<List<StopOrder>> GetStopOrdersAsync()
         {
             var message = new Command<string>(string.Empty, "get_stop_orders");
-            var response = await _quikClient.SendAsync<Result<List<StopOrder>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<List<StopOrder>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -50,7 +50,7 @@ namespace QuikSharp.QuikFunctions.StopOrders
         public async Task<List<StopOrder>> GetStopOrdersAsync(string classCode, string securityCode)
         {
             var message = new Command<string[]>(new[] { classCode, securityCode }, "get_stop_orders");
-            var response = await _quikClient.SendAsync<Result<List<StopOrder>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<List<StopOrder>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 

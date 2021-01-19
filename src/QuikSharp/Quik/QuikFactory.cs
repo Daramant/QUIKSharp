@@ -1,6 +1,4 @@
-﻿using QuikSharp.Json.Converters;
-using QuikSharp.Json.Serializers;
-using QuikSharp.PersistentStorages;
+﻿using QuikSharp.PersistentStorages;
 using QuikSharp.QuikFunctions.Candles;
 using QuikSharp.QuikFunctions.Classes;
 using QuikSharp.QuikFunctions.Debug;
@@ -15,7 +13,9 @@ using System.Collections.Generic;
 using System.Text;
 using QuikSharp.QuikFunctions.Labels;
 using QuikSharp.TypeConverters;
-using QuikSharp.IdProviders;
+using QuikSharp.Providers;
+using QuikSharp.Serialization.Json;
+using QuikSharp.QuikEvents;
 
 namespace QuikSharp.Quik
 {
@@ -23,17 +23,18 @@ namespace QuikSharp.Quik
     {
         public IQuik Create(QuikClientOptions options)
         {
-            var jsonSerializer = new QuikJsonSerializer();
+            var pendingResultContainer = new PendingResultContainer();
+            var eventTypeProvider = new EventTypeProvider();
+            var serializer = new QuikJsonSerializer(pendingResultContainer, eventTypeProvider);
             var persistentStorage = new InMemoryPersistantStorage();
             var typeConverter = new CachingQuikTypeConverter();
             var idProvider = new IdProvider();
+            var dateTimeProvider = new CurrentDateTimeProvider();
 
             var quikEvents = new QuikEvents.QuikEvents();
-            var quikEventHandler = new EventInvoker(typeConverter, quikEvents);
-            var quikClient = new QuikClient.QuikClient(quikEventHandler, jsonSerializer, idProvider, options);
+            var quikEventHandler = new QuikEventInvoker(typeConverter, quikEvents);
+            var quikClient = new QuikClient.QuikClient(quikEventHandler, serializer, idProvider, dateTimeProvider, pendingResultContainer, options);
             var tradingFunctions = new TradingFunctions(quikClient, persistentStorage, typeConverter, idProvider);
-
-            jsonSerializer.AddConverter(new MessageConverter(quikClient));
 
             var quik = new Quik(
                 quikClient,

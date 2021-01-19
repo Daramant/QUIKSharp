@@ -47,10 +47,10 @@ namespace QuikSharp.Tests
         public void GetSecurityInfo()
         {
             var securityInfo = Quik.Functions.Class.GetSecurityInfoAsync("SPBFUT", "RIM5").Result;
-            Console.WriteLine("GetSecurityInfo for RIM5: " + string.Join(",", JsonSerializer.Serialize(securityInfo)));
+            Console.WriteLine("GetSecurityInfo for RIM5: " + string.Join(",", Serializer.Serialize(securityInfo)));
 
             securityInfo = Quik.Functions.Class.GetSecurityInfoAsync("TQBR", "LKOH").Result;
-            Console.WriteLine("GetSecurityInfo for LKOH: " + string.Join(",", JsonSerializer.Serialize(securityInfo)));
+            Console.WriteLine("GetSecurityInfo for LKOH: " + string.Join(",", Serializer.Serialize(securityInfo)));
         }
 
     }

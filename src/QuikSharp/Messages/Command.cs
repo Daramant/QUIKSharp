@@ -5,14 +5,8 @@ using System.Text;
 
 namespace QuikSharp.Messages
 {
-    internal class Command<T>: Message<T>, ICommand<T>
+    public class Command<T>: Message<T>, ICommand<T>
     {
-        /// <summary>
-        /// Unique correlation id to match requests and responses
-        /// </summary>
-        [JsonProperty(PropertyName = "id")]
-        public long Id { get; set; }
-
         /// <summary>
         /// A name of a function to call for requests
         /// </summary>

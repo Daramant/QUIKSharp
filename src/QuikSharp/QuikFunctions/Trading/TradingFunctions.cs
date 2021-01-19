@@ -5,7 +5,7 @@ using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Exceptions;
 using QuikSharp.Extensions;
-using QuikSharp.IdProviders;
+using QuikSharp.Providers;
 using QuikSharp.Messages;
 using QuikSharp.QuikClient;
 using QuikSharp.TypeConverters;
@@ -41,14 +41,14 @@ namespace QuikSharp.QuikFunctions.Trading
 
         public async Task<DepoLimit> GetDepoAsync(string clientCode, string firmId, string secCode, string account)
         {
-            var response = await _quikClient.SendAsync<Result<DepoLimit>>(
+            var response = await _quikClient.SendAsync<IResult<DepoLimit>>(
                 (new Command<string[]>(new[] { clientCode, firmId, secCode, account }, "getDepo"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<DepoLimitEx> GetDepoExAsync(string firmId, string clientCode, string secCode, string accID, int limitKind)
         {
-            var response = await _quikClient.SendAsync<Result<DepoLimitEx>>(
+            var response = await _quikClient.SendAsync<IResult<DepoLimitEx>>(
                 (new Command<string[]>(new[] { firmId, clientCode, secCode, accID, _typeConverter.ToStringLookup(limitKind) }, "getDepoEx"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -59,7 +59,7 @@ namespace QuikSharp.QuikFunctions.Trading
         public async Task<List<DepoLimitEx>> GetDepoLimitsAsync()
         {
             var message = new Command<string>(string.Empty, "get_depo_limits");
-            Message<List<DepoLimitEx>> response = await _quikClient.SendAsync<Result<List<DepoLimitEx>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<List<DepoLimitEx>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -69,7 +69,7 @@ namespace QuikSharp.QuikFunctions.Trading
         public async Task<List<DepoLimitEx>> GetDepoLimitsAsync(string secCode)
         {
             var message = new Command<string>(secCode, "get_depo_limits");
-            Message<List<DepoLimitEx>> response = await _quikClient.SendAsync<Result<List<DepoLimitEx>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<List<DepoLimitEx>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -78,7 +78,7 @@ namespace QuikSharp.QuikFunctions.Trading
         /// </summary>
         public async Task<MoneyLimit> GetMoneyAsync(string clientCode, string firmId, string tag, string currCode)
         {
-            var response = await _quikClient.SendAsync<Result<MoneyLimit>>(
+            var response = await _quikClient.SendAsync<IResult<MoneyLimit>>(
                 (new Command<string[]>(new[] { clientCode, firmId, tag, currCode }, "getMoney"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -88,7 +88,7 @@ namespace QuikSharp.QuikFunctions.Trading
         /// </summary>
         public async Task<MoneyLimitEx> GetMoneyExAsync(string firmId, string clientCode, string tag, string currCode, int limitKind)
         {
-            var response = await _quikClient.SendAsync<Result<MoneyLimitEx>>(
+            var response = await _quikClient.SendAsync<IResult<MoneyLimitEx>>(
                 (new Command<string[]>(new[] { firmId, clientCode, tag, currCode, _typeConverter.ToStringLookup(limitKind) }, "getMoneyEx"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -99,7 +99,7 @@ namespace QuikSharp.QuikFunctions.Trading
         /// </summary>
         public async Task<List<MoneyLimitEx>> GetMoneyLimitsAsync()
         {
-            var response = await _quikClient.SendAsync<Result<List<MoneyLimitEx>>>(
+            var response = await _quikClient.SendAsync<IResult<List<MoneyLimitEx>>>(
                 (new Command<string>(string.Empty, "getMoneyLimits"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -113,14 +113,14 @@ namespace QuikSharp.QuikFunctions.Trading
         /// <returns></returns>
         public async Task<bool> ParamRequestAsync(string classCode, string secCode, string paramName)
         {
-            var response = await _quikClient.SendAsync<Result<bool>>(
+            var response = await _quikClient.SendAsync<IResult<bool>>(
                 (new Command<string[]>(new[] { classCode, secCode, paramName }, "paramRequest"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<bool> ParamRequestAsync(string classCode, string secCode, ParamName paramName)
         {
-            var response = await _quikClient.SendAsync<Result<bool>>(
+            var response = await _quikClient.SendAsync<IResult<bool>>(
                 (new Command<string[]>(new[] { classCode, secCode, _typeConverter.ToString(paramName) }, "paramRequest"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -134,14 +134,14 @@ namespace QuikSharp.QuikFunctions.Trading
         /// <returns></returns>
         public async Task<bool> CancelParamRequestAsync(string classCode, string secCode, string paramName)
         {
-            var response = await _quikClient.SendAsync<Result<bool>>(
+            var response = await _quikClient.SendAsync<IResult<bool>>(
                 (new Command<string[]>(new[] { classCode, secCode, paramName }, "cancelParamRequest"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<bool> CancelParamRequestAsync(string classCode, string secCode, ParamName paramName)
         {
-            var response = await _quikClient.SendAsync<Result<bool>>(
+            var response = await _quikClient.SendAsync<IResult<bool>>(
                 (new Command<string[]>(new[] { classCode, secCode, _typeConverter.ToString(paramName) }, "cancelParamRequest"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -156,14 +156,14 @@ namespace QuikSharp.QuikFunctions.Trading
         /// <returns></returns>
         public async Task<ParamTable> GetParamExAsync(string classCode, string secCode, string paramName, TimeSpan? timeout = null)
         {
-            var response = await _quikClient.SendAsync<Result<ParamTable>>(
+            var response = await _quikClient.SendAsync<IResult<ParamTable>>(
                 (new Command<string[]>(new[] { classCode, secCode, paramName }, "getParamEx")), timeout).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<ParamTable> GetParamExAsync(string classCode, string secCode, ParamName paramName, TimeSpan? timeout = null)
         {
-            var response = await _quikClient.SendAsync<Result<ParamTable>>(
+            var response = await _quikClient.SendAsync<IResult<ParamTable>>(
                 (new Command<string[]>(new[] { classCode, secCode, _typeConverter.ToString(paramName) }, "getParamEx")), timeout).ConfigureAwait(false);
             return response.Data;
         }
@@ -177,14 +177,14 @@ namespace QuikSharp.QuikFunctions.Trading
         /// <returns></returns>
         public async Task<ParamTable> GetParamEx2Async(string classCode, string secCode, string paramName)
         {
-            var response = await _quikClient.SendAsync<Result<ParamTable>>(
+            var response = await _quikClient.SendAsync<IResult<ParamTable>>(
                 (new Command<string[]>(new[] { classCode, secCode, paramName }, "getParamEx2"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<ParamTable> GetParamEx2Async(string classCode, string secCode, ParamName paramName)
         {
-            var response = await _quikClient.SendAsync<Result<ParamTable>>(
+            var response = await _quikClient.SendAsync<IResult<ParamTable>>(
                 (new Command<string[]>(new[] { classCode, secCode, _typeConverter.ToString(paramName) }, "getParamEx2"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -199,7 +199,7 @@ namespace QuikSharp.QuikFunctions.Trading
         /// <returns></returns>
         public async Task<FuturesLimits> GetFuturesLimitAsync(string firmId, string accId, int limitType, string currCode)
         {
-            var response = await _quikClient.SendAsync<Result<FuturesLimits>>(
+            var response = await _quikClient.SendAsync<IResult<FuturesLimits>>(
                 (new Command<string[]>(new[] { firmId, accId, _typeConverter.ToStringLookup(limitType), currCode }, "getFuturesLimit"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -209,7 +209,7 @@ namespace QuikSharp.QuikFunctions.Trading
         /// </summary>
         public async Task<List<FuturesLimits>> GetFuturesClientLimitsAsync()
         {
-            var response = await _quikClient.SendAsync<Result<List<FuturesLimits>>>(
+            var response = await _quikClient.SendAsync<IResult<List<FuturesLimits>>>(
                 (new Command<string>(string.Empty, "getFuturesClientLimits"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -224,7 +224,7 @@ namespace QuikSharp.QuikFunctions.Trading
         /// <returns></returns>
         public async Task<FuturesClientHolding> GetFuturesHoldingAsync(string firmId, string accId, string secCode, int posType)
         {
-            var response = await _quikClient.SendAsync<Result<FuturesClientHolding>>(
+            var response = await _quikClient.SendAsync<IResult<FuturesClientHolding>>(
                 (new Command<string[]>(new[] { firmId, accId, secCode, _typeConverter.ToStringLookup(posType) }, "getFuturesHolding"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -232,62 +232,62 @@ namespace QuikSharp.QuikFunctions.Trading
         public async Task<List<OptionBoard>> GetOptionBoardAsync(string classCode, string secCode)
         {
             var message = new Command<string[]>(new[] { classCode, secCode }, "getOptionBoard");
-            var response = await _quikClient.SendAsync<Result<List<OptionBoard>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<List<OptionBoard>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<List<Trade>> GetTradesAsync()
         {
-            var response = await _quikClient.SendAsync<Result<List<Trade>>>(
+            var response = await _quikClient.SendAsync<IResult<List<Trade>>>(
                 (new Command<string>(string.Empty, "get_trades"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<List<Trade>> GetTradesAsync(string classCode, string secCode)
         {
-            var response = await _quikClient.SendAsync<Result<List<Trade>>>(
+            var response = await _quikClient.SendAsync<IResult<List<Trade>>>(
                 (new Command<string[]>(new[] { classCode, secCode }, "get_trades"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<List<Trade>> GetTradesByOrderNumberAsync(long orderNum)
         {
-            var response = await _quikClient.SendAsync<Result<List<Trade>>>(
+            var response = await _quikClient.SendAsync<IResult<List<Trade>>>(
                 (new Command<string[]>(new[] { _typeConverter.ToString(orderNum) }, "get_Trades_by_OrderNumber"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<PortfolioInfo> GetPortfolioInfoAsync(string firmId, string clientCode)
         {
-            var response = await _quikClient.SendAsync<Result<PortfolioInfo>>(
+            var response = await _quikClient.SendAsync<IResult<PortfolioInfo>>(
                 (new Command<string[]>(new[] { firmId, clientCode }, "getPortfolioInfo"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<PortfolioInfoEx> GetPortfolioInfoExAsync(string firmId, string clientCode, int limitKind)
         {
-            var response = await _quikClient.SendAsync<Result<PortfolioInfoEx>>(
+            var response = await _quikClient.SendAsync<IResult<PortfolioInfoEx>>(
                 (new Command<string[]>(new[] { firmId, clientCode, _typeConverter.ToStringLookup(limitKind) }, "getPortfolioInfoEx"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<string> GetTrdAccByClientCodeAsync(string firmId, string clientCode)
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string[]>(new[] { firmId, clientCode }, "GetTrdAccByClientCode"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<string> GetClientCodeByTrdAccAsync(string firmId, string trdAccId)
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string[]>(new[] { firmId, trdAccId }, "GetClientCodeByTrdAcc"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<bool> IsUcpClientAsync(string firmId, string client)
         {
-            var response = await _quikClient.SendAsync<Result<bool>>(
+            var response = await _quikClient.SendAsync<IResult<bool>>(
                 (new Command<string[]>(new[] { firmId, client }, "IsUcpClient"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -321,7 +321,7 @@ namespace QuikSharp.QuikFunctions.Trading
 
             try
             {
-                var response = await _quikClient.SendAsync<Result<bool>>(
+                var response = await _quikClient.SendAsync<IResult<bool>>(
                     (new Command<Transaction>(transaction, "sendTransaction"))).ConfigureAwait(false);
                 Trace.Assert(response.Data);
 

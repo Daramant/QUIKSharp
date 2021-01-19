@@ -1,5 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using QuikSharp.DataStructures.Transaction;
+using QuikSharp.QuikClient;
+using QuikSharp.QuikEvents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +21,10 @@ namespace Profiler.QuikJsonSerializer
         public void QuikJsonSerializer_Serialize_Deserialize()
         {
             var results = new List<string>(_roundCount * (_endIndex - _startIndex + 1));
-            var jsonSerializer = new QuikSharp.Json.Serializers.QuikJsonSerializer();
+
+            var pendingResultContainer = new PendingResultContainer();
+            var eventTypeProvider = new EventTypeProvider();
+            var serializer = new QuikSharp.Serialization.Json.QuikJsonSerializer(pendingResultContainer, eventTypeProvider);
 
             var t = new Transaction();
             t.PRICE = 123.456m;
@@ -28,8 +33,8 @@ namespace Profiler.QuikJsonSerializer
             {
                 for (var i = _startIndex; i <= _endIndex; i++)
                 {
-                    var j = jsonSerializer.Serialize(t);
-                    var t2 = jsonSerializer.Deserialize<Transaction>(j);
+                    var j = serializer.Serialize(t);
+                    var t2 = serializer.Deserialize<Transaction>(j);
                     
                     //if (t.PRICE != t2.PRICE)
                     //{

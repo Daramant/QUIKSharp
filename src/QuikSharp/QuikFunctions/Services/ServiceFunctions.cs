@@ -30,28 +30,28 @@ namespace QuikSharp.QuikFunctions.Services
 
         public async Task<string> GetWorkingFolderAsync()
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(string.Empty, "getWorkingFolder"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<bool> IsConnectedAsync(TimeSpan? timeout = null)
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(string.Empty, "isConnected")), timeout).ConfigureAwait(false);
             return response.Data == "1";
         }
 
         public async Task<string> GetScriptPathAsync()
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(string.Empty, "getScriptPath"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<string> GetInfoParamAsync(InfoParams param)
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(_typeConverter.ToString(param), "getInfoParam"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -61,17 +61,17 @@ namespace QuikSharp.QuikFunctions.Services
             switch (iconType)
             {
                 case NotificationType.Info:
-                    await _quikClient.SendAsync<Result<string>>(
+                    await _quikClient.SendAsync<IResult<string>>(
                         (new Command<string>(message, "message"))).ConfigureAwait(false);
                     break;
 
                 case NotificationType.Warning:
-                    await _quikClient.SendAsync<Result<string>>(
+                    await _quikClient.SendAsync<IResult<string>>(
                         (new Command<string>(message, "warning_message"))).ConfigureAwait(false);
                     break;
 
                 case NotificationType.Error:
-                    await _quikClient.SendAsync<Result<string>>(
+                    await _quikClient.SendAsync<IResult<string>>(
                         (new Command<string>(message, "error_message"))).ConfigureAwait(false);
                     break;
 
@@ -84,7 +84,7 @@ namespace QuikSharp.QuikFunctions.Services
 
         public async Task<bool> PrintDbgStrAsync(string message)
         {
-            await _quikClient.SendAsync<Result<string>>(
+            await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(message, "PrintDbgStr"))).ConfigureAwait(false);
             return true; // TODO: Возвращать результат из Quik.
         }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace QuikSharp.Json.Converters
+namespace QuikSharp.Serialization.Json.Converters
 {
     /// <summary>
     /// Serialize Decimal to string without trailing zeros

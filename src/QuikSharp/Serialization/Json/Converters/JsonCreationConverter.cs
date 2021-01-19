@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.Json.Converters
+namespace QuikSharp.Serialization.Json.Converters
 {
     public abstract class JsonCreationConverter<T> : JsonConverter
     {

@@ -170,7 +170,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<Order> GetOrderAsync(string classCode, long orderId)
         {
             var message = new Command<string[]>(new[] { classCode, _typeConverter.ToString(orderId) }, "get_order_by_number");
-            var response = await _quikClient.SendAsync<Result<Order>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<Order>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -181,7 +181,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<List<Order>> GetOrdersAsync()
         {
             var message = new Command<string>(string.Empty, "get_orders");
-            var response = await _quikClient.SendAsync<Result<List<Order>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<List<Order>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -191,7 +191,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<List<Order>> GetOrdersAsync(string classCode, string securityCode)
         {
             var message = new Command<string[]>(new[] { classCode, securityCode }, "get_orders");
-            var response = await _quikClient.SendAsync<Result<List<Order>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<List<Order>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -201,7 +201,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<Order> GetOrderByTransactionIdAsync(string classCode, string securityCode, long trans_id)
         {
             var message = new Command<string[]>(new[] { classCode, securityCode, _typeConverter.ToString(trans_id) }, "getOrder_by_ID");
-            var response = await _quikClient.SendAsync<Result<Order>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<Order>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -211,7 +211,7 @@ namespace QuikSharp.QuikFunctions.Orders
         public async Task<Order> GetOrderByNumberAsync(long order_num)
         {
             var message = new Command<string>(_typeConverter.ToString(order_num), "getOrder_by_Number");
-            var response = await _quikClient.SendAsync<Result<Order>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<Order>>(message).ConfigureAwait(false);
             return response.Data;
         }
     }

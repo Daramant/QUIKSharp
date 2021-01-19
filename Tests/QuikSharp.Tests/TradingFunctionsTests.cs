@@ -32,8 +32,8 @@ namespace QuikSharp.Tests
 		[Test]
 		public void CouldDeserializeOrderBook()
 		{
-			var ob = JsonSerializer.Deserialize<OrderBook>(_orderBookSample);
-			Console.WriteLine("Order book: " + JsonSerializer.Serialize(ob));
+			var ob = Serializer.Deserialize<OrderBook>(_orderBookSample);
+			Console.WriteLine("Order book: " + Serializer.Serialize(ob));
 		}
 
 		[Test]

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.Json.Converters
+namespace QuikSharp.Serialization.Json.Converters
 {
     /// <summary>
     /// Serialize as string with ToString()

@@ -4,11 +4,12 @@ using System.Text;
 
 namespace QuikSharp.Messages
 {
-    public interface IResult : IMessage
+    public enum ResultStatus
     {
-    }
+        Undefined,
 
-    public interface IResult<T> : IMessage<T>, IResult
-    {
+        Ok,
+
+        Error
     }
 }

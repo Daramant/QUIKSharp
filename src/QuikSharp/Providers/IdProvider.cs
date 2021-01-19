@@ -5,7 +5,7 @@ using System.IO.MemoryMappedFiles;
 using System.Text;
 using System.Threading;
 
-namespace QuikSharp.IdProviders
+namespace QuikSharp.Providers
 {
     public class IdProvider : IIdProvider
     {

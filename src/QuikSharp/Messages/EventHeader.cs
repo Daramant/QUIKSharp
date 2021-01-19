@@ -4,11 +4,8 @@ using System.Text;
 
 namespace QuikSharp.Messages
 {
-    public interface IResult : IMessage
+    public struct EventHeader
     {
-    }
-
-    public interface IResult<T> : IMessage<T>, IResult
-    {
+        public EventName EventName { get; set; }
     }
 }

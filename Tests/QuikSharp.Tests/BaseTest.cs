@@ -1,5 +1,4 @@
-﻿using QuikSharp.Json.Converters;
-using QuikSharp.Json.Serializers;
+﻿using QuikSharp.Serialization.Json.Converters;
 using QuikSharp.Quik;
 using QuikSharp.QuikClient;
 using System;
@@ -7,6 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QuikSharp.Serialization;
+using QuikSharp.Serialization.Json;
+using QuikSharp.QuikEvents;
 
 namespace QuikSharp.Tests
 {
@@ -16,7 +18,7 @@ namespace QuikSharp.Tests
 
         protected IQuikFactory QuikFactory { get; private set; }
 
-        protected IJsonSerializer JsonSerializer { get; private set; }
+        protected ISerializer Serializer { get; private set; }
 
         protected void SetUpQuik()
         {
@@ -27,9 +29,9 @@ namespace QuikSharp.Tests
 
             Quik.Client.Start();
 
-            JsonSerializer = new QuikJsonSerializer();
-
-            JsonSerializer.AddConverter(new MessageConverter((QuikClient.QuikClient)Quik.Client));
+            var pendingResultContainer = new PendingResultContainer();
+            var eventTypeProvider = new EventTypeProvider();
+            Serializer = new QuikJsonSerializer(pendingResultContainer, eventTypeProvider);
         }
     }
 }

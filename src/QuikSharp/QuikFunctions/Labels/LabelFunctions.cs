@@ -24,7 +24,7 @@ namespace QuikSharp.QuikFunctions.Labels
 
         public async Task<decimal> AddLabelAsync(decimal price, string curDate, string curTime, string hint, string path, string tag, string alignment, decimal backgnd)
         {
-            var response = await _quikClient.SendAsync<Result<decimal>>(
+            var response = await _quikClient.SendAsync<IResult<decimal>>(
                     (new Command<string[]>(new[] { _typeConverter.ToString(price), curDate, curTime, hint, path, tag, alignment, _typeConverter.ToString(backgnd) }, "addLabel")))
                 .ConfigureAwait(false);
             return response.Data;
@@ -32,14 +32,14 @@ namespace QuikSharp.QuikFunctions.Labels
 
         public async Task<bool> DelLabelAsync(string tag, decimal id)
         {
-            await _quikClient.SendAsync<Result<string>>(
+            await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string[]>(new[] { tag, _typeConverter.ToString(id) }, "delLabel"))).ConfigureAwait(false);
             return true;
         }
 
         public async Task<bool> DelAllLabelsAsync(string tag)
         {
-            await _quikClient.SendAsync<Result<string>>(
+            await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(tag, "delAllLabels"))).ConfigureAwait(false);
             return true; // TODO: Возвращать результат из quik.
         }

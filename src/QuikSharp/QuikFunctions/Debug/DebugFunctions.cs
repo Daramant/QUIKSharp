@@ -50,7 +50,7 @@ namespace QuikSharp.QuikFunctions.Debug
         public async Task<T> EchoAsync<T>(T msg)
         {
             // could have used StringMessage directly. This is an example of how to define DTOs for custom commands
-            var response = await _quikClient.SendAsync<Result<T>>(
+            var response = await _quikClient.SendAsync<IResult<T>>(
                 (new Command<T>(msg, "echo"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -61,7 +61,7 @@ namespace QuikSharp.QuikFunctions.Debug
         /// <returns></returns>
         public async Task<string> DivideStringByZeroAsync()
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(string.Empty, "divide_string_by_zero"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -71,7 +71,7 @@ namespace QuikSharp.QuikFunctions.Debug
         /// </summary>
         public async Task<bool> IsQuikAsync()
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(string.Empty, "is_quik"))).ConfigureAwait(false);
             return response.Data == "1";
         }

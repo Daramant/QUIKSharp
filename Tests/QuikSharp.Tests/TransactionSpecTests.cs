@@ -5,8 +5,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
-using QuikSharp.Json.Converters;
-using QuikSharp.Json.Serializers;
+using QuikSharp.Serialization.Json.Converters;
 using QuikSharp.Quik;
 using QuikSharp.QuikClient;
 
@@ -54,28 +53,28 @@ namespace QuikSharp.Tests
         public void UndefinedEnumCannotBeSerialized()
         {
             var op = (TransactionOperation)10;
-            var json = JsonSerializer.Serialize(op);
+            var json = Serializer.Serialize(op);
             Assert.AreEqual(json, "null");
             Console.WriteLine(json);
             op = (TransactionOperation)1;
-            json = JsonSerializer.Serialize(op);
+            json = Serializer.Serialize(op);
             Console.WriteLine(json);
-            Assert.AreEqual(json, JsonSerializer.Serialize("B"));
+            Assert.AreEqual(json, Serializer.Serialize("B"));
 
             var act = (TransactionAction)0;
-            json = JsonSerializer.Serialize(act);
+            json = Serializer.Serialize(act);
             Console.WriteLine(json);
             Assert.AreEqual(json, "null");
 
             var yesNo = (YesOrNo)0;
-            json = JsonSerializer.Serialize(yesNo);
+            json = Serializer.Serialize(yesNo);
             Console.WriteLine(json);
             Assert.AreEqual(json, "null");
 
             var yesNoDef = (YesOrNoDefault)0;
-            json = JsonSerializer.Serialize(yesNoDef);
+            json = Serializer.Serialize(yesNoDef);
             Console.WriteLine(json);
-            Assert.AreEqual(json, JsonSerializer.Serialize("NO"));
+            Assert.AreEqual(json, Serializer.Serialize("NO"));
         }
 
 
@@ -85,11 +84,11 @@ namespace QuikSharp.Tests
             var t = new TypeWithNumberSerializedAsString();
             t.NormalInt = 123;
             t.AsString = 456;
-            var j = JsonSerializer.Serialize(t);
+            var j = Serializer.Serialize(t);
             Console.WriteLine(j);
-            var t2 = JsonSerializer.Deserialize<TypeWithNumberDeSerializedAsString>(j);
+            var t2 = Serializer.Deserialize<TypeWithNumberDeSerializedAsString>(j);
             Assert.AreEqual("456", t2.AsString);
-            var t1 = JsonSerializer.Deserialize<TypeWithNumberSerializedAsString>(j);
+            var t1 = Serializer.Deserialize<TypeWithNumberSerializedAsString>(j);
             Assert.AreEqual(456, t1.AsString);
         }
 
@@ -100,11 +99,11 @@ namespace QuikSharp.Tests
             var t = new TypeWithDateTimeSerializedAsString();
             var now = DateTime.Now;
             t.AsString = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
-            var j = JsonSerializer.Serialize(t);
+            var j = Serializer.Serialize(t);
             Console.WriteLine(j);
-            var t2 = JsonSerializer.Deserialize<TypeWithDateTimeDeSerializedAsString>(j);
+            var t2 = Serializer.Deserialize<TypeWithDateTimeDeSerializedAsString>(j);
             Assert.AreEqual(t.AsString.Value.ToString("HHmmss"), t2.AsString);
-            var t1 = JsonSerializer.Deserialize<TypeWithDateTimeSerializedAsString>(j);
+            var t1 = Serializer.Deserialize<TypeWithDateTimeSerializedAsString>(j);
             Assert.AreEqual(t.AsString, t1.AsString);
         }
 
@@ -112,10 +111,10 @@ namespace QuikSharp.Tests
         public void CouldSerializeEmptyTransactionSpec()
         {
             var t = new Transaction();
-            var j = JsonSerializer.Serialize(t);
+            var j = Serializer.Serialize(t);
             Console.WriteLine(j);
-            var t2 = JsonSerializer.Deserialize<Transaction>(j);
-            Assert.AreEqual(JsonSerializer.Serialize(t), JsonSerializer.Serialize(t2));
+            var t2 = Serializer.Deserialize<Transaction>(j);
+            Assert.AreEqual(Serializer.Serialize(t), Serializer.Serialize(t2));
         }
 
 
@@ -127,8 +126,8 @@ namespace QuikSharp.Tests
             sw.Start();
             for (int i = 0; i < 100000; i++)
             {
-                var j = JsonSerializer.Serialize(t);
-                var t2 = JsonSerializer.Deserialize<Transaction>(j);
+                var j = Serializer.Serialize(t);
+                var t2 = Serializer.Deserialize<Transaction>(j);
             }
             sw.Stop();
             Console.WriteLine("Multiserialization takes msecs: " + sw.ElapsedMilliseconds);
@@ -143,9 +142,9 @@ namespace QuikSharp.Tests
         {
             var t = new Transaction();
             var echoed = Quik.Functions.Debug.EchoAsync(t).Result;
-            Console.WriteLine(JsonSerializer.Serialize(t));
-            Console.WriteLine(JsonSerializer.Serialize(echoed));
-            Assert.AreEqual(JsonSerializer.Serialize(t), JsonSerializer.Serialize(echoed));
+            Console.WriteLine(Serializer.Serialize(t));
+            Console.WriteLine(Serializer.Serialize(echoed));
+            Assert.AreEqual(Serializer.Serialize(t), Serializer.Serialize(echoed));
         }
 
         [Test]
@@ -200,8 +199,8 @@ namespace QuikSharp.Tests
 
             var t1 = new Transaction { PRICE = 1.00000m };
             var t2 = new Transaction { PRICE = 1.01000m };
-            string json1 = JsonSerializer.Serialize(t1);
-            string json2 = JsonSerializer.Serialize(t2);
+            string json1 = Serializer.Serialize(t1);
+            string json2 = Serializer.Serialize(t2);
 
             Assert.IsTrue(json1.Contains("\"PRICE\":\"1\"}"));
             Assert.IsTrue(json2.Contains("\"PRICE\":\"1,01\"}") || json2.Contains("\"PRICE\":\"1.01\"}"));

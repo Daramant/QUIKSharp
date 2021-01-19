@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.IdProviders
+namespace QuikSharp.Providers
 {
     public interface IIdProvider
     {

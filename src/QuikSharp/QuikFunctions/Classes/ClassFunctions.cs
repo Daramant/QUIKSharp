@@ -24,7 +24,7 @@ namespace QuikSharp.QuikFunctions.Classes
 
         public async Task<string[]> GetClassesListAsync()
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(string.Empty, "getClassesList"))).ConfigureAwait(false);
 
             return response.Data == null
@@ -34,14 +34,14 @@ namespace QuikSharp.QuikFunctions.Classes
 
         public async Task<ClassInfo> GetClassInfoAsync(string classID)
         {
-            var response = await _quikClient.SendAsync<Result<ClassInfo>>(
+            var response = await _quikClient.SendAsync<IResult<ClassInfo>>(
                 (new Command<string>(classID, "getClassInfo"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<SecurityInfo> GetSecurityInfoAsync(string classCode, string secCode)
         {
-            var response = await _quikClient.SendAsync<Result<SecurityInfo>>(
+            var response = await _quikClient.SendAsync<IResult<SecurityInfo>>(
                 (new Command<string[]>(new[] { classCode, secCode }, "getSecurityInfo"))).ConfigureAwait(false);
             return response.Data;
         }
@@ -53,7 +53,7 @@ namespace QuikSharp.QuikFunctions.Classes
 
         public async Task<string[]> GetClassSecuritiesAsync(string classID)
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(classID, "getClassSecurities"))).ConfigureAwait(false);
             return response.Data == null
                 ? Array.Empty<string>()
@@ -62,28 +62,28 @@ namespace QuikSharp.QuikFunctions.Classes
 
         public async Task<string> GetSecurityClassAsync(string classesList, string secCode)
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string[]>(new[] { classesList, secCode }, "getSecurityClass"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<string> GetClientCodeAsync()
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(string.Empty, "getClientCode"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<string> GetTradeAccountAsync(string classCode)
         {
-            var response = await _quikClient.SendAsync<Result<string>>(
+            var response = await _quikClient.SendAsync<IResult<string>>(
                 (new Command<string>(classCode, "getTradeAccount"))).ConfigureAwait(false);
             return response.Data;
         }
 
         public async Task<List<TradesAccounts>> GetTradeAccountsAsync()
         {
-            var response = await _quikClient.SendAsync<Result<List<TradesAccounts>>>(
+            var response = await _quikClient.SendAsync<IResult<List<TradesAccounts>>>(
                 (new Command<string>(string.Empty, "getTradeAccounts"))).ConfigureAwait(false);
             return response.Data;
         }

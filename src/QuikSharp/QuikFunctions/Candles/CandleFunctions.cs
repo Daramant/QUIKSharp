@@ -35,7 +35,7 @@ namespace QuikSharp.QuikFunctions.Candles
         public async Task<int> GetNumCandlesAsync(string graphicTag)
         {
             var message = new Command<string>(graphicTag, "get_num_candles");
-            var response = await _quikClient.SendAsync<Result<int>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<int>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -60,7 +60,7 @@ namespace QuikSharp.QuikFunctions.Candles
         public async Task<List<Candle>> GetCandlesAsync(string graphicTag, int line, int first, int count)
         {
             var message = new Command<string[]>(new[] { graphicTag, _typeConverter.ToStringLookup(line), _typeConverter.ToStringLookup(first), _typeConverter.ToStringLookup(count) }, "get_candles");
-            var response = await _quikClient.SendAsync<Result<List<Candle>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<List<Candle>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -88,7 +88,7 @@ namespace QuikSharp.QuikFunctions.Candles
         public async Task<List<Candle>> GetLastCandlesAsync(string classCode, string securityCode, CandleInterval interval, int count)
         {
             var message = new Command<string[]>(new[] { classCode, securityCode, _typeConverter.ToString((int)interval), _typeConverter.ToStringLookup(count) }, "get_candles_from_data_source");
-            var response = await _quikClient.SendAsync<Result<List<Candle>>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<List<Candle>>>(message).ConfigureAwait(false);
             return response.Data;
         }
 
@@ -101,7 +101,7 @@ namespace QuikSharp.QuikFunctions.Candles
         public Task SubscribeAsync(string classCode, string securityCode, CandleInterval interval)
         {
             var message = new Command<string[]>(new[] { classCode, securityCode, _typeConverter.ToString((int)interval) }, "subscribe_to_candles");
-            return _quikClient.SendAsync<Result<string>>(message);
+            return _quikClient.SendAsync<IResult<string>>(message);
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace QuikSharp.QuikFunctions.Candles
         public Task UnsubscribeAsync(string classCode, string securityCode, CandleInterval interval)
         {
             var message = new Command<string[]>(new[] { classCode, securityCode, _typeConverter.ToString((int)interval) }, "unsubscribe_from_candles");
-            return _quikClient.SendAsync<Result<string>>(message);
+            return _quikClient.SendAsync<IResult<string>>(message);
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace QuikSharp.QuikFunctions.Candles
         public async Task<bool> IsSubscribedAsync(string classCode, string securityCode, CandleInterval interval)
         {
             var message = new Command<string[]>(new[] { classCode, securityCode, _typeConverter.ToString((int)interval) }, "is_subscribed");
-            var response = await _quikClient.SendAsync<Result<bool>>(message).ConfigureAwait(false);
+            var response = await _quikClient.SendAsync<IResult<bool>>(message).ConfigureAwait(false);
             return response.Data;
         }
     }

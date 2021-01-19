@@ -9,12 +9,12 @@ using System.Diagnostics;
 
 namespace QuikSharp.QuikClient
 {
-    public class EventInvoker : IEventInvoker
+    public class QuikEventInvoker : IEventInvoker
     {
         private readonly ITypeConverter _typeConverter;
         private readonly IQuikEventsInvoker _quikEventsInvoker;
 
-        public EventInvoker(
+        public QuikEventInvoker(
             ITypeConverter typeConverter,
             IQuikEventsInvoker quikEventsInvoker)
         {
@@ -30,12 +30,8 @@ namespace QuikSharp.QuikClient
                 throw new ArgumentNullException(nameof(@event));
             }
 
-            var isParsed = _typeConverter.TryParseEnum<EventName>(@event.Name, out var eventName);
-            if (!isParsed)
-                throw new QuikException($"Parse event name: '{@event.Name}' failed!");
-
             // TODO use as instead of assert+is+cast
-            switch (eventName)
+            switch (@event.Name)
             {
                 case EventName.AccountBalance:
                     Trace.Assert(@event is Event<AccountBalance>);
@@ -194,7 +190,7 @@ namespace QuikSharp.QuikClient
                     break;
 
                 default:
-                    throw new NotSupportedException($"EventName: '{@event.Name}' not supported.");
+                    throw new EventTypeNotSupportedException($"Тип события: '{@event.Name}' не поддерживается.");
             }
         }
     }

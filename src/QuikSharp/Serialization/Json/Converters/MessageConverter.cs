@@ -1,0 +1,162 @@
+﻿using Newtonsoft.Json.Linq;
+using QuikSharp.DataStructures;
+using QuikSharp.DataStructures.Transaction;
+using QuikSharp.Exceptions;
+using QuikSharp.Messages;
+using QuikSharp.QuikClient;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace QuikSharp.Serialization.Json.Converters
+{
+    //public class MessageConverter : JsonCreationConverter<IMessage>
+    //{
+    //    private QuikClient.QuikClient _service; // TODO: Убрать использование.
+
+    //    public MessageConverter(QuikClient.QuikClient service)
+    //    {
+    //        _service = service;
+    //    }
+
+    //    // we learn object type from correlation id and a type stored in responses dictionary
+    //    // ReSharper disable once RedundantAssignment
+    //    protected override IMessage Create(Type objectType, JObject jObject)
+    //    {
+    //        if (FieldExists("Error", jObject))
+    //        {
+    //            var id = jObject.GetValue("id").Value<long>();
+    //            var cmd = jObject.GetValue("n").Value<string>();
+    //            var message = jObject.GetValue("Error").Value<string>();
+    //            Exception exception;
+    //            switch (cmd)
+    //            {
+    //                case "lua_transaction_error":
+    //                    exception = new TransactionException(message);
+    //                    break;
+
+    //                default:
+    //                    exception = new LuaException(message);
+    //                    break;
+    //            }
+
+    //            _service._pendingResults.TryRemove(id, out var pendingResponse);
+    //            pendingResponse.TaskCompletionSource.SetException(exception);
+    //            // terminate listener task that was processing this task
+    //            throw exception;
+    //        }
+    //        else if (FieldExists("id", jObject))
+    //        {
+    //            // Если есть id, значит пришел ответ на запрос (IRespose).
+    //            var id = jObject.GetValue("id").Value<long>();
+    //            objectType = _service._pendingResults[id].ResultType;
+    //            return (IResult)Activator.CreateInstance(objectType);
+    //        }
+    //        else if (FieldExists("n", jObject))
+    //        {
+    //            // without id we have an event
+    //            EventType eventName;
+    //            string cmd = jObject.GetValue("n").Value<string>();
+    //            var parsed = Enum.TryParse(cmd, true, out eventName);
+    //            if (parsed)
+    //            {
+    //                switch (eventName)
+    //                {
+    //                    case EventType.AccountBalance:
+    //                        return new Event<AccountBalance> { Data = new AccountBalance() };
+
+    //                    case EventType.AccountPosition:
+    //                        return new Event<AccountPosition> { Data = new AccountPosition() };
+
+    //                    case EventType.AllTrade:
+    //                        return new Event<AllTrade> { Data = new AllTrade() };
+
+    //                    case EventType.CleanUp:
+    //                    case EventType.Close:
+    //                    case EventType.Connected:
+    //                    case EventType.Disconnected:
+    //                    case EventType.Init:
+
+    //                    case EventType.Stop:
+    //                        return new Event<string>();
+
+    //                    case EventType.DepoLimit:
+    //                        return new Event<DepoLimitEx> { Data = new DepoLimitEx() };
+
+    //                    case EventType.DepoLimitDelete:
+    //                        return new Event<DepoLimitDelete> { Data = new DepoLimitDelete() };
+
+    //                    case EventType.Firm:
+    //                        return new Event<Firm> { Data = new Firm() };
+
+    //                    case EventType.FuturesClientHolding:
+    //                        return new Event<FuturesClientHolding> { Data = new FuturesClientHolding() };
+
+    //                    case EventType.FuturesLimitChange:
+    //                        return new Event<FuturesLimits> { Data = new FuturesLimits() };
+
+    //                    case EventType.FuturesLimitDelete:
+    //                        return new Event<FuturesLimitDelete> { Data = new FuturesLimitDelete() };
+
+    //                    case EventType.MoneyLimit:
+    //                        return new Event<MoneyLimitEx> { Data = new MoneyLimitEx() };
+
+    //                    case EventType.MoneyLimitDelete:
+    //                        return new Event<MoneyLimitDelete> { Data = new MoneyLimitDelete() };
+
+    //                    case EventType.NegDeal:
+    //                        break;
+
+    //                    case EventType.NegTrade:
+    //                        break;
+
+    //                    case EventType.Order:
+    //                        return new Event<Order> { Data = new Order() };
+
+    //                    case EventType.Param:
+    //                        return new Event<Param> { Data = new Param() };
+
+    //                    case EventType.Quote:
+    //                        return new Event<OrderBook> { Data = new OrderBook() };
+
+    //                    case EventType.StopOrder:
+    //                        return new Event<StopOrder> { Data = new StopOrder() };
+
+    //                    case EventType.Trade:
+    //                        return new Event<Trade> { Data = new Trade() };
+
+    //                    case EventType.TransReply:
+    //                        return new Event<TransactionReply> { Data = new TransactionReply() };
+
+    //                    case EventType.Candle:
+    //                        return new Event<Candle> { Data = new Candle() };
+
+    //                    default:
+    //                        throw new ArgumentOutOfRangeException();
+    //                }
+    //            }
+    //            else
+    //            {
+    //                // if we have a custom event (e.g. add some processing  of standard Quik event) then we must process it here
+    //                switch (cmd)
+    //                {
+    //                    case "Error":
+    //                        return new Event<string>();
+
+    //                    default:
+    //                        //return (IMessage)Activator.CreateInstance(typeof(Message<string>));
+    //                        throw new InvalidOperationException("Unknown command in a message: " + cmd);
+    //                }
+    //            }
+    //        }
+
+    //        throw new ArgumentException("Bad message format: no cmd or Error fields");
+    //    }
+
+    //    private static bool FieldExists(string fieldName, JObject jObject)
+    //    {
+    //        return jObject[fieldName] != null;
+    //    }
+    //}
+}

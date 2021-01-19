@@ -8,7 +8,7 @@ namespace QuikSharp.Messages
     public interface IEvent : IMessage
     {
         /// <summary>
-        /// A name of a function to call for requests
+        /// Тип события.
         /// </summary>
         EventName Name { get; set; }
     }

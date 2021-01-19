@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 using Newtonsoft.Json;
-using QuikSharp.Json.Converters;
+using QuikSharp.Serialization.Json.Converters;
 
 namespace QuikSharp.DataStructures
 {

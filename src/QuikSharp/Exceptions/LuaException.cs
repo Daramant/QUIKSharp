@@ -9,7 +9,7 @@ namespace QuikSharp.Exceptions
     /// An exception caught on Lua side with a message from Lua
     /// </summary>
     [Serializable]
-    public class LuaException : Exception
+    public class LuaException : QuikException
     {
         public LuaException()
             : base()

@@ -4,13 +4,8 @@ using System.Text;
 
 namespace QuikSharp.Messages
 {
-    public interface ICommand: IMessage
+    public interface ICommand : IMessage
     {
-        /// <summary>
-        /// Unique correlation id to match requests and responses
-        /// </summary>
-        long Id { get; set; }
-
         /// <summary>
         /// A name of a function to call for requests
         /// </summary>

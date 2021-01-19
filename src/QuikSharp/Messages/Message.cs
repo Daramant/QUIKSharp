@@ -10,7 +10,7 @@ namespace QuikSharp.Messages
     /// <summary>
     /// Default generic implementation
     /// </summary>
-    internal class Message<T> : IMessage<T>
+    public class Message<T> : IMessage<T>
     {
         public Message()
         {

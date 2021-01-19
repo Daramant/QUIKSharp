@@ -4,7 +4,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.Json.Tools
+namespace QuikSharp.Serialization.Json.Tools
 {
     public class JsonArrayPool : IArrayPool<char>
     {
