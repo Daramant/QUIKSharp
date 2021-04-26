@@ -6,7 +6,7 @@ using System.Text;
 namespace QuikSharp.Exceptions
 {
     [Serializable]
-    public class EventTypeNotSupportedException : QuikException
+    public class EventTypeNotSupportedException : QuikSharpException
     {
         public EventTypeNotSupportedException()
             : base()

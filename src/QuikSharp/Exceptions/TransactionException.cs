@@ -9,7 +9,7 @@ namespace QuikSharp.Exceptions
     ///
     /// </summary>
     [Serializable]
-    public class TransactionException : QuikException
+    public class TransactionException : QuikSharpException
     {
         public TransactionException() 
             : base()

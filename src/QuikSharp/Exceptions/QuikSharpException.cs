@@ -9,21 +9,21 @@ namespace QuikSharp.Exceptions
     /// An exception caught on Lua side with a message from Lua
     /// </summary>
     [Serializable]
-    public class QuikException : Exception
+    public class QuikSharpException : Exception
     {
-        public QuikException()
+        public QuikSharpException()
             : base()
         { }
 
-        public QuikException(string message)
+        public QuikSharpException(string message)
             : base(message)
         { }
 
-        public QuikException(string message, Exception innerException)
+        public QuikSharpException(string message, Exception innerException)
             : base(message, innerException)
         { }
 
-        protected QuikException(SerializationInfo info, StreamingContext context)
+        protected QuikSharpException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }
     }

@@ -1,11 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.ObjectPool;
+using Newtonsoft.Json;
 using QuikSharp.Messages;
 using QuikSharp.QuikEvents;
 using QuikSharp.Serialization.Exceptions;
-using QuikSharp.Serialization.Json.Converters;
 using QuikSharp.Serialization.Json.Tools;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -18,8 +17,8 @@ namespace QuikSharp.Serialization.Json
         private readonly IResultTypeProvider _resultTypeProvider;
         private readonly IEventTypeProvider _eventTypeProvider;
 
-        [ThreadStatic]
-        private static StringBuilder _stringBuilder;
+        private readonly ObjectPool<StringBuilder> _stringBuilderPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
+
 
         public QuikJsonSerializer(
             IResultTypeProvider resultTypeProvider,
@@ -36,10 +35,10 @@ namespace QuikSharp.Serialization.Json
             };
         }
 
+        /// <inheritdoc />
         public Envelope<ResultHeader, IResult> DeserializeResultEnvelope(string data)
         {
-            using (var stringReader = new StringReader(data))
-            using (var jsonReader = new JsonTextReader(stringReader))
+            using (var jsonReader = new JsonTextReader(new StringReader(data)))
             {
                 jsonReader.SupportMultipleContent = true;
                 // reader will get buffer from array pool
@@ -78,10 +77,10 @@ namespace QuikSharp.Serialization.Json
             }
         }
 
+        /// <inheritdoc />
         public Envelope<EventHeader, IEvent> DeserializeEventEnvelope(string data)
         {
-            using (var stringReader = new StringReader(data))
-            using (var jsonReader = new JsonTextReader(stringReader))
+            using (var jsonReader = new JsonTextReader(new StringReader(data)))
             {
                 jsonReader.SupportMultipleContent = true;
                 // reader will get buffer from array pool
@@ -96,11 +95,12 @@ namespace QuikSharp.Serialization.Json
                     throw new QuikSerializationException($"Отсутствуют данные конверта. data: '{data}'.");
 
                 if (!_eventTypeProvider.TryGetEventType(header.EventName, out var eventType))
-                    throw new QuikSerializationException($"Не найден тип события для десериализации по идентификатору: {header.EventName}.");
+                    throw new QuikSerializationException($"Не найден тип события для десериализации по событию: '{header.EventName}'.");
 
-                var @event = _serializer.Deserialize(jsonReader, eventType);
+                var @event = (IEvent)_serializer.Deserialize(jsonReader, eventType);
+                @event.Name = header.EventName;
 
-                return new Envelope<EventHeader, IEvent>(header, (IEvent)@event);
+                return new Envelope<EventHeader, IEvent>(header, @event);
             }
         }
 
@@ -111,8 +111,8 @@ namespace QuikSharp.Serialization.Json
             {
                 // reader will get buffer from array pool
                 reader.ArrayPool = JsonArrayPool.Instance;
-                var value = _serializer.Deserialize<T>(reader);
-                return value;
+                
+                return _serializer.Deserialize<T>(reader);
             }
         }
 
@@ -123,8 +123,8 @@ namespace QuikSharp.Serialization.Json
             {
                 // reader will get buffer from array pool
                 reader.ArrayPool = JsonArrayPool.Instance;
-                var value = _serializer.Deserialize(reader, type);
-                return value;
+                
+                return _serializer.Deserialize(reader, type);
             }
         }
 
@@ -148,24 +148,22 @@ namespace QuikSharp.Serialization.Json
         /// <inheritdoc />
         public string Serialize<T>(T obj)
         {
-            if (_stringBuilder == null)
-            {
-                _stringBuilder = new StringBuilder();
-            }
+            var stringBuilder = _stringBuilderPool.Get();
 
-            using (var writer = new JsonTextWriter(new StringWriter(_stringBuilder)))
+            try
             {
-                try
+                using (var writer = new JsonTextWriter(new StringWriter(stringBuilder)))
                 {
                     // reader will get buffer from array pool
                     writer.ArrayPool = JsonArrayPool.Instance;
+
                     _serializer.Serialize(writer, obj);
-                    return _stringBuilder.ToString();
+                    return stringBuilder.ToString();
                 }
-                finally
-                {
-                    _stringBuilder.Clear();
-                }
+            }
+            finally
+            {
+                _stringBuilderPool.Return(stringBuilder);
             }
         }
     }

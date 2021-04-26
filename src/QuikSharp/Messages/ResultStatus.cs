@@ -6,7 +6,7 @@ namespace QuikSharp.Messages
 {
     public enum ResultStatus
     {
-        Undefined,
+        Undefined = 0,
 
         Ok,
 

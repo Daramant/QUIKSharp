@@ -6,7 +6,7 @@ using System.Text;
 
 namespace QuikSharp.Serialization.Exceptions
 {
-    public class QuikSerializationException : QuikException
+    public class QuikSerializationException : QuikSharpException
     {
         public QuikSerializationException()
             : base()

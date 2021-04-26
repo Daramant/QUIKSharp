@@ -193,7 +193,7 @@ namespace QuikSharp.QuikClient
                                                         new CommandTimeoutException($"Результат выполнения команды с идентификатором: {commandEnvelope.Header.CommandId} получен в: {utcNow} после крайнего срока: {pendingResult.Command.ValidUntil}."));
                                                 }
                                                 {
-                                                    throw new QuikException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {commandEnvelope.Header.CommandId}.");
+                                                    throw new QuikSharpException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {commandEnvelope.Header.CommandId}.");
                                                 }
                                             }
                                             else
@@ -235,7 +235,7 @@ namespace QuikSharp.QuikClient
                     {
                         Trace.TraceError(e.ToString());
                         _cancellationTokenSource.Cancel();
-                        throw new QuikException("Unhandled exception in background task", e);
+                        throw new QuikSharpException("Unhandled exception in background task", e);
                     }
                     finally
                     {
@@ -284,7 +284,7 @@ namespace QuikSharp.QuikClient
                                         var serializedResult = readLineTask.Result;
                                         if (serializedResult == null)
                                         {
-                                            throw new QuikException("Lua returned an empty response or closed the connection");
+                                            throw new QuikSharpException("Lua returned an empty response or closed the connection");
                                         }
 
                                         // No IO exceptions possible for response, move its processing
@@ -379,7 +379,7 @@ namespace QuikSharp.QuikClient
                                         Trace.Assert(readLineTask.Status == TaskStatus.RanToCompletion);
                                         var serializedEvent = readLineTask.Result;
                                         if (serializedEvent == null)
-                                            throw new QuikException("Lua returned an empty response or closed the connection");
+                                            throw new QuikSharpException("Lua returned an empty response or closed the connection");
 
                                         try
                                         {
@@ -464,7 +464,7 @@ namespace QuikSharp.QuikClient
 
             if (!_pendingResultContainer.TryRemove(envelope.Header.CommandId, out var pendingResult))
             {
-                throw new QuikException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {envelope.Header.CommandId}.");
+                throw new QuikSharpException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {envelope.Header.CommandId}.");
             }
 
             if (envelope.Header.Status == ResultStatus.Ok)
@@ -607,7 +607,7 @@ namespace QuikSharp.QuikClient
                 }
                 else
                 {
-                    throw new QuikException($"Result type mismatch. Provided: '{result?.GetType()}', but expected: '{typeof(TResult)}'.");
+                    throw new QuikSharpException($"Result type mismatch. Provided: '{result?.GetType()}', but expected: '{typeof(TResult)}'.");
                 }
             }
             finally

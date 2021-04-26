@@ -74,28 +74,27 @@ namespace QuikSharp.TypeConverters
 
         private EnumData GetOrCreateEnumData(Type enumType)
         {
-            if (!_enumsDictionary.TryGetValue(enumType, out var enumData))
+            if (_enumsDictionary.TryGetValue(enumType, out var enumData))
+                return enumData;
+            
+            lock (_enumsDictionary)
             {
-                lock (_enumsDictionary)
+                if (_enumsDictionary.TryGetValue(enumType, out enumData))
+                    return enumData;
+                
+                enumData = new EnumData();
+
+                foreach (Enum @enum in Enum.GetValues(enumType))
                 {
-                    if (!_enumsDictionary.TryGetValue(enumType, out enumData))
-                    {
-                        enumData = new EnumData();
+                    var enumStringValue = @enum.ToString();
+                    enumData.Values.Add(@enum);
+                    enumData.EnumToStringDictionary[@enum] = enumStringValue;
+                    enumData.StringToEnumDictionary[enumStringValue] = @enum;
+                };
 
-                        foreach (Enum @enum in Enum.GetValues(enumType))
-                        {
-                            var enumStringValue = @enum.ToString();
-                            enumData.Values.Add(@enum);
-                            enumData.EnumToStringDictionary[@enum] = enumStringValue;
-                            enumData.StringToEnumDictionary[enumStringValue] = @enum;
-                        };
-
-                        _enumsDictionary[enumType] = enumData;
-                    }
-                }
+                _enumsDictionary[enumType] = enumData;
+                return enumData;
             }
-
-            return enumData;
         }
     }
 }

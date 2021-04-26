@@ -7,7 +7,7 @@ using System.Text;
 namespace QuikSharp.Exceptions
 {
     [Serializable]
-    public class CommandTimeoutException : QuikException
+    public class CommandTimeoutException : QuikSharpException
     {
         public CommandTimeoutException()
             : base()
