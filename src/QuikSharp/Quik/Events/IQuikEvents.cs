@@ -5,7 +5,7 @@ using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using System;
 
-namespace QuikSharp.QuikEvents
+namespace QuikSharp.Quik.Events
 {
     // TODO Redirect these callbacks to events or rather do with events from the beginning
 

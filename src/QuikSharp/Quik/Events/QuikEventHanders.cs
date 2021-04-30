@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.QuikEvents
+namespace QuikSharp.Quik.Events
 {
     public delegate void QuikEventHandler<in TArgs>(IQuik sender, TArgs args)
         where TArgs : EventArgs;

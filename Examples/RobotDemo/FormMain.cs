@@ -9,7 +9,7 @@ using QuikSharp;
 using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Quik;
-using QuikSharp.QuikClient;
+using QuikSharp.Quik.Client;
 
 namespace RobotDemo
 {

@@ -1,4 +1,4 @@
-﻿using QuikSharp.QuikClient;
+﻿using QuikSharp.Quik.Client;
 using System;
 using System.Collections.Generic;
 using System.Text;

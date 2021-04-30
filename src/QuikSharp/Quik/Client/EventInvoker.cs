@@ -2,23 +2,20 @@
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Exceptions;
 using QuikSharp.Messages;
-using QuikSharp.QuikEvents;
+using QuikSharp.Quik.Events;
 using QuikSharp.TypeConverters;
 using System;
 using System.Diagnostics;
 
-namespace QuikSharp.QuikClient
+namespace QuikSharp.Quik.Client
 {
-    public class QuikEventInvoker : IEventInvoker
+    public class EventInvoker : IEventInvoker
     {
-        private readonly ITypeConverter _typeConverter;
         private readonly IQuikEventsInvoker _quikEventsInvoker;
 
-        public QuikEventInvoker(
-            ITypeConverter typeConverter,
+        public EventInvoker(
             IQuikEventsInvoker quikEventsInvoker)
         {
-            _typeConverter = typeConverter;
             _quikEventsInvoker = quikEventsInvoker;
         }
 

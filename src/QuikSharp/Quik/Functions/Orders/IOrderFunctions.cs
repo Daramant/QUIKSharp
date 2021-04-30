@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikFunctions.Orders
+namespace QuikSharp.Quik.Functions.Orders
 {
     public interface IOrderFunctions
     {

@@ -10,7 +10,7 @@ using QuikSharp.TypeConverters;
 using System;
 using System.Diagnostics;
 
-namespace QuikSharp.QuikEvents
+namespace QuikSharp.Quik.Events
 {
     public class QuikEvents : IQuikEvents, IQuikEventsInvoker
     {

@@ -1,6 +1,6 @@
-﻿using QuikSharp.QuikClient;
-using QuikSharp.QuikEvents;
-using QuikSharp.QuikFunctions;
+﻿using QuikSharp.Quik.Client;
+using QuikSharp.Quik.Events;
+using QuikSharp.Quik.Functions;
 using System;
 using System.Collections.Generic;
 using System.Text;

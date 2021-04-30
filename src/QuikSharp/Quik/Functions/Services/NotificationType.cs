@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.QuikFunctions.Services
+namespace QuikSharp.Quik.Functions.Services
 {
     /// <summary>
     ///

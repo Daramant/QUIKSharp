@@ -1,11 +1,11 @@
-﻿using QuikSharp.QuikFunctions.Services;
+﻿using QuikSharp.Quik.Functions.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikFunctions.Services
+namespace QuikSharp.Quik.Functions.Services
 {
     /// <summary>
     /// Сервисные функции

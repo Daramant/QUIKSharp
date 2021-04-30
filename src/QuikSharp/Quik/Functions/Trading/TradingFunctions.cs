@@ -7,7 +7,7 @@ using QuikSharp.Exceptions;
 using QuikSharp.Extensions;
 using QuikSharp.Providers;
 using QuikSharp.Messages;
-using QuikSharp.QuikClient;
+using QuikSharp.Quik.Client;
 using QuikSharp.TypeConverters;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikFunctions.Trading
+namespace QuikSharp.Quik.Functions.Trading
 {
     /// <summary>
     /// Функции взаимодействия скрипта Lua и Рабочего места QUIK

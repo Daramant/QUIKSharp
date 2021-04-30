@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using QuikSharp.DataStructures.Transaction;
-using QuikSharp.QuikClient;
-using QuikSharp.QuikEvents;
+using QuikSharp.Quik.Client;
+using QuikSharp.Quik.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;

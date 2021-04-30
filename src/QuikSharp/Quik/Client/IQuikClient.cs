@@ -1,11 +1,11 @@
 ﻿using QuikSharp.Messages;
-using QuikSharp.QuikEvents;
+using QuikSharp.Quik.Events;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikClient
+namespace QuikSharp.Quik.Client
 {
     public interface IQuikClient
     {

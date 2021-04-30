@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikFunctions.Debug
+namespace QuikSharp.Quik.Functions.Debug
 {
     public interface IDebugFunctions
     {

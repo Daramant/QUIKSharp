@@ -1,6 +1,6 @@
 ﻿using QuikSharp.Serialization.Json.Converters;
 using QuikSharp.Quik;
-using QuikSharp.QuikClient;
+using QuikSharp.Quik.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using QuikSharp.Serialization;
 using QuikSharp.Serialization.Json;
-using QuikSharp.QuikEvents;
+using QuikSharp.Quik.Events;
 
 namespace QuikSharp.Tests
 {

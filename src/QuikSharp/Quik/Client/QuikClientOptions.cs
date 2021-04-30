@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 
-namespace QuikSharp.QuikClient
+namespace QuikSharp.Quik.Client
 {
     public class QuikClientOptions
     {
@@ -13,7 +13,13 @@ namespace QuikSharp.QuikClient
 
         public int EventPort { get; set; }
 
+        public TimeSpan ConnectTimeout { get; set; }
+
+        public int ConnectAttemptCount { get; set; }
+
         public TimeSpan SendCommandTimeout { get; set; }
+
+        public TimeSpan StopTimeout { get; set; }
 
         public static QuikClientOptions GetDefault()
         {
@@ -22,7 +28,10 @@ namespace QuikSharp.QuikClient
                 Host = IPAddress.Parse("127.0.0.1"),
                 CommandPort = 34130,
                 EventPort = 34131,
-                SendCommandTimeout = TimeSpan.Zero
+                ConnectTimeout = TimeSpan.FromMilliseconds(100),
+                ConnectAttemptCount = 0,
+                SendCommandTimeout = TimeSpan.Zero,
+                StopTimeout = TimeSpan.FromSeconds(5),
             };
         }
     }

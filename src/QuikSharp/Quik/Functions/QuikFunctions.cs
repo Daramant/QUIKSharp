@@ -1,17 +1,17 @@
-﻿using QuikSharp.QuikFunctions.Candles;
-using QuikSharp.QuikFunctions.Classes;
-using QuikSharp.QuikFunctions.Debug;
-using QuikSharp.QuikFunctions.Labels;
-using QuikSharp.QuikFunctions.OrderBooks;
-using QuikSharp.QuikFunctions.Orders;
-using QuikSharp.QuikFunctions.Services;
-using QuikSharp.QuikFunctions.StopOrders;
-using QuikSharp.QuikFunctions.Trading;
+﻿using QuikSharp.Quik.Functions.Candles;
+using QuikSharp.Quik.Functions.Classes;
+using QuikSharp.Quik.Functions.Debug;
+using QuikSharp.Quik.Functions.Labels;
+using QuikSharp.Quik.Functions.OrderBooks;
+using QuikSharp.Quik.Functions.Orders;
+using QuikSharp.Quik.Functions.Services;
+using QuikSharp.Quik.Functions.StopOrders;
+using QuikSharp.Quik.Functions.Trading;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.QuikFunctions
+namespace QuikSharp.Quik.Functions
 {
     public class QuikFunctions : IQuikFunctions
     {

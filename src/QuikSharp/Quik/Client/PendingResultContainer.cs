@@ -5,27 +5,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace QuikSharp.QuikClient
+namespace QuikSharp.Quik.Client
 {
     public class PendingResultContainer : IPendingResultContainer, IResultTypeProvider
     {
         private readonly ConcurrentDictionary<long, PendingResult> _pendingResults = new ConcurrentDictionary<long, PendingResult>();
 
+        /// <inheritdoc/>
         public void Add(long commandId, PendingResult pendingResult)
         {
             _pendingResults[commandId] = pendingResult;
         }
 
+        /// <inheritdoc/>
         public void Remove(long commandId)
         {
             _pendingResults.TryRemove(commandId, out var _);
         }
 
+        /// <inheritdoc/>
         public bool TryRemove(long commandId, out PendingResult pendingResult)
         {
             return _pendingResults.TryRemove(commandId, out pendingResult);
         }
 
+        /// <inheritdoc/>
         public void CancelAll()
         {
             // cancel responses to release waiters
@@ -38,9 +42,10 @@ namespace QuikSharp.QuikClient
             }
         }
 
+        /// <inheritdoc/>
         public bool TryGetResultType(long commandId, out Type resultType)
         {
-            if (_pendingResults.TryRemove(commandId, out var pendingResult))
+            if (_pendingResults.TryGetValue(commandId, out var pendingResult))
             {
                 resultType = pendingResult.ResultType;
                 return true;

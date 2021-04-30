@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework;
 using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
-using QuikSharp.QuikClient;
-using QuikSharp.QuikEvents;
+using QuikSharp.Quik.Client;
+using QuikSharp.Quik.Events;
 using QuikSharp.Serialization;
 using QuikSharp.Serialization.Json;
 using System;

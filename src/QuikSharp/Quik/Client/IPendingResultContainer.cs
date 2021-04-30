@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.QuikClient
+namespace QuikSharp.Quik.Client
 {
     public interface IPendingResultContainer
     {

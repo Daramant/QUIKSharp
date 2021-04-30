@@ -3,7 +3,7 @@ using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Quik;
 using System;
 
-namespace QuikSharp.QuikEvents
+namespace QuikSharp.Quik.Events
 {
     public interface IQuikEventsInvoker
     {

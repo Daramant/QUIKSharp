@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using Newtonsoft.Json;
 using QuikSharp.Messages;
-using QuikSharp.QuikEvents;
+using QuikSharp.Quik.Events;
 using QuikSharp.Serialization.Exceptions;
 using QuikSharp.Serialization.Json.Tools;
 using System;

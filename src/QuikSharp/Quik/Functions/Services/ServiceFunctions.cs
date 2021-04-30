@@ -3,14 +3,14 @@
 
 using QuikSharp.DataStructures;
 using QuikSharp.Messages;
-using QuikSharp.QuikClient;
-using QuikSharp.QuikFunctions.Services;
+using QuikSharp.Quik.Client;
+using QuikSharp.Quik.Functions.Services;
 using QuikSharp.TypeConverters;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikFunctions.Services
+namespace QuikSharp.Quik.Functions.Services
 {
     /// <summary>
     /// Service functions implementations

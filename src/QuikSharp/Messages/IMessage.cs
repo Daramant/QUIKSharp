@@ -12,7 +12,7 @@ namespace QuikSharp.Messages
         long CreatedTime { get; set; }
     }
 
-    public interface IMessage<T>: IMessage
+    public interface IMessage<T> : IMessage
     {
         T Data { get; }
     }

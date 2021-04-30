@@ -13,12 +13,11 @@ using System.Threading.Tasks;
 using QuikSharp.Messages;
 using QuikSharp.Extensions;
 using QuikSharp.Exceptions;
-using QuikSharp.QuikEvents;
-using QuikSharp.Quik;
+using QuikSharp.Quik.Events;
 using QuikSharp.Providers;
 using QuikSharp.Serialization;
 
-namespace QuikSharp.QuikClient
+namespace QuikSharp.Quik.Client
 {
     /// <summary>
     ///
@@ -36,13 +35,36 @@ namespace QuikSharp.QuikClient
 
         private IQuik _quik;
 
-        static QuikClient()
+        private readonly object _commandClientSyncRoot = new object();
+        private readonly object _eventClientSyncRoot = new object();
+
+        private TcpClient _commandClient;
+        private TcpClient _eventClient;
+
+        private Task _commandTask;
+        private Task _resultTask;
+        private Task _eventReceiverTask;
+        private Task _eventInvokerTask;
+
+        private readonly Channel<IEvent> _eventChannel = Channel.CreateUnbounded<IEvent>(new UnboundedChannelOptions()
         {
-            System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
-        }
+            SingleReader = true,
+            SingleWriter = true
+        });
+
+        private CancellationTokenSource _cancellationTokenSource;
+        private TaskCompletionSource<bool> _taskCompletionSource;
+        private CancellationTokenRegistration _cancellationTokenRegistration;
+
+        /// <summary>
+        /// IQuickCalls functions enqueue a message and return a task from TCS
+        /// </summary>
+        private readonly BlockingCollection<Envelope<CommandHeader, ICommand>> _commandEnvelopeQueue = new BlockingCollection<Envelope<CommandHeader, ICommand>>();
+
+        public ClientState State { get; private set; } = ClientState.Stopped;
 
         public QuikClient(
-            IEventInvoker eventInvoker, 
+            IEventInvoker eventInvoker,
             ISerializer serializer,
             IIdProvider idProvider,
             IDateTimeProvider dateTimeProvider,
@@ -85,62 +107,33 @@ namespace QuikSharp.QuikClient
         {
             _quik = quik;
         }
-
+        
         /// <summary>
         ///
         /// </summary>
-        public bool IsStarted { get; private set; }
-
-        private readonly object _syncRoot = new object();
-
-        private TcpClient _commandClient;
-        private TcpClient _eventClient;
-
-        private Task _commandTask;
-        private Task _resultTask;
-        private Task _eventReceiverTask;
-        private Task _eventInvokerTask;
-
-        private readonly Channel<IEvent> _eventChannel =
-            Channel.CreateUnbounded<IEvent>(new UnboundedChannelOptions()
-            {
-                SingleReader = true,
-                SingleWriter = true
-            });
-
-        private CancellationTokenSource _cancellationTokenSource;
-        private TaskCompletionSource<bool> _taskCompletionSource;
-        private CancellationTokenRegistration _cancellationTokenRegistration;
-
-        /// <summary>
-        /// IQuickCalls functions enqueue a message and return a task from TCS
-        /// </summary>
-        private readonly BlockingCollection<Envelope<CommandHeader, ICommand>> _commandEnvelopeQueue = new BlockingCollection<Envelope<CommandHeader, ICommand>>();
-
-        /// <summary>
-        ///
-        /// </summary>
-        public Task StopAsync()
+        public async Task StopAsync()
         {
-            if (!IsStarted) 
-                return Task.CompletedTask;
+            if (State == ClientState.Stopping || State == ClientState.Stopped)
+                return;
 
-            IsStarted = false;
+            State = ClientState.Stopping;
+
             _cancellationTokenSource.Cancel();
             _cancellationTokenRegistration.Dispose();
 
             try
             {
-                // here all tasks must exit gracefully
-                var isCleanExit = Task.WaitAll(new[] {_commandTask, _resultTask, _eventReceiverTask}, 5000);
-                Trace.Assert(isCleanExit, "All tasks must finish gracefully after cancellation token is cancelled!");
+                var stoppingTasks = Task.WhenAll(_commandTask, _resultTask, _eventReceiverTask, _eventInvokerTask);
+                await Task.WhenAny(stoppingTasks, Task.Delay(_options.StopTimeout));
+                //var isCleanExit = Task.WaitAll(new[] { _commandTask, _resultTask, _eventReceiverTask }, _options.StopTimeout);
+                //Trace.Assert(isCleanExit, "All tasks must finish gracefully after cancellation token is cancelled!");
             }
             finally
             {
                 _pendingResultContainer.CancelAll();
             }
 
-            return Task.CompletedTask;
+            State = ClientState.Stopped;
         }
 
         /// <summary>
@@ -149,313 +142,296 @@ namespace QuikSharp.QuikClient
         /// <exception cref="ApplicationException">Response message id does not exists in results dictionary</exception>
         public void Start()
         {
-            if (IsStarted) 
+            if (State == ClientState.Starting || State == ClientState.Started)
                 return;
 
-            IsStarted = true;
+            State = ClientState.Starting;
+
             _cancellationTokenSource = new CancellationTokenSource();
             _taskCompletionSource = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             _cancellationTokenRegistration = _cancellationTokenSource.Token.Register(() => _taskCompletionSource.TrySetResult(true));
 
-            _commandTask = Task.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        // Enter the listening loop.
-                        while (!_cancellationTokenSource.IsCancellationRequested)
-                        {
-                            Trace.WriteLine("Connecting on request/response channel... ");
-                            EnsureConnectedClient(_cancellationTokenSource.Token);
-                            // here we have a connected TCP client
-                            Trace.WriteLine("Request/response channel connected");
-                            try
-                            {
-                                using (var stream = new NetworkStream(_commandClient.Client))
-                                using (var writer = new StreamWriter(stream))
-                                {
-                                    while (!_cancellationTokenSource.IsCancellationRequested)
-                                    {
-                                        try
-                                        {
-                                            // BLOCKING
-                                            var commandEnvelope = _commandEnvelopeQueue.Take(_cancellationTokenSource.Token);
-                                            //Trace.WriteLine("Request: " + request);
-                                            // scenario: Quik is restarted or script is stopped
-                                            // then writer must throw and we will add a message back
-                                            // then we will iterate over messages and cancel expired ones
-                                            var utcNow = _dateTimeProvider.UtcNow;
-
-                                            if (commandEnvelope.Body.ValidUntil < utcNow)
-                                            {
-                                                if (_pendingResultContainer.TryRemove(commandEnvelope.Header.CommandId, out var pendingResult))
-                                                {
-                                                    pendingResult.TaskCompletionSource.SetException(
-                                                        new CommandTimeoutException($"Результат выполнения команды с идентификатором: {commandEnvelope.Header.CommandId} получен в: {utcNow} после крайнего срока: {pendingResult.Command.ValidUntil}."));
-                                                }
-                                                {
-                                                    throw new QuikSharpException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {commandEnvelope.Header.CommandId}.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                var serializedCommandEnvelope = _serializer.Serialize(commandEnvelope);
-
-                                                try
-                                                {
-                                                    writer.WriteLine(serializedCommandEnvelope);
-                                                    writer.Flush();
-                                                }
-                                                catch (IOException)
-                                                {
-                                                    // this catch is for unexpected and unchecked connection termination
-                                                    // add back, there was an error while writing
-                                                    _commandEnvelopeQueue.Add(commandEnvelope);
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        catch (OperationCanceledException)
-                                        {
-                                            // EnvelopeQueue.Take(_cts.Token) was cancelled via the token
-                                        }
-                                    }
-                                }
-                            }
-                            catch (IOException e)
-                            {
-                                Trace.TraceError(e.ToString());
-                            }
-                        }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        Trace.TraceInformation("Request task is cancelling");
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.TraceError(e.ToString());
-                        _cancellationTokenSource.Cancel();
-                        throw new QuikSharpException("Unhandled exception in background task", e);
-                    }
-                    finally
-                    {
-                        lock (_syncRoot)
-                        {
-                            if (_commandClient != null)
-                            {
-                                _commandClient.Client.Shutdown(SocketShutdown.Both);
-                                _commandClient.Close();
-                                _commandClient = null; // У нас два потока работают с одним сокетом, но только один из них должен его закрыть !
-                                Trace.WriteLine("Response channel disconnected");
-                            }
-                        }
-                    }
-                },
-                CancellationToken.None, // NB we use the token for signalling, could use a simple TCS
+            _commandTask = Task.Factory.StartNew(SendCommandAction,
+                CancellationToken.None,
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default);
 
-            // Response Task
-            _resultTask = Task.Factory.StartNew(async () =>
-                {
-                    try
-                    {
-                        while (!_cancellationTokenSource.IsCancellationRequested)
-                        {
-                            // Поток Response использует тот же сокет, что и поток request
-                            EnsureConnectedClient(_cancellationTokenSource.Token);
-                            // here we have a connected TCP client
-                            
-                            try
-                            {
-                                using (var stream = new NetworkStream(_commandClient.Client))
-                                using (var reader = new StreamReader(stream, Encoding.GetEncoding(1251)))
-                                {
-                                    while (!_cancellationTokenSource.IsCancellationRequested)
-                                    {
-                                        var readLineTask = reader.ReadLineAsync();
-                                        var completedTask = await Task.WhenAny(readLineTask, _taskCompletionSource.Task).ConfigureAwait(false);
-                                        if (completedTask == _taskCompletionSource.Task || _cancellationTokenSource.IsCancellationRequested)
-                                        {
-                                            break;
-                                        }
-
-                                        Trace.Assert(readLineTask.Status == TaskStatus.RanToCompletion);
-                                        var serializedResult = readLineTask.Result;
-                                        if (serializedResult == null)
-                                        {
-                                            throw new QuikSharpException("Lua returned an empty response or closed the connection");
-                                        }
-
-                                        // No IO exceptions possible for response, move its processing
-                                        // to the threadpool and wait for the next message
-                                        // A new task here gives c.30% boost for full TransactionSpec echo
-
-                                        // ReSharper disable once UnusedVariable
-                                        var doNotAwaitMe = Task.Factory.StartNew(serializedResultObj =>
-                                        {
-                                            //var r = response;
-                                            //Trace.WriteLine("Response:" + response);
-                                            try
-                                            {
-                                                ProcessResultEnvelope((string)serializedResultObj);
-                                            }
-                                            catch (LuaException e)
-                                            {
-                                                Trace.TraceError(e.ToString());
-                                            }
-                                        }, serializedResult, TaskCreationOptions.PreferFairness);
-                                    }
-                                }
-                            }
-                            catch (TaskCanceledException)
-                            {
-                            } // Это исключение возникнет при отмене ReadLineAsync через Cancellation Token
-                            catch (IOException e)
-                            {
-                                Trace.TraceError(e.ToString());
-                            }
-                        }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        Trace.TraceInformation("Response task is cancelling");
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.TraceError(e.ToString());
-                        _cancellationTokenSource.Cancel();
-                        throw new AggregateException("Unhandled exception in background task", e);
-                    }
-                    finally
-                    {
-                        lock (_syncRoot)
-                        {
-                            if (_commandClient != null)
-                            {
-                                _commandClient.Client.Shutdown(SocketShutdown.Both);
-                                _commandClient.Close();
-                                _commandClient = null; // У нас два потока работают с одним сокетом, но только один из них должен его закрыть !
-                                Trace.WriteLine("Response channel disconnected");
-                            }
-                        }
-                    }
-                },
-                CancellationToken.None, // NB we use the token for signalling, could use a simple TCS
+            _resultTask = Task.Factory.StartNew(ReceiveResultAction,
+                CancellationToken.None,
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default);
 
-            // Callback Task
-            _eventReceiverTask = Task.Factory.StartNew(async () =>
+            _eventReceiverTask = Task.Factory.StartNew(ReceiveEventAction,
+                CancellationToken.None,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
+
+            _eventInvokerTask = Task.Factory.StartNew(InvokeEventAction,
+                CancellationToken.None,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
+
+            State = ClientState.Started;
+        }
+
+        private void SendCommandAction()
+        {
+            try
+            {
+                // Enter the listening loop.
+                while (!_cancellationTokenSource.IsCancellationRequested)
                 {
+                    Trace.WriteLine("Connecting on request/response channel... ");
+                    EnsureConnectedClient(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
+                    // here we have a connected TCP client
+                    Trace.WriteLine("Request/response channel connected");
                     try
                     {
-                        // reconnection loop
-                        while (!_cancellationTokenSource.IsCancellationRequested)
+                        using (var stream = new NetworkStream(_commandClient.Client))
+                        using (var writer = new StreamWriter(stream))
                         {
-                            Trace.WriteLine("Connecting on callback channel... ");
-                            EnsureConnectedClient(_cancellationTokenSource.Token);
-                            // now we are connected
-                            OnConnected(_options.CommandPort); // Оповещаем клиента что произошло подключение к Quik'у
-                            _connectedMre.Set();
-
-                            // here we have a connected TCP client
-                            Trace.WriteLine("Callback channel connected");
-                            try
+                            while (!_cancellationTokenSource.IsCancellationRequested)
                             {
-                                using (var stream = new NetworkStream(_eventClient.Client))
-                                using (var reader = new StreamReader(stream, Encoding.GetEncoding(1251)))
+                                try
                                 {
-                                    while (!_cancellationTokenSource.IsCancellationRequested)
+                                    // BLOCKING
+                                    var commandEnvelope = _commandEnvelopeQueue.Take(_cancellationTokenSource.Token);
+                                    //Trace.WriteLine("Request: " + request);
+                                    // scenario: Quik is restarted or script is stopped
+                                    // then writer must throw and we will add a message back
+                                    // then we will iterate over messages and cancel expired ones
+                                    var utcNow = _dateTimeProvider.UtcNow;
+
+                                    if (commandEnvelope.Body.ValidUntil < utcNow)
                                     {
-                                        var readLineTask = reader.ReadLineAsync();
-                                        var completedTask = await Task.WhenAny(readLineTask, _taskCompletionSource.Task).ConfigureAwait(false);
-
-                                        if (completedTask == _taskCompletionSource.Task || _cancellationTokenSource.IsCancellationRequested)
+                                        if (_pendingResultContainer.TryRemove(commandEnvelope.Header.CommandId, out var pendingResult))
                                         {
-                                            break;
+                                            pendingResult.TaskCompletionSource.SetException(
+                                                new CommandTimeoutException($"Результат выполнения команды с идентификатором: {commandEnvelope.Header.CommandId} получен в: '{utcNow}' после крайнего срока: '{pendingResult.Command.ValidUntil}'."));
                                         }
-
-                                        Trace.Assert(readLineTask.Status == TaskStatus.RanToCompletion);
-                                        var serializedEvent = readLineTask.Result;
-                                        if (serializedEvent == null)
-                                            throw new QuikSharpException("Lua returned an empty response or closed the connection");
+                                        else
+                                        {
+                                            throw new QuikSharpException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {commandEnvelope.Header.CommandId}.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var serializedCommandEnvelope = _serializer.Serialize(commandEnvelope);
 
                                         try
                                         {
-                                            await ProcessEventEnvelopeAsync(serializedEvent).ConfigureAwait(false);
-                                            //var @event = _serializer.Deserialize<IEvent>(serializedEvent);
-                                            // it is a callback message
-                                            //await _eventChannel.Writer.WriteAsync(@event, _cancellationTokenSource.Token);
+                                            writer.WriteLine(serializedCommandEnvelope);
+                                            writer.Flush();
                                         }
-                                        catch (Exception e) // deserialization exception is possible
+                                        catch (IOException)
                                         {
-                                            Trace.TraceError(e.ToString());
+                                            // this catch is for unexpected and unchecked connection termination
+                                            // add back, there was an error while writing
+                                            _commandEnvelopeQueue.Add(commandEnvelope);
+                                            break;
                                         }
                                     }
                                 }
-                            }
-                            catch (IOException e)
-                            {
-                                Trace.TraceError(e.ToString());
-                                // handled exception will cause reconnect in the outer loop
-                                _connectedMre.Reset();
-                                OnDisconnected();
+                                catch (OperationCanceledException)
+                                {
+                                    // EnvelopeQueue.Take(_cts.Token) was cancelled via the token
+                                }
                             }
                         }
                     }
-                    catch (OperationCanceledException)
-                    {
-                        Trace.TraceInformation("Callback task is cancelling");
-                    }
-                    catch (Exception e)
+                    catch (IOException e)
                     {
                         Trace.TraceError(e.ToString());
-                        _cancellationTokenSource.Cancel();
-                        throw new AggregateException("Unhandled exception in background task", e);
                     }
-                    finally
-                    {
-                        lock (_syncRoot)
-                        {
-                            if (_eventClient != null)
-                            {
-                                _eventClient.Client.Shutdown(SocketShutdown.Both);
-                                _eventClient.Close();
-                                _eventClient = null;
-                                Trace.WriteLine("Callback channel disconnected");
-                            }
-                        }
-                    }
-                },
-                CancellationToken.None, // NB we use the token for signalling, could use a simple TCS
-                TaskCreationOptions.LongRunning,
-                TaskScheduler.Default);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Trace.TraceInformation("Request task is cancelling");
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(e.ToString());
+                _cancellationTokenSource.Cancel();
+                throw new QuikSharpException("Unhandled exception in background task", e);
+            }
+            finally
+            {
+                CloseClient(ref _commandClient, _commandClientSyncRoot);
+            }
+        }
 
-            _eventInvokerTask = Task.Factory.StartNew(async () =>
+        private async Task ReceiveResultAction()
+        {
+            try
+            {
+                while (!_cancellationTokenSource.IsCancellationRequested)
                 {
-                    while (!_cancellationTokenSource.IsCancellationRequested)
+                    // Поток Response использует тот же сокет, что и поток request
+                    EnsureConnectedClient(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
+                    // here we have a connected TCP client
+
+                    try
                     {
-                        try
+                        using (var stream = new NetworkStream(_commandClient.Client))
+                        using (var reader = new StreamReader(stream, Encoding.GetEncoding(1251)))
                         {
-                            var @event = await _eventChannel.Reader.ReadAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
-                            try
+                            while (!_cancellationTokenSource.IsCancellationRequested)
                             {
-                                _eventInvoker.Invoke(@event);
+                                var readLineTask = reader.ReadLineAsync();
+                                var completedTask = await Task.WhenAny(readLineTask, _taskCompletionSource.Task).ConfigureAwait(false);
+                                if (completedTask == _taskCompletionSource.Task || _cancellationTokenSource.IsCancellationRequested)
+                                {
+                                    break;
+                                }
+
+                                Trace.Assert(readLineTask.Status == TaskStatus.RanToCompletion);
+                                var serializedResult = readLineTask.Result;
+                                if (serializedResult == null)
+                                {
+                                    throw new QuikSharpException("Lua returned an empty response or closed the connection");
+                                }
+
+                                // No IO exceptions possible for response, move its processing
+                                // to the threadpool and wait for the next message
+                                // A new task here gives c.30% boost for full TransactionSpec echo
+
+                                // ReSharper disable once UnusedVariable
+                                var doNotAwaitMe = Task.Factory.StartNew(serializedResultObj =>
+                                {
+                                    //var r = response;
+                                    //Trace.WriteLine("Response:" + response);
+                                    try
+                                    {
+                                        ProcessResultEnvelope((string)serializedResultObj);
+                                    }
+                                    catch (LuaException e)
+                                    {
+                                        Trace.TraceError(e.ToString());
+                                    }
+                                }, serializedResult, TaskCreationOptions.PreferFairness);
                             }
-                            catch (Exception e) // 
-                            {
-                                Trace.TraceError($"Error in event handler for {@event.Name}:\n" + e);
-                            }
-                        }
-                        catch (OperationCanceledException)
-                        {
                         }
                     }
-                },
-                CancellationToken.None, // NB we use the token for signalling, could use a simple TCS
-                TaskCreationOptions.LongRunning,
-                TaskScheduler.Default);
+                    catch (TaskCanceledException)
+                    {
+                    } // Это исключение возникнет при отмене ReadLineAsync через Cancellation Token
+                    catch (IOException e)
+                    {
+                        Trace.TraceError(e.ToString());
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Trace.TraceInformation("Response task is cancelling");
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(e.ToString());
+                _cancellationTokenSource.Cancel();
+                throw new AggregateException("Unhandled exception in background task", e);
+            }
+            finally
+            {
+                CloseClient(ref _commandClient, _commandClientSyncRoot);
+            }
+        }
+
+        private async Task ReceiveEventAction()
+        {
+            try
+            {
+                // reconnection loop
+                while (!_cancellationTokenSource.IsCancellationRequested)
+                {
+                    Trace.WriteLine("Connecting on callback channel... ");
+                    EnsureConnectedClient(ref _eventClient, _eventClientSyncRoot, _cancellationTokenSource.Token);
+                    // now we are connected
+                    OnConnected(_options.CommandPort); // Оповещаем клиента что произошло подключение к Quik'у
+                    _connectedMre.Set();
+
+                    // here we have a connected TCP client
+                    Trace.WriteLine("Callback channel connected");
+                    try
+                    {
+                        using (var stream = new NetworkStream(_eventClient.Client))
+                        using (var reader = new StreamReader(stream, Encoding.GetEncoding(1251)))
+                        {
+                            while (!_cancellationTokenSource.IsCancellationRequested)
+                            {
+                                var readLineTask = reader.ReadLineAsync();
+                                var completedTask = await Task.WhenAny(readLineTask, _taskCompletionSource.Task).ConfigureAwait(false);
+
+                                if (completedTask == _taskCompletionSource.Task || _cancellationTokenSource.IsCancellationRequested)
+                                {
+                                    break;
+                                }
+
+                                Trace.Assert(readLineTask.Status == TaskStatus.RanToCompletion);
+                                var serializedEvent = readLineTask.Result;
+                                if (serializedEvent == null)
+                                    throw new QuikSharpException("Lua returned an empty response or closed the connection");
+
+                                try
+                                {
+                                    await ProcessEventEnvelopeAsync(serializedEvent).ConfigureAwait(false);
+                                    //var @event = _serializer.Deserialize<IEvent>(serializedEvent);
+                                    // it is a callback message
+                                    //await _eventChannel.Writer.WriteAsync(@event, _cancellationTokenSource.Token);
+                                }
+                                catch (Exception e) // deserialization exception is possible
+                                {
+                                    Trace.TraceError(e.ToString());
+                                }
+                            }
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Trace.TraceError(e.ToString());
+                        // handled exception will cause reconnect in the outer loop
+                        _connectedMre.Reset();
+                        OnDisconnected();
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Trace.TraceInformation("Callback task is cancelling");
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(e.ToString());
+                _cancellationTokenSource.Cancel();
+                throw new AggregateException("Unhandled exception in background task", e);
+            }
+            finally
+            {
+                CloseClient(ref _eventClient, _eventClientSyncRoot);
+            }
+        }
+
+        private async Task InvokeEventAction()
+        {
+            while (!_cancellationTokenSource.IsCancellationRequested)
+            {
+                try
+                {
+                    var @event = await _eventChannel.Reader.ReadAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
+                    try
+                    {
+                        _eventInvoker.Invoke(@event);
+                    }
+                    catch (Exception e) // 
+                    {
+                        Trace.TraceError($"Error in event handler for {@event.Name}:\n" + e);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                }
+            }
         }
 
         private void ProcessResultEnvelope(string data)
@@ -499,63 +475,7 @@ namespace QuikSharp.QuikClient
                    && (_eventClient != null && _eventClient.Connected && _eventClient.Client.IsConnected());
         }
 
-        private void EnsureConnectedClient(CancellationToken ct)
-        {
-            lock (_syncRoot)
-            {
-                var attempt = 0;
-                if (!(_commandClient != null && _commandClient.Connected && _commandClient.Client.IsConnected()))
-                {
-                    var connected = false;
-                    while (!connected)
-                    {
-                        ct.ThrowIfCancellationRequested();
-                        try
-                        {
-                            _commandClient = new TcpClient
-                            {
-                                ExclusiveAddressUse = true,
-                                NoDelay = true
-                            };
-                            _commandClient.Connect(_options.Host, _options.CommandPort);
-                            connected = true;
-                        }
-                        catch
-                        {
-                            attempt++;
-                            Thread.Sleep(100);
-                            if (attempt % 10 == 0) Trace.WriteLine($"Trying to connect... {attempt}");
-                        }
-                    }
-                }
-
-                if (!(_eventClient != null && _eventClient.Connected && _eventClient.Client.IsConnected()))
-                {
-                    var connected = false;
-                    while (!connected)
-                    {
-                        ct.ThrowIfCancellationRequested();
-                        try
-                        {
-                            _eventClient = new TcpClient
-                            {
-                                ExclusiveAddressUse = true,
-                                NoDelay = true
-                            };
-                            _eventClient.Connect(_options.Host, _options.EventPort);
-                            connected = true;
-                        }
-                        catch
-                        {
-                            attempt++;
-                            Thread.Sleep(100);
-                            if (attempt % 10 == 0) Trace.WriteLine($"Trying to connect... {attempt}");
-                        }
-                    }
-                }
-            }
-        }
-
+        /// <inheritdoc/>
         public async Task<TResult> SendAsync<TResult>(ICommand command, TimeSpan? timeout = null)
             where TResult : class, IResult
         {
@@ -575,7 +495,7 @@ namespace QuikSharp.QuikClient
             }
 
             var taskCompletionSource = new TaskCompletionSource<IResult>(TaskCreationOptions.RunContinuationsAsynchronously);
-            
+
             CancellationTokenSource cancellationTokenSource = null;
             var cancellationTokenRegistration = default(CancellationTokenRegistration);
 
@@ -600,7 +520,7 @@ namespace QuikSharp.QuikClient
             try
             {
                 var result = await taskCompletionSource.Task.ConfigureAwait(false);
-                
+
                 if (result is TResult typedResult)
                 {
                     return typedResult;
@@ -615,8 +535,70 @@ namespace QuikSharp.QuikClient
                 if (timeout > TimeSpan.Zero)
                 {
                     cancellationTokenSource?.Dispose();
-                    //cancellationTokenRegistration.Dispose();
+                    cancellationTokenRegistration.Dispose();
                 }
+            }
+        }
+
+        private void EnsureConnectedClient(ref TcpClient tcpClient, object syncRoot, CancellationToken cancellationToken)
+        {
+            lock (syncRoot)
+            {
+                if (tcpClient?.Client.IsConnected() == true)
+                    return;
+
+                var attemptCount = 0;
+                var maxAttemptCount = _options.ConnectAttemptCount;
+                
+                if (tcpClient == null)
+                {
+                    tcpClient = new TcpClient
+                    {
+                        ExclusiveAddressUse = true,
+                        NoDelay = true
+                    };
+                }
+
+                var isConnected = false;
+                while (!isConnected)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    try
+                    {
+                        _commandClient.Connect(_options.Host, _options.CommandPort);
+                        isConnected = true;
+                    }
+                    catch
+                    {
+                        attemptCount++;
+
+                        if (maxAttemptCount > 0 && attemptCount >= maxAttemptCount)
+                            throw new QuikSharpException($"Не удалось подключиться к '{_options.Host}:{_options.CommandPort}' за {maxAttemptCount} попыток.");
+
+                        Thread.Sleep(_options.ConnectTimeout);
+
+                        if (attemptCount % 10 == 0)
+                        {
+                            Trace.WriteLine($"Trying to connect... {attemptCount}");
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CloseClient(ref TcpClient tcpClient, object syncRoot)
+        {
+            if (tcpClient == null)
+                return;
+
+            lock (syncRoot)
+            {
+                if (tcpClient == null)
+                    return;
+
+                tcpClient.Client.Shutdown(SocketShutdown.Both);
+                tcpClient.Close();
+                tcpClient = null; // У нас два потока работают с одним сокетом, но только один из них должен его закрыть.
             }
         }
     }

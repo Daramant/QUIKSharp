@@ -3,7 +3,7 @@
 
 using Newtonsoft.Json;
 using QuikSharp.Serialization.Json.Converters;
-using QuikSharp.QuikEvents;
+using QuikSharp.Quik.Events;
 using QuikSharp.Transactions;
 using System;
 using System.Collections.Concurrent;

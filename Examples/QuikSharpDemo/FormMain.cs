@@ -14,7 +14,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using QuikSharp.Quik;
-using QuikSharp.QuikClient;
+using QuikSharp.Quik.Client;
 using System.Net;
 
 namespace QuikSharpDemo

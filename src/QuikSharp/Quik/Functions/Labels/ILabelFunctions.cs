@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikFunctions.Labels
+namespace QuikSharp.Quik.Functions.Labels
 {
     public interface ILabelFunctions
     {

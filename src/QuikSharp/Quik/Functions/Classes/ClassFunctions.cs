@@ -3,12 +3,12 @@
 
 using QuikSharp.DataStructures;
 using QuikSharp.Messages;
-using QuikSharp.QuikClient;
+using QuikSharp.Quik.Client;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikFunctions.Classes
+namespace QuikSharp.Quik.Functions.Classes
 {
     /// <summary>
     /// Функции для обращения к спискам доступных параметров

@@ -4,12 +4,12 @@
 using QuikSharp.DataStructures;
 using QuikSharp.Extensions;
 using QuikSharp.Messages;
-using QuikSharp.QuikClient;
+using QuikSharp.Quik.Client;
 using QuikSharp.TypeConverters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikFunctions.Candles
+namespace QuikSharp.Quik.Functions.Candles
 {
     /// <summary>
     /// Функции для получения свечей

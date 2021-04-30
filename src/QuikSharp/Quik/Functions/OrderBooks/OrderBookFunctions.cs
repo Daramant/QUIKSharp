@@ -4,9 +4,9 @@
 using System.Threading.Tasks;
 using QuikSharp.DataStructures;
 using QuikSharp.Messages;
-using QuikSharp.QuikClient;
+using QuikSharp.Quik.Client;
 
-namespace QuikSharp.QuikFunctions.OrderBooks
+namespace QuikSharp.Quik.Functions.OrderBooks
 {
     /// <summary>
     /// Функции для работы со стаканом котировок

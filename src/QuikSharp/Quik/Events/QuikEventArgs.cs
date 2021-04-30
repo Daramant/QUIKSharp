@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.QuikEvents
+namespace QuikSharp.Quik.Events
 {
     public class InitEventArgs : EventArgs
     {

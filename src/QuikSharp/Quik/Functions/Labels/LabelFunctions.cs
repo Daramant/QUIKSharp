@@ -1,13 +1,13 @@
 ﻿using QuikSharp.Extensions;
 using QuikSharp.Messages;
-using QuikSharp.QuikClient;
+using QuikSharp.Quik.Client;
 using QuikSharp.TypeConverters;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.QuikFunctions.Labels
+namespace QuikSharp.Quik.Functions.Labels
 {
     public class LabelFunctions : ILabelFunctions
     {
