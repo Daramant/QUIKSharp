@@ -16,6 +16,7 @@ using QuikSharp.Exceptions;
 using QuikSharp.Quik.Events;
 using QuikSharp.Providers;
 using QuikSharp.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace QuikSharp.Quik.Client
 {
@@ -24,14 +25,13 @@ namespace QuikSharp.Quik.Client
     /// </summary>
     public sealed class QuikClient : IQuikClient
     {
-        private readonly AsyncManualResetEvent _connectedMre = new AsyncManualResetEvent();
-
         private readonly IEventInvoker _eventInvoker;
         private readonly ISerializer _serializer;
         private readonly IIdProvider _idProvider;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPendingResultContainer _pendingResultContainer;
         private readonly QuikClientOptions _options;
+        private readonly ILogger<QuikClient> _logger;
 
         private IQuik _quik;
 
@@ -46,7 +46,7 @@ namespace QuikSharp.Quik.Client
         private Task _eventReceiverTask;
         private Task _eventInvokerTask;
 
-        private readonly Channel<IEvent> _eventChannel = Channel.CreateUnbounded<IEvent>(new UnboundedChannelOptions()
+        private readonly Channel<string> _eventChannel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions()
         {
             SingleReader = true,
             SingleWriter = true
@@ -69,7 +69,8 @@ namespace QuikSharp.Quik.Client
             IIdProvider idProvider,
             IDateTimeProvider dateTimeProvider,
             IPendingResultContainer pendingResultContainer,
-            QuikClientOptions options)
+            QuikClientOptions options,
+            ILogger<QuikClient> logger)
         {
             _eventInvoker = eventInvoker;
             _serializer = serializer;
@@ -77,6 +78,7 @@ namespace QuikSharp.Quik.Client
             _dateTimeProvider = dateTimeProvider;
             _pendingResultContainer = pendingResultContainer;
             _options = options;
+            _logger = logger;
         }
 
         #region Events
@@ -125,8 +127,11 @@ namespace QuikSharp.Quik.Client
             {
                 var stoppingTasks = Task.WhenAll(_commandTask, _resultTask, _eventReceiverTask, _eventInvokerTask);
                 await Task.WhenAny(stoppingTasks, Task.Delay(_options.StopTimeout));
-                //var isCleanExit = Task.WaitAll(new[] { _commandTask, _resultTask, _eventReceiverTask }, _options.StopTimeout);
-                //Trace.Assert(isCleanExit, "All tasks must finish gracefully after cancellation token is cancelled!");
+
+                if (!stoppingTasks.IsCompleted)
+                {
+                    _logger.LogWarning($"Не все задачи были отменены после остановки клиента (CommandTask: {_commandTask.Status}, ResultTask: {_resultTask.Status}, EventRecevierTask: {_eventReceiverTask.Status}, EventInvokerTask: {_eventInvokerTask.Status}, Timeout: {_options.StopTimeout}).");
+                }
             }
             finally
             {
@@ -178,13 +183,12 @@ namespace QuikSharp.Quik.Client
         {
             try
             {
-                // Enter the listening loop.
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {
-                    Trace.WriteLine("Connecting on request/response channel... ");
-                    EnsureConnectedClient(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
-                    // here we have a connected TCP client
-                    Trace.WriteLine("Request/response channel connected");
+                    _logger.LogTrace("Подключение к терминалу Quik для отправки команд...");
+                    ReconnectIfConnectionMissing(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
+                    _logger.LogTrace("Подключение к терминалу Quik для отправки команд установлено.");
+                    
                     try
                     {
                         using (var stream = new NetworkStream(_commandClient.Client))
@@ -192,68 +196,60 @@ namespace QuikSharp.Quik.Client
                         {
                             while (!_cancellationTokenSource.IsCancellationRequested)
                             {
-                                try
-                                {
-                                    // BLOCKING
-                                    var commandEnvelope = _commandEnvelopeQueue.Take(_cancellationTokenSource.Token);
-                                    //Trace.WriteLine("Request: " + request);
-                                    // scenario: Quik is restarted or script is stopped
-                                    // then writer must throw and we will add a message back
-                                    // then we will iterate over messages and cancel expired ones
-                                    var utcNow = _dateTimeProvider.UtcNow;
+                                var commandEnvelope = _commandEnvelopeQueue.Take(_cancellationTokenSource.Token);
+                                    
+                                var utcNow = _dateTimeProvider.UtcNow;
 
-                                    if (commandEnvelope.Body.ValidUntil < utcNow)
+                                if (commandEnvelope.Body.ValidUntil < utcNow)
+                                {
+                                    if (_pendingResultContainer.TryRemove(commandEnvelope.Header.CommandId, out var pendingResult))
                                     {
-                                        if (_pendingResultContainer.TryRemove(commandEnvelope.Header.CommandId, out var pendingResult))
-                                        {
-                                            pendingResult.TaskCompletionSource.SetException(
-                                                new CommandTimeoutException($"Результат выполнения команды с идентификатором: {commandEnvelope.Header.CommandId} получен в: '{utcNow}' после крайнего срока: '{pendingResult.Command.ValidUntil}'."));
-                                        }
-                                        else
-                                        {
-                                            throw new QuikSharpException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {commandEnvelope.Header.CommandId}.");
-                                        }
+                                        pendingResult.TaskCompletionSource.SetException(
+                                            new CommandTimeoutException($"Результат выполнения команды с идентификатором: {commandEnvelope.Header.CommandId} получен в: '{utcNow}' после крайнего срока: '{pendingResult.Command.ValidUntil}'."));
                                     }
                                     else
                                     {
-                                        var serializedCommandEnvelope = _serializer.Serialize(commandEnvelope);
-
-                                        try
-                                        {
-                                            writer.WriteLine(serializedCommandEnvelope);
-                                            writer.Flush();
-                                        }
-                                        catch (IOException)
-                                        {
-                                            // this catch is for unexpected and unchecked connection termination
-                                            // add back, there was an error while writing
-                                            _commandEnvelopeQueue.Add(commandEnvelope);
-                                            break;
-                                        }
+                                        throw new QuikSharpException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {commandEnvelope.Header.CommandId}.");
                                     }
                                 }
-                                catch (OperationCanceledException)
+                                else
                                 {
-                                    // EnvelopeQueue.Take(_cts.Token) was cancelled via the token
+                                    var serializedCommandEnvelope = _serializer.Serialize(commandEnvelope);
+
+                                    try
+                                    {
+                                        writer.WriteLine(serializedCommandEnvelope);
+                                        writer.Flush();
+                                    }
+                                    catch (IOException)
+                                    {
+                                        // При ошибке ввода/вывода (например при перезапуске терминала Quik или остановке скрипта)
+                                        // возвращаем команду обратно в очередь, чтобы отправить повторно после установки
+                                        // соединения с терминалом Quik.
+                                        _commandEnvelopeQueue.Add(commandEnvelope);
+
+                                        throw;
+                                    }
                                 }
                             }
                         }
                     }
                     catch (IOException e)
                     {
-                        Trace.TraceError(e.ToString());
+                        _logger.LogError(e, "Исключение при отправке команды в терминал Quik.");
                     }
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
-                Trace.TraceInformation("Request task is cancelling");
+                _logger.LogTrace(e, "Отправка команд в терминал Quik остановлена.");
             }
             catch (Exception e)
             {
-                Trace.TraceError(e.ToString());
+                _logger.LogError(e, "Исключение при отправке команды.");
                 _cancellationTokenSource.Cancel();
-                throw new QuikSharpException("Unhandled exception in background task", e);
+
+                throw new QuikSharpException("Исключение при отправке команд.", e);
             }
             finally
             {
@@ -267,14 +263,14 @@ namespace QuikSharp.Quik.Client
             {
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {
-                    // Поток Response использует тот же сокет, что и поток request
-                    EnsureConnectedClient(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
-                    // here we have a connected TCP client
+                    _logger.LogTrace("Подключение к терминалу Quik для получения результатов команд...");
+                    ReconnectIfConnectionMissing(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
+                    _logger.LogTrace("Подключение к терминалу Quik для получения результатов команд установлено.");
 
                     try
                     {
                         using (var stream = new NetworkStream(_commandClient.Client))
-                        using (var reader = new StreamReader(stream, Encoding.GetEncoding(1251)))
+                        using (var reader = new StreamReader(stream, _options.Encoding))
                         {
                             while (!_cancellationTokenSource.IsCancellationRequested)
                             {
@@ -285,52 +281,45 @@ namespace QuikSharp.Quik.Client
                                     break;
                                 }
 
-                                Trace.Assert(readLineTask.Status == TaskStatus.RanToCompletion);
                                 var serializedResult = readLineTask.Result;
+
                                 if (serializedResult == null)
-                                {
-                                    throw new QuikSharpException("Lua returned an empty response or closed the connection");
-                                }
+                                    throw new QuikSharpException("От терминала Quik получен пустой ответ.");
 
                                 // No IO exceptions possible for response, move its processing
                                 // to the threadpool and wait for the next message
                                 // A new task here gives c.30% boost for full TransactionSpec echo
 
-                                // ReSharper disable once UnusedVariable
                                 var doNotAwaitMe = Task.Factory.StartNew(serializedResultObj =>
                                 {
-                                    //var r = response;
-                                    //Trace.WriteLine("Response:" + response);
                                     try
                                     {
                                         ProcessResultEnvelope((string)serializedResultObj);
                                     }
                                     catch (LuaException e)
                                     {
-                                        Trace.TraceError(e.ToString());
+                                        _logger.LogError(e, "Исключение при обработке результата команды.");
                                     }
                                 }, serializedResult, TaskCreationOptions.PreferFairness);
                             }
                         }
                     }
-                    catch (TaskCanceledException)
-                    {
-                    } // Это исключение возникнет при отмене ReadLineAsync через Cancellation Token
                     catch (IOException e)
                     {
-                        Trace.TraceError(e.ToString());
+                        _logger.LogError(e, "Исключение при получении результата команды от терминал Quik.");
                     }
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
-                Trace.TraceInformation("Response task is cancelling");
+                _logger.LogTrace(e, "Получение результов команд от терминала Quik остановлено.");
             }
             catch (Exception e)
             {
-                Trace.TraceError(e.ToString());
+                _logger.LogError(e, "Исключение при получении результата команды.");
                 _cancellationTokenSource.Cancel();
-                throw new AggregateException("Unhandled exception in background task", e);
+
+                throw new QuikSharpException("Исключение при получении результатов команд.", e);
             }
             finally
             {
@@ -342,21 +331,18 @@ namespace QuikSharp.Quik.Client
         {
             try
             {
-                // reconnection loop
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {
-                    Trace.WriteLine("Connecting on callback channel... ");
-                    EnsureConnectedClient(ref _eventClient, _eventClientSyncRoot, _cancellationTokenSource.Token);
-                    // now we are connected
-                    OnConnected(_options.CommandPort); // Оповещаем клиента что произошло подключение к Quik'у
-                    _connectedMre.Set();
+                    _logger.LogTrace("Подключение к терминалу Quik для получения событий...");
+                    ReconnectIfConnectionMissing(ref _eventClient, _eventClientSyncRoot, _cancellationTokenSource.Token);
+                    _logger.LogTrace("Подключение к терминалу Quik для получения событий установлено.");
+                    
+                    OnConnected(_options.CommandPort);
 
-                    // here we have a connected TCP client
-                    Trace.WriteLine("Callback channel connected");
                     try
                     {
                         using (var stream = new NetworkStream(_eventClient.Client))
-                        using (var reader = new StreamReader(stream, Encoding.GetEncoding(1251)))
+                        using (var reader = new StreamReader(stream, _options.Encoding))
                         {
                             while (!_cancellationTokenSource.IsCancellationRequested)
                             {
@@ -368,69 +354,70 @@ namespace QuikSharp.Quik.Client
                                     break;
                                 }
 
-                                Trace.Assert(readLineTask.Status == TaskStatus.RanToCompletion);
                                 var serializedEvent = readLineTask.Result;
                                 if (serializedEvent == null)
-                                    throw new QuikSharpException("Lua returned an empty response or closed the connection");
+                                    throw new QuikSharpException("Терминал Quik вернул пустой ответ.");
 
-                                try
-                                {
-                                    await ProcessEventEnvelopeAsync(serializedEvent).ConfigureAwait(false);
-                                    //var @event = _serializer.Deserialize<IEvent>(serializedEvent);
-                                    // it is a callback message
-                                    //await _eventChannel.Writer.WriteAsync(@event, _cancellationTokenSource.Token);
-                                }
-                                catch (Exception e) // deserialization exception is possible
-                                {
-                                    Trace.TraceError(e.ToString());
-                                }
+                                await _eventChannel.Writer.WriteAsync(serializedEvent, _cancellationTokenSource.Token);
                             }
                         }
                     }
                     catch (IOException e)
                     {
-                        Trace.TraceError(e.ToString());
-                        // handled exception will cause reconnect in the outer loop
-                        _connectedMre.Reset();
+                        _logger.LogError(e, "Исключение при получении событий от терминал Quik.");
+                        
                         OnDisconnected();
                     }
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
-                Trace.TraceInformation("Callback task is cancelling");
+                _logger.LogTrace(e, "Получение событий от терминала Quik остановлено.");
             }
             catch (Exception e)
             {
-                Trace.TraceError(e.ToString());
+                _logger.LogError(e, "Исключение при получении события.");
                 _cancellationTokenSource.Cancel();
-                throw new AggregateException("Unhandled exception in background task", e);
+
+                throw new QuikSharpException("Исключение при получении событий.", e);
             }
             finally
             {
                 CloseClient(ref _eventClient, _eventClientSyncRoot);
+                OnDisconnected();
             }
         }
 
         private async Task InvokeEventAction()
         {
-            while (!_cancellationTokenSource.IsCancellationRequested)
+            try
             {
-                try
+                while (!_cancellationTokenSource.IsCancellationRequested)
                 {
-                    var @event = await _eventChannel.Reader.ReadAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
+                    var serializedEvent = await _eventChannel.Reader.ReadAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
+                    
                     try
                     {
-                        _eventInvoker.Invoke(@event);
+                        var envelope = _serializer.DeserializeEventEnvelope(serializedEvent);
+                        _eventInvoker.Invoke(envelope.Body);
                     }
-                    catch (Exception e) // 
+                    catch (Exception e)
                     {
-                        Trace.TraceError($"Error in event handler for {@event.Name}:\n" + e);
+                        e.Data["Event"] = serializedEvent;
+                        _logger.LogError(e, "Исключение при обработке событий");
                     }
                 }
-                catch (OperationCanceledException)
-                {
-                }
+            }
+            catch (OperationCanceledException e)
+            {
+                _logger.LogTrace(e, "Обработка событий от терминала Quik остановлена.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Исключение при обработке событий.");
+                _cancellationTokenSource.Cancel();
+
+                throw new QuikSharpException("Исключение при обработке событий.", e);
             }
         }
 
@@ -463,16 +450,10 @@ namespace QuikSharp.Quik.Client
             }
         }
 
-        private ValueTask ProcessEventEnvelopeAsync(string data)
-        {
-            var envelope = _serializer.DeserializeEventEnvelope(data);
-            return _eventChannel.Writer.WriteAsync(envelope.Body, _cancellationTokenSource.Token);
-        }
-
         public bool IsConnected()
         {
-            return (_commandClient != null && _commandClient.Connected && _commandClient.Client.IsConnected())
-                   && (_eventClient != null && _eventClient.Connected && _eventClient.Client.IsConnected());
+            return (_commandClient != null && _commandClient.Client.IsConnected())
+                   && (_eventClient != null && _eventClient.Client.IsConnected());
         }
 
         /// <inheritdoc/>
@@ -482,21 +463,9 @@ namespace QuikSharp.Quik.Client
             if (timeout == null)
                 timeout = _options.SendCommandTimeout;
 
-            var task = _connectedMre.WaitAsync();
-            if (timeout > TimeSpan.Zero)
-            {
-                var timeoutTask = Task.Delay(timeout.Value);
-                if (await Task.WhenAny(task, timeoutTask).ConfigureAwait(false) == timeoutTask)
-                    throw new CommandTimeoutException("Send operation timed out");
-            }
-            else
-            {
-                await task.ConfigureAwait(false);
-            }
-
             var taskCompletionSource = new TaskCompletionSource<IResult>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            CancellationTokenSource cancellationTokenSource = null;
+            var cancellationTokenSource = default(CancellationTokenSource);
             var cancellationTokenRegistration = default(CancellationTokenRegistration);
 
             var commandId = _idProvider.GetUniqueCommandId();
@@ -540,7 +509,7 @@ namespace QuikSharp.Quik.Client
             }
         }
 
-        private void EnsureConnectedClient(ref TcpClient tcpClient, object syncRoot, CancellationToken cancellationToken)
+        private void ReconnectIfConnectionMissing(ref TcpClient tcpClient, object syncRoot, CancellationToken cancellationToken)
         {
             lock (syncRoot)
             {
@@ -579,7 +548,7 @@ namespace QuikSharp.Quik.Client
 
                         if (attemptCount % 10 == 0)
                         {
-                            Trace.WriteLine($"Trying to connect... {attemptCount}");
+                            _logger.LogInformation($"Подключение к терминалу Quik. Попытка: {attemptCount}...");
                         }
                     }
                 }

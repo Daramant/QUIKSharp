@@ -16,11 +16,21 @@ using QuikSharp.TypeConverters;
 using QuikSharp.Providers;
 using QuikSharp.Serialization.Json;
 using QuikSharp.Quik.Events;
+using Microsoft.Extensions.Logging;
 
 namespace QuikSharp.Quik
 {
     public class QuikFactory : IQuikFactory
     {
+        private ILoggerFactory _loggerFactory = LoggerFactory.Create(b => { });
+
+        /// <inheritdoc/>
+        public void ConfigureLogging(Action<ILoggingBuilder> configure)
+        {
+            _loggerFactory = LoggerFactory.Create(configure);
+        }
+
+        /// <inheritdoc/>
         public IQuik Create(QuikClientOptions options)
         {
             var pendingResultContainer = new PendingResultContainer();
@@ -33,7 +43,9 @@ namespace QuikSharp.Quik
 
             var quikEvents = new QuikEvents();
             var eventHandler = new EventInvoker(quikEvents);
-            var quikClient = new QuikClient(eventHandler, serializer, idProvider, dateTimeProvider, pendingResultContainer, options);
+            var quikClient = new QuikClient(eventHandler, serializer, idProvider, dateTimeProvider, 
+                pendingResultContainer, options, _loggerFactory.CreateLogger<QuikClient>());
+
             var tradingFunctions = new TradingFunctions(quikClient, persistentStorage, typeConverter, idProvider);
 
             var quik = new Quik(
