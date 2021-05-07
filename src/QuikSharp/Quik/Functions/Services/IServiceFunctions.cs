@@ -43,8 +43,8 @@ namespace QuikSharp.Quik.Functions.Services
         /// <param name="message"></param>
         /// <param name="iconType"></param>
         /// <returns></returns>
-        Task<bool> MessageAsync(string message, NotificationType iconType);
+        Task MessageAsync(string message, NotificationType iconType);
 
-        Task<bool> PrintDbgStrAsync(string message);
+        Task PrintDbgStrAsync(string message);
     }
 }

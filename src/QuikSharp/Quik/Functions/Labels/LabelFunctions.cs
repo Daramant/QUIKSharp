@@ -9,39 +9,32 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.Labels
 {
-    public class LabelFunctions : ILabelFunctions
+    public class LabelFunctions : FunctionsBase, ILabelFunctions
     {
-        private readonly IQuikClient _quikClient;
-        private readonly ITypeConverter _typeConverter;
-
         public LabelFunctions(
+            IMessageFactory messageFactory,
             IQuikClient quikClient,
             ITypeConverter typeConverter)
+            : base(messageFactory, quikClient, typeConverter)
+        { }
+
+        /// <inheritdoc/>
+        public Task<decimal> AddLabelAsync(decimal price, string curDate, string curTime, string hint, string path, string tag, string alignment, decimal backgnd)
         {
-            _quikClient = quikClient;
-            _typeConverter = typeConverter;
+            return ExecuteCommandAsync<decimal>("addLabel", 
+                new[] { TypeConverter.ToString(price), curDate, curTime, hint, path, tag, alignment, TypeConverter.ToString(backgnd) });
         }
 
-        public async Task<decimal> AddLabelAsync(decimal price, string curDate, string curTime, string hint, string path, string tag, string alignment, decimal backgnd)
+        /// <inheritdoc/>
+        public Task<bool> DelLabelAsync(string tag, decimal id)
         {
-            var response = await _quikClient.SendAsync<IResult<decimal>>(
-                    (new Command<string[]>(new[] { _typeConverter.ToString(price), curDate, curTime, hint, path, tag, alignment, _typeConverter.ToString(backgnd) }, "addLabel")))
-                .ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<bool>("delLabel", new[] { tag, TypeConverter.ToString(id) });
         }
 
-        public async Task<bool> DelLabelAsync(string tag, decimal id)
+        /// <inheritdoc/>
+        public Task<bool> DelAllLabelsAsync(string tag)
         {
-            await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string[]>(new[] { tag, _typeConverter.ToString(id) }, "delLabel"))).ConfigureAwait(false);
-            return true;
-        }
-
-        public async Task<bool> DelAllLabelsAsync(string tag)
-        {
-            await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(tag, "delAllLabels"))).ConfigureAwait(false);
-            return true; // TODO: Возвращать результат из quik.
+            return ExecuteCommandAsync<string, bool>("delAllLabels", tag);
         }
     }
 }

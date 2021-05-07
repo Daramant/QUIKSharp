@@ -17,43 +17,33 @@ namespace QuikSharp.Quik.Functions.StopOrders
     /// <summary>
     /// Функции для работы со стоп-заявками
     /// </summary>
-    public class StopOrderFunctions : IStopOrderFunctions
+    public class StopOrderFunctions : FunctionsBase, IStopOrderFunctions
     {
-        private readonly IQuikClient _quikClient;
-        private readonly ITradingFunctions _trading;
-        private readonly ITypeConverter _typeConverter;
+        private readonly ITradingFunctions _tradingFunctions;
 
         public StopOrderFunctions(
+            IMessageFactory messageFactory,
             IQuikClient quikClient,
-            ITradingFunctions trading,
-            ITypeConverter typeConverter)
+            ITypeConverter typeConverter,
+            ITradingFunctions tradingFunctions)
+            : base(messageFactory, quikClient, typeConverter)
         {
-            _quikClient = quikClient;
-            _trading = trading;
-            _typeConverter = typeConverter;
+            _tradingFunctions = tradingFunctions;
         }
 
-        /// <summary>
-        /// Возвращает список всех стоп-заявок.
-        /// </summary>
-        /// <returns></returns>
-        public async Task<List<StopOrder>> GetStopOrdersAsync()
+        /// <inheritdoc/>
+        public Task<IReadOnlyCollection<StopOrder>> GetStopOrdersAsync()
         {
-            var message = new Command<string>(string.Empty, "get_stop_orders");
-            var response = await _quikClient.SendAsync<IResult<List<StopOrder>>>(message).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<string, IReadOnlyCollection<StopOrder>>("get_stop_orders", string.Empty);
         }
 
-        /// <summary>
-        /// Возвращает список стоп-заявок для заданного инструмента.
-        /// </summary>
-        public async Task<List<StopOrder>> GetStopOrdersAsync(string classCode, string securityCode)
+        /// <inheritdoc/>
+        public Task<IReadOnlyCollection<StopOrder>> GetStopOrdersAsync(string classCode, string securityCode)
         {
-            var message = new Command<string[]>(new[] { classCode, securityCode }, "get_stop_orders");
-            var response = await _quikClient.SendAsync<IResult<List<StopOrder>>>(message).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<IReadOnlyCollection<StopOrder>>("get_stop_orders", new[] { classCode, securityCode });
         }
 
+        /// <inheritdoc/>
         public Task<long> CreateStopOrderAsync(StopOrder stopOrder)
         {
             var newStopOrderTransaction = new Transaction
@@ -92,7 +82,7 @@ namespace QuikSharp.Quik.Functions.StopOrders
             //["STOPPRICE2"]=tostring(SysFunc.toPrice(SecCode,StopLoss)),
             //["EXECUTION_CONDITION"] = "FILL_OR_KILL",
 
-            return _trading.SendTransactionAsync(newStopOrderTransaction);
+            return _tradingFunctions.SendTransactionAsync(newStopOrderTransaction);
         }
 
         private StopOrderKind ConvertStopOrderType(StopOrderType stopOrderType)
@@ -113,6 +103,7 @@ namespace QuikSharp.Quik.Functions.StopOrders
             }
         }
 
+        /// <inheritdoc/>
         public Task<long> KillStopOrderAsync(StopOrder stopOrder)
         {
             var killStopOrderTransaction = new Transaction
@@ -120,10 +111,10 @@ namespace QuikSharp.Quik.Functions.StopOrders
                 ACTION = TransactionAction.KILL_STOP_ORDER,
                 CLASSCODE = stopOrder.ClassCode,
                 SECCODE = stopOrder.SecCode,
-                STOP_ORDER_KEY = _typeConverter.ToString(stopOrder.OrderNum)
+                STOP_ORDER_KEY = TypeConverter.ToString(stopOrder.OrderNum)
             };
 
-            return _trading.SendTransactionAsync(killStopOrderTransaction);
+            return _tradingFunctions.SendTransactionAsync(killStopOrderTransaction);
         }
     }
 }

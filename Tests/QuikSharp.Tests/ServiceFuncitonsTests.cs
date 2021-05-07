@@ -46,21 +46,17 @@ namespace QuikSharp.Tests
         }
 
         [Test]
-        public void Message()
+        public async Task Message()
         {
-            Console.WriteLine("This is a message: " +
-                Quik.Functions.Service.MessageAsync("This is a message", NotificationType.Info).Result);
-            Console.WriteLine("This is a warning: " +
-                Quik.Functions.Service.MessageAsync("This is a warning", NotificationType.Warning).Result);
-            Console.WriteLine("This is an error: " +
-                Quik.Functions.Service.MessageAsync("This is an error", NotificationType.Error).Result);
+            await Quik.Functions.Service.MessageAsync("This is a message", NotificationType.Info);
+            await Quik.Functions.Service.MessageAsync("This is a warning", NotificationType.Warning);
+            await Quik.Functions.Service.MessageAsync("This is an error", NotificationType.Error);
         }
 
         [Test]
-        public void PrintDbgStr()
+        public async Task PrintDbgStr()
         {
-            Console.WriteLine("Debug: " +
-                Quik.Functions.Service.PrintDbgStrAsync("This is debug info").Result);
+            await Quik.Functions.Service.PrintDbgStrAsync("This is debug info");
         }
 
         [Test]

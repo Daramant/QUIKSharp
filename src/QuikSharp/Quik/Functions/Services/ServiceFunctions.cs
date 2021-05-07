@@ -15,78 +15,49 @@ namespace QuikSharp.Quik.Functions.Services
     /// <summary>
     /// Service functions implementations
     /// </summary>
-    public class ServiceFunctions : IServiceFunctions
+    public class ServiceFunctions : FunctionsBase, IServiceFunctions
     {
-        private readonly IQuikClient _quikClient;
-        private readonly ITypeConverter _typeConverter;
-
         public ServiceFunctions(
+            IMessageFactory messageFactory,
             IQuikClient quikClient,
             ITypeConverter typeConverter)
+            : base(messageFactory, quikClient, typeConverter)
+        { }
+
+        /// <inheritdoc/>
+        public Task<string> GetWorkingFolderAsync()
         {
-            _quikClient = quikClient;
-            _typeConverter = typeConverter;
+            return ExecuteCommandAsync<string, string>("getWorkingFolder", string.Empty);
         }
 
-        public async Task<string> GetWorkingFolderAsync()
-        {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(string.Empty, "getWorkingFolder"))).ConfigureAwait(false);
-            return response.Data;
-        }
-
+        /// <inheritdoc/>
         public async Task<bool> IsConnectedAsync(TimeSpan? timeout = null)
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(string.Empty, "isConnected")), timeout).ConfigureAwait(false);
-            return response.Data == "1";
+            return await ExecuteCommandAsync<string, string>("isConnected", string.Empty) == "1";
         }
 
-        public async Task<string> GetScriptPathAsync()
+        /// <inheritdoc/>
+        public Task<string> GetScriptPathAsync()
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(string.Empty, "getScriptPath"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<string, string>("getScriptPath", string.Empty);
         }
 
-        public async Task<string> GetInfoParamAsync(InfoParams param)
+        /// <inheritdoc/>
+        public Task<string> GetInfoParamAsync(InfoParams param)
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(_typeConverter.ToString(param), "getInfoParam"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<string, string>("getInfoParam", TypeConverter.ToString(param));
         }
 
-        public async Task<bool> MessageAsync(string message, NotificationType iconType = NotificationType.Info)
+        /// <inheritdoc/>
+        public Task MessageAsync(string message, NotificationType iconType = NotificationType.Info)
         {
-            switch (iconType)
-            {
-                case NotificationType.Info:
-                    await _quikClient.SendAsync<IResult<string>>(
-                        (new Command<string>(message, "message"))).ConfigureAwait(false);
-                    break;
-
-                case NotificationType.Warning:
-                    await _quikClient.SendAsync<IResult<string>>(
-                        (new Command<string>(message, "warning_message"))).ConfigureAwait(false);
-                    break;
-
-                case NotificationType.Error:
-                    await _quikClient.SendAsync<IResult<string>>(
-                        (new Command<string>(message, "error_message"))).ConfigureAwait(false);
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException("iconType");
-            }
-
-            return true; // TODO: Возвращать результат из Quik.
+            return ExecuteCommandAsync<string>("message", new[] { message, TypeConverter.ToStringLookup((int)iconType) });
         }
 
-        public async Task<bool> PrintDbgStrAsync(string message)
+        /// <inheritdoc/>
+        public Task PrintDbgStrAsync(string message)
         {
-            await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(message, "PrintDbgStr"))).ConfigureAwait(false);
-            return true; // TODO: Возвращать результат из Quik.
+            return ExecuteCommandAsync<string, string>("PrintDbgStr", message);
         }
     }
 }

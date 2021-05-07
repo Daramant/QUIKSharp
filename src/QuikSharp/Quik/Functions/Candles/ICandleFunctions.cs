@@ -20,7 +20,7 @@ namespace QuikSharp.Quik.Functions.Candles
         /// </summary>
         /// <param name="graphicTag">Строковый идентификатор графика или индикатора</param>
         /// <returns></returns>
-        Task<List<Candle>> GetAllCandlesAsync(string graphicTag);
+        Task<IReadOnlyCollection<Candle>> GetAllCandlesAsync(string graphicTag);
 
         /// <summary>
         /// Функция предназначена для получения информации о свечках по идентификатору (заказ данных для построения графика плагин не осуществляет, поэтому для успешного доступа нужный график должен быть открыт).
@@ -30,7 +30,7 @@ namespace QuikSharp.Quik.Functions.Candles
         /// <param name="first">Индекс первой свечки. Первая (самая левая) свечка имеет индекс 0</param>
         /// <param name="count">Количество запрашиваемых свечек</param>
         /// <returns></returns>
-        Task<List<Candle>> GetCandlesAsync(string graphicTag, int line, int first, int count);
+        Task<IReadOnlyCollection<Candle>> GetCandlesAsync(string graphicTag, int line, int first, int count);
 
         /// <summary>
         /// Функция возвращает список свечек указанного инструмента заданного интервала.
@@ -39,7 +39,7 @@ namespace QuikSharp.Quik.Functions.Candles
         /// <param name="securityCode">Код инструмента.</param>
         /// <param name="interval">Интервал свечей.</param>
         /// <returns>Список свечей.</returns>
-        Task<List<Candle>> GetAllCandlesAsync(string classCode, string securityCode, CandleInterval interval);
+        Task<IReadOnlyCollection<Candle>> GetAllCandlesAsync(string classCode, string securityCode, CandleInterval interval);
 
         /// <summary>
         /// Возвращает заданное количество свечек указанного инструмента и интервала с конца.
@@ -49,7 +49,7 @@ namespace QuikSharp.Quik.Functions.Candles
         /// <param name="interval">Интервал свечей.</param>
         /// <param name="count">Количество возвращаемых свечей с конца.</param>
         /// <returns>Список свечей.</returns>
-        Task<List<Candle>> GetLastCandlesAsync(string classCode, string securityCode, CandleInterval interval, int count);
+        Task<IReadOnlyCollection<Candle>> GetLastCandlesAsync(string classCode, string securityCode, CandleInterval interval, int count);
 
         /// <summary>
         /// Осуществляет подписку на получение исторических данных (свечи)

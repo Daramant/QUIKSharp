@@ -26,14 +26,14 @@ namespace QuikSharp.Quik.Functions.Trading
         /// <summary>
         /// Возвращает список записей из таблицы 'Лимиты по бумагам'.
         /// </summary>
-        Task<List<DepoLimitEx>> GetDepoLimitsAsync();
+        Task<IReadOnlyCollection<DepoLimitEx>> GetDepoLimitsAsync();
 
         /// <summary>
         /// Возвращает список записей из таблицы 'Лимиты по бумагам', отфильтрованных по коду инструмента.
         /// </summary>
         /// <param name="secCode">Код инструментаю</param>
         /// <returns></returns>
-        Task<List<DepoLimitEx>> GetDepoLimitsAsync(string secCode);
+        Task<IReadOnlyCollection<DepoLimitEx>> GetDepoLimitsAsync(string secCode);
 
         /// <summary>
         /// Функция для получения информации по денежным лимитам
@@ -49,7 +49,7 @@ namespace QuikSharp.Quik.Functions.Trading
         ///  функция для получения информации по денежным лимитам всех торговых счетов (кроме фьючерсных) и валют
         ///  Лучшее место для получения связки clientCode + firmid
         /// </summary>
-        Task<List<MoneyLimitEx>> GetMoneyLimitsAsync();
+        Task<IReadOnlyCollection<MoneyLimitEx>> GetMoneyLimitsAsync();
 
         /// <summary>
         ///  функция для получения информации по фьючерсным лимитам
@@ -59,7 +59,7 @@ namespace QuikSharp.Quik.Functions.Trading
         /// <summary>
         ///  функция для получения информации по фьючерсным лимитам всех клиентских счетов
         /// </summary>
-        Task<List<FuturesLimits>> GetFuturesClientLimitsAsync();
+        Task<IReadOnlyCollection<FuturesLimits>> GetFuturesClientLimitsAsync();
 
         /// <summary>
         ///  функция для получения информации по фьючерсным позициям
@@ -72,7 +72,7 @@ namespace QuikSharp.Quik.Functions.Trading
         /// <param name="classCode"></param>
         /// <param name="secCode"></param>
         /// <returns></returns>
-        Task<List<OptionBoard>> GetOptionBoardAsync(string classCode, string secCode);
+        Task<IReadOnlyCollection<OptionBoard>> GetOptionBoardAsync(string classCode, string secCode);
 
         /// <summary>
         /// Функция заказывает получение параметров Таблицы текущих торгов
@@ -122,7 +122,7 @@ namespace QuikSharp.Quik.Functions.Trading
         /// <summary>
         /// функция для получения таблицы сделок по заданному инструменту
         /// </summary>
-        Task<List<Trade>> GetTradesAsync();
+        Task<IReadOnlyCollection<Trade>> GetTradesAsync();
 
         /// <summary>
         /// функция для получения таблицы сделок по заданному инструменту
@@ -130,14 +130,14 @@ namespace QuikSharp.Quik.Functions.Trading
         /// <param name="classCode"></param>
         /// <param name="secCode"></param>
         /// <returns></returns>
-        Task<List<Trade>> GetTradesAsync(string classCode, string secCode);
+        Task<IReadOnlyCollection<Trade>> GetTradesAsync(string classCode, string secCode);
 
         /// <summary>
         /// функция для получения таблицы сделок номеру заявки
         /// </summary>
         /// <param name="orderNum"></param>
         /// <returns></returns>
-        Task<List<Trade>> GetTradesByOrderNumberAsync(long orderNum);
+        Task<IReadOnlyCollection<Trade>> GetTradesByOrderNumberAsync(long orderNum);
 
         ///// <summary>
         /////  функция для получения информации по инструменту

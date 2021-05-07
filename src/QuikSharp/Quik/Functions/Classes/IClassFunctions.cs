@@ -58,6 +58,6 @@ namespace QuikSharp.Quik.Functions.Classes
         /// Функция возвращает таблицу всех счетов в торговой системе.
         /// </summary>
         /// <returns></returns>
-        Task<List<TradesAccounts>> GetTradeAccountsAsync();
+        Task<IReadOnlyCollection<TradesAccounts>> GetTradeAccountsAsync();
     }
 }

@@ -19,7 +19,6 @@ namespace QuikSharp.Messages
         public Message(T data)
         {
             Data = data;
-            CreatedTime = DateTimeTool.GetCurrentTime();
         }
 
         /// <summary>

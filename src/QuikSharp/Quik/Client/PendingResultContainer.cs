@@ -30,6 +30,12 @@ namespace QuikSharp.Quik.Client
         }
 
         /// <inheritdoc/>
+        public bool TryGet(long commandId, out PendingResult pendingResult)
+        {
+            return _pendingResults.TryGetValue(commandId, out pendingResult);
+        }
+
+        /// <inheritdoc/>
         public void CancelAll()
         {
             // cancel responses to release waiters

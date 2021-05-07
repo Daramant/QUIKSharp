@@ -13,12 +13,12 @@ namespace QuikSharp.Quik.Functions.StopOrders
         /// Возвращает список всех стоп-заявок.
         /// </summary>
         /// <returns></returns>
-        Task<List<StopOrder>> GetStopOrdersAsync();
+        Task<IReadOnlyCollection<StopOrder>> GetStopOrdersAsync();
 
         /// <summary>
         /// Возвращает список стоп-заявок для заданного инструмента.
         /// </summary>
-        Task<List<StopOrder>> GetStopOrdersAsync(string classCode, string securityCode);
+        Task<IReadOnlyCollection<StopOrder>> GetStopOrdersAsync(string classCode, string securityCode);
 
         Task<long> CreateStopOrderAsync(StopOrder stopOrder);
 

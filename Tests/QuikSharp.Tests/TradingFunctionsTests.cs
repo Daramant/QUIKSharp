@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using QuikSharp.DataStructures;
 
@@ -37,16 +38,16 @@ namespace QuikSharp.Tests
 		}
 
 		[Test]
-		public void GetDepoLimitsTest()
+		public async Task GetDepoLimitsTest()
 		{
 			// Получаем информацию по всем лимитам со всех доступных счетов.
-			List<DepoLimitEx> depoLimits = Quik.Functions.Trading.GetDepoLimitsAsync().Result;
+			var depoLimits = await Quik.Functions.Trading.GetDepoLimitsAsync();
 			Console.WriteLine($"Все лимиты со всех доступных счетов {depoLimits.Count}");
 			if (depoLimits.Count > 0)
 				PrintDepoLimits(depoLimits);
 
 			// Получаем информацию по лимитам инструмента "Сбербанк"
-			depoLimits = Quik.Functions.Trading.GetDepoLimitsAsync("SBER").Result;
+			depoLimits = await Quik.Functions.Trading.GetDepoLimitsAsync("SBER");
 			Console.WriteLine($"Лимиты инструмента сбербанк {depoLimits.Count}");
 			if (depoLimits.Count > 0)
 				PrintDepoLimits(depoLimits);
@@ -58,7 +59,7 @@ namespace QuikSharp.Tests
 
 		}
 
-		private void PrintDepoLimits(List<DepoLimitEx> depoLimits)
+		private void PrintDepoLimits(IReadOnlyCollection<DepoLimitEx> depoLimits)
 		{
 			Console.WriteLine($"Количество стро: {depoLimits.Count}");
 			foreach (var depo in depoLimits)

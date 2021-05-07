@@ -55,12 +55,12 @@ namespace QuikSharp.Quik.Functions.Orders
         /// Возвращает список всех заявок.
         /// </summary>
         /// <returns></returns>
-        Task<List<Order>> GetOrdersAsync();
+        Task<IReadOnlyCollection<Order>> GetOrdersAsync();
 
         /// <summary>
         /// Возвращает список заявок для заданного инструмента.
         /// </summary>
-        Task<List<Order>> GetOrdersAsync(string classCode, string securityCode);
+        Task<IReadOnlyCollection<Order>> GetOrdersAsync(string classCode, string securityCode);
 
         /// <summary>
         /// Возвращает заявку для заданного инструмента по ID.

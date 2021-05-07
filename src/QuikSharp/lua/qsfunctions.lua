@@ -102,17 +102,8 @@ end
 
 --- Функция отображает сообщения в терминале QUIK.
 function qsfunctions.message(msg)
-    log(msg.data, 1)
-    msg.data = ""
-    return msg
-end
-function qsfunctions.warning_message(msg)
-    log(msg.data, 2)
-    msg.data = ""
-    return msg
-end
-function qsfunctions.error_message(msg)
-    log(msg.data, 3)
+	local text, level = msg.data[1], msg.data[2]
+    log(text, level)
     msg.data = ""
     return msg
 end

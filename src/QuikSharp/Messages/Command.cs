@@ -7,6 +7,10 @@ namespace QuikSharp.Messages
 {
     public class Command<T>: Message<T>, ICommand<T>
     {
+        /// <inheritdoc/>
+        [JsonProperty(PropertyName = "id")]
+        public long Id { get; set; }
+
         /// <summary>
         /// A name of a function to call for requests
         /// </summary>
@@ -24,7 +28,7 @@ namespace QuikSharp.Messages
         {
         }
 
-        public Command(T data, string name, DateTime? validUntil = null)
+        public Command(string name, T data, DateTime? validUntil = null)
             : base(data)
         {
             Name = name;

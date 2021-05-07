@@ -3,19 +3,20 @@
 
 using QuikSharp.Messages;
 using QuikSharp.Quik.Client;
+using QuikSharp.TypeConverters;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.Debug
 {
-    public class DebugFunctions : IDebugFunctions
+    public class DebugFunctions : FunctionsBase, IDebugFunctions
     {
-        private readonly IQuikClient _quikClient;
-
-        public DebugFunctions(IQuikClient quikClient)
-        {
-            _quikClient = quikClient;
-        }
+        public DebugFunctions(
+            IMessageFactory messageFactory,
+            IQuikClient quikClient,
+            ITypeConverter typeConverter)
+            : base (messageFactory, quikClient, typeConverter)
+        { }
 
         private class PingRequest : Command<string>
         {
@@ -36,44 +37,28 @@ namespace QuikSharp.Quik.Functions.Debug
         public async Task<string> PingAsync()
         {
             // could have used StringMessage directly. This is an example of how to define DTOs for custom commands
-            var response = await _quikClient.SendAsync<PingResponse>((new PingRequest())).ConfigureAwait(false);
+            var response = await QuikClient.SendAsync<PingResponse>((new PingRequest())).ConfigureAwait(false);
             Trace.Assert(response.Data == "Pong");
             return response.Data;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public async Task<T> EchoAsync<T>(T msg)
+        /// <inheritdoc/>
+        public Task<T> EchoAsync<T>(T msg)
         {
             // could have used StringMessage directly. This is an example of how to define DTOs for custom commands
-            var response = await _quikClient.SendAsync<IResult<T>>(
-                (new Command<T>(msg, "echo"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<T, T>("echo", msg);
         }
 
-        /// <summary>
-        /// This method returns LuaException and demonstrates how Lua errors are caught
-        /// </summary>
-        /// <returns></returns>
-        public async Task<string> DivideStringByZeroAsync()
+        /// <inheritdoc/>
+        public Task<string> DivideStringByZeroAsync()
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(string.Empty, "divide_string_by_zero"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<string, string>("divide_string_by_zero", string.Empty);
         }
 
-        /// <summary>
-        /// Check if running inside Quik
-        /// </summary>
+        /// <inheritdoc/>
         public async Task<bool> IsQuikAsync()
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(string.Empty, "is_quik"))).ConfigureAwait(false);
-            return response.Data == "1";
+            return await ExecuteCommandAsync<string, string>("is_quik", string.Empty) == "1";
         }
     }
 }

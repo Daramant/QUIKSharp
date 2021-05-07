@@ -253,7 +253,7 @@ namespace RobotDemo
         }
         async Task GetQuotation(Tool instrument, CandleInterval tf)
         {
-            List<Candle> AllCandles;
+            IReadOnlyCollection<Candle> AllCandles;
             string InstrID;
             toolCandles = new DataSet();
             try
@@ -295,7 +295,7 @@ namespace RobotDemo
                 textBoxLogs.AppendText("Ошибка подписки на инструмент." + Environment.NewLine);
             }
         }
-        DataTable AllCandles_to_Table(List<Candle> AllCandles, string InstrID)
+        DataTable AllCandles_to_Table(IEnumerable<Candle> AllCandles, string InstrID)
         {
             DataTable dataTable = new System.Data.DataTable(InstrID);
 
@@ -644,7 +644,7 @@ namespace RobotDemo
                                 priceTrade = 0;
                                 qtyTrade = 0;
                                 //textBoxLogs.AppendText("Получаем журнал сделок..." + Environment.NewLine);
-                                List<Trade> trades = _quik.Functions.Trading.GetTradesAsync().Result;
+                                var trades = _quik.Functions.Trading.GetTradesAsync().Result;
                                 foreach (Trade trade in trades)
                                 {
                                     if (trade.OrderNum == order.OrderNum)
@@ -740,7 +740,7 @@ namespace RobotDemo
                             {
                                 priceTrade = 0;
                                 qtyTrade = 0;
-                                List<Trade> trades = _quik.Functions.Trading.GetTradesAsync().Result;
+                                var trades = _quik.Functions.Trading.GetTradesAsync().Result;
                                 foreach (Trade trade in trades)
                                 {
                                     if (trade.OrderNum == order.OrderNum)

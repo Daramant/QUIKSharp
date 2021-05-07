@@ -23,67 +23,67 @@ namespace QuikSharpDemo
             InitializeComponent();
         }
 
-        public FormOutputTable(List<Candle> _candles)
+        public FormOutputTable(IEnumerable<Candle> _candles)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _candles;
         }
 
-        public FormOutputTable(List<SecurityInfo> _secInfo)
+        public FormOutputTable(IEnumerable<SecurityInfo> _secInfo)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _secInfo;
         }
 
-        public FormOutputTable(List<FuturesLimits> _futuresLimits)
+        public FormOutputTable(IEnumerable<FuturesLimits> _futuresLimits)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _futuresLimits;
         }
 
-        public FormOutputTable(List<DepoLimit> _depoLimits)
+        public FormOutputTable(IEnumerable<DepoLimit> _depoLimits)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _depoLimits;
         }
 
-        public FormOutputTable(List<DepoLimitEx> _limits)
+        public FormOutputTable(IEnumerable<DepoLimitEx> _limits)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _limits;
         }
 
-        public FormOutputTable(List<Order> _orders)
+        public FormOutputTable(IEnumerable<Order> _orders)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _orders;
         }
 
-        public FormOutputTable(List<Trade> _trades)
+        public FormOutputTable(IEnumerable<Trade> _trades)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _trades;
         }
 
-        public FormOutputTable(List<PortfolioInfo> _portfolio)
+        public FormOutputTable(IEnumerable<PortfolioInfo> _portfolio)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _portfolio;
         }
 
-        public FormOutputTable(List<PortfolioInfoEx> _portfolio)
+        public FormOutputTable(IEnumerable<PortfolioInfoEx> _portfolio)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _portfolio;
         }
 
-        public FormOutputTable(List<MoneyLimit> _moneyLimit)
+        public FormOutputTable(IEnumerable<MoneyLimit> _moneyLimit)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _moneyLimit;
         }
 
-        public FormOutputTable(List<MoneyLimitEx> _moneyLimit)
+        public FormOutputTable(IEnumerable<MoneyLimitEx> _moneyLimit)
         {
             InitializeComponent();
             dataGridViewCandles.DataSource = _moneyLimit;

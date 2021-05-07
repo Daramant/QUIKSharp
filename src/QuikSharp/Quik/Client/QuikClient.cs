@@ -3,10 +3,8 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -27,7 +25,6 @@ namespace QuikSharp.Quik.Client
     {
         private readonly IEventInvoker _eventInvoker;
         private readonly ISerializer _serializer;
-        private readonly IIdProvider _idProvider;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPendingResultContainer _pendingResultContainer;
         private readonly QuikClientOptions _options;
@@ -59,14 +56,13 @@ namespace QuikSharp.Quik.Client
         /// <summary>
         /// IQuickCalls functions enqueue a message and return a task from TCS
         /// </summary>
-        private readonly BlockingCollection<Envelope<CommandHeader, ICommand>> _commandEnvelopeQueue = new BlockingCollection<Envelope<CommandHeader, ICommand>>();
+        private readonly BlockingCollection<ICommand> _commandEnvelopeQueue = new BlockingCollection<ICommand>();
 
         public ClientState State { get; private set; } = ClientState.Stopped;
 
         public QuikClient(
             IEventInvoker eventInvoker,
             ISerializer serializer,
-            IIdProvider idProvider,
             IDateTimeProvider dateTimeProvider,
             IPendingResultContainer pendingResultContainer,
             QuikClientOptions options,
@@ -74,7 +70,6 @@ namespace QuikSharp.Quik.Client
         {
             _eventInvoker = eventInvoker;
             _serializer = serializer;
-            _idProvider = idProvider;
             _dateTimeProvider = dateTimeProvider;
             _pendingResultContainer = pendingResultContainer;
             _options = options;
@@ -186,7 +181,7 @@ namespace QuikSharp.Quik.Client
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {
                     _logger.LogTrace("Подключение к терминалу Quik для отправки команд...");
-                    ReconnectIfConnectionMissing(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
+                    ReconnectIfMissingConnection(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
                     _logger.LogTrace("Подключение к терминалу Quik для отправки команд установлено.");
                     
                     try
@@ -196,25 +191,30 @@ namespace QuikSharp.Quik.Client
                         {
                             while (!_cancellationTokenSource.IsCancellationRequested)
                             {
-                                var commandEnvelope = _commandEnvelopeQueue.Take(_cancellationTokenSource.Token);
-                                    
+                                var command = _commandEnvelopeQueue.Take(_cancellationTokenSource.Token);
+
+                                if (!_pendingResultContainer.TryGet(command.Id, out var pendingResult))
+                                {
+                                    _logger.LogWarning($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {command.Id}.");
+                                }
+
                                 var utcNow = _dateTimeProvider.UtcNow;
 
-                                if (commandEnvelope.Body.ValidUntil < utcNow)
+                                if (command.ValidUntil < utcNow)
                                 {
-                                    if (_pendingResultContainer.TryRemove(commandEnvelope.Header.CommandId, out var pendingResult))
+                                    if (_pendingResultContainer.TryRemove(command.Id, out pendingResult))
                                     {
                                         pendingResult.TaskCompletionSource.SetException(
-                                            new CommandTimeoutException($"Результат выполнения команды с идентификатором: {commandEnvelope.Header.CommandId} получен в: '{utcNow}' после крайнего срока: '{pendingResult.Command.ValidUntil}'."));
+                                            new CommandTimeoutException($"Результат выполнения команды с идентификатором: {command.Id} получен в: '{utcNow}' после крайнего срока: '{pendingResult.Command.ValidUntil}'."));
                                     }
                                     else
                                     {
-                                        throw new QuikSharpException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {commandEnvelope.Header.CommandId}.");
+                                        _logger.LogWarning($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {command.Id}.");
                                     }
                                 }
                                 else
                                 {
-                                    var serializedCommandEnvelope = _serializer.Serialize(commandEnvelope);
+                                    var serializedCommandEnvelope = _serializer.Serialize(command);
 
                                     try
                                     {
@@ -226,7 +226,7 @@ namespace QuikSharp.Quik.Client
                                         // При ошибке ввода/вывода (например при перезапуске терминала Quik или остановке скрипта)
                                         // возвращаем команду обратно в очередь, чтобы отправить повторно после установки
                                         // соединения с терминалом Quik.
-                                        _commandEnvelopeQueue.Add(commandEnvelope);
+                                        _commandEnvelopeQueue.Add(command);
 
                                         throw;
                                     }
@@ -264,7 +264,7 @@ namespace QuikSharp.Quik.Client
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {
                     _logger.LogTrace("Подключение к терминалу Quik для получения результатов команд...");
-                    ReconnectIfConnectionMissing(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
+                    ReconnectIfMissingConnection(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
                     _logger.LogTrace("Подключение к терминалу Quik для получения результатов команд установлено.");
 
                     try
@@ -334,7 +334,7 @@ namespace QuikSharp.Quik.Client
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {
                     _logger.LogTrace("Подключение к терминалу Quik для получения событий...");
-                    ReconnectIfConnectionMissing(ref _eventClient, _eventClientSyncRoot, _cancellationTokenSource.Token);
+                    ReconnectIfMissingConnection(ref _eventClient, _eventClientSyncRoot, _cancellationTokenSource.Token);
                     _logger.LogTrace("Подключение к терминалу Quik для получения событий установлено.");
                     
                     OnConnected(_options.CommandPort);
@@ -404,7 +404,7 @@ namespace QuikSharp.Quik.Client
                     catch (Exception e)
                     {
                         e.Data["Event"] = serializedEvent;
-                        _logger.LogError(e, "Исключение при обработке событий");
+                        _logger.LogError(e, "Исключение при обработке события.");
                     }
                 }
             }
@@ -427,7 +427,8 @@ namespace QuikSharp.Quik.Client
 
             if (!_pendingResultContainer.TryRemove(envelope.Header.CommandId, out var pendingResult))
             {
-                throw new QuikSharpException($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {envelope.Header.CommandId}.");
+                _logger.LogWarning($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {envelope.Header.CommandId}.");
+                return;
             }
 
             if (envelope.Header.Status == ResultStatus.Ok)
@@ -468,23 +469,20 @@ namespace QuikSharp.Quik.Client
             var cancellationTokenSource = default(CancellationTokenSource);
             var cancellationTokenRegistration = default(CancellationTokenRegistration);
 
-            var commandId = _idProvider.GetUniqueCommandId();
-            var envelope = new Envelope<CommandHeader, ICommand>(new CommandHeader(commandId), command);
-
             if (timeout > TimeSpan.Zero)
             {
                 cancellationTokenSource = new CancellationTokenSource();
                 cancellationTokenRegistration = cancellationTokenSource.Token.Register(() =>
                 {
                     taskCompletionSource.TrySetException(new CommandTimeoutException("Send operation timed out"));
-                    _pendingResultContainer.Remove(commandId);
+                    _pendingResultContainer.Remove(command.Id);
                 }, useSynchronizationContext: false);
 
                 cancellationTokenSource.CancelAfter(timeout.Value);
             }
 
-            _pendingResultContainer.Add(commandId, new PendingResult(command, typeof(TResult), taskCompletionSource));
-            _commandEnvelopeQueue.Add(envelope);
+            _pendingResultContainer.Add(command.Id, new PendingResult(command, typeof(TResult), taskCompletionSource));
+            _commandEnvelopeQueue.Add(command);
 
             try
             {
@@ -501,15 +499,15 @@ namespace QuikSharp.Quik.Client
             }
             finally
             {
-                if (timeout > TimeSpan.Zero)
+                if (cancellationTokenSource != null)
                 {
-                    cancellationTokenSource?.Dispose();
+                    cancellationTokenSource.Dispose();
                     cancellationTokenRegistration.Dispose();
                 }
             }
         }
 
-        private void ReconnectIfConnectionMissing(ref TcpClient tcpClient, object syncRoot, CancellationToken cancellationToken)
+        private void ReconnectIfMissingConnection(ref TcpClient tcpClient, object syncRoot, CancellationToken cancellationToken)
         {
             lock (syncRoot)
             {

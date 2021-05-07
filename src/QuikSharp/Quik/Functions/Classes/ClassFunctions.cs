@@ -4,6 +4,7 @@
 using QuikSharp.DataStructures;
 using QuikSharp.Messages;
 using QuikSharp.Quik.Client;
+using QuikSharp.TypeConverters;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,79 +14,71 @@ namespace QuikSharp.Quik.Functions.Classes
     /// <summary>
     /// Функции для обращения к спискам доступных параметров
     /// </summary>
-    public class ClassFunctions : IClassFunctions
+    public class ClassFunctions : FunctionsBase, IClassFunctions
     {
-        private readonly IQuikClient _quikClient;
+        private static readonly char[] Separators = new[] { ',' };
 
-        public ClassFunctions(IQuikClient quikClient)
-        {
-            _quikClient = quikClient;
-        }
+        public ClassFunctions(
+            IMessageFactory messageFactory,
+            IQuikClient quikClient,
+            ITypeConverter typeConverter)
+            : base(messageFactory, quikClient, typeConverter)
+        { }
 
+        /// <inheritdoc/>
         public async Task<string[]> GetClassesListAsync()
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(string.Empty, "getClassesList"))).ConfigureAwait(false);
-
-            return response.Data == null
-                ? Array.Empty<string>()
-                : response.Data.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries);
+            var classes = await ExecuteCommandAsync<string, string>("getClassesList", string.Empty);
+            return classes?.Split(Separators, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
         }
 
-        public async Task<ClassInfo> GetClassInfoAsync(string classID)
+        /// <inheritdoc/>
+        public Task<ClassInfo> GetClassInfoAsync(string classID)
         {
-            var response = await _quikClient.SendAsync<IResult<ClassInfo>>(
-                (new Command<string>(classID, "getClassInfo"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<string, ClassInfo>("getClassInfo", classID);
         }
 
-        public async Task<SecurityInfo> GetSecurityInfoAsync(string classCode, string secCode)
+        /// <inheritdoc/>
+        public Task<SecurityInfo> GetSecurityInfoAsync(string classCode, string secCode)
         {
-            var response = await _quikClient.SendAsync<IResult<SecurityInfo>>(
-                (new Command<string[]>(new[] { classCode, secCode }, "getSecurityInfo"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<SecurityInfo>("getSecurityInfo", new[] { classCode, secCode });
         }
 
+        /// <inheritdoc/>
         public Task<SecurityInfo> GetSecurityInfoAsync(ISecurity security)
         {
             return GetSecurityInfoAsync(security.ClassCode, security.SecCode);
         }
 
+        /// <inheritdoc/>
         public async Task<string[]> GetClassSecuritiesAsync(string classID)
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(classID, "getClassSecurities"))).ConfigureAwait(false);
-            return response.Data == null
-                ? Array.Empty<string>()
-                : response.Data.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries);
+            var securities = await ExecuteCommandAsync<string, string>("getClassSecurities", classID);
+            return securities?.Split(Separators, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
         }
 
-        public async Task<string> GetSecurityClassAsync(string classesList, string secCode)
+        /// <inheritdoc/>
+        public Task<string> GetSecurityClassAsync(string classesList, string secCode)
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string[]>(new[] { classesList, secCode }, "getSecurityClass"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<string>("getSecurityClass", new[] { classesList, secCode });
         }
 
-        public async Task<string> GetClientCodeAsync()
+        /// <inheritdoc/>
+        public Task<string> GetClientCodeAsync()
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(string.Empty, "getClientCode"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<string, string>("getClientCode", string.Empty);
         }
 
-        public async Task<string> GetTradeAccountAsync(string classCode)
+        /// <inheritdoc/>
+        public Task<string> GetTradeAccountAsync(string classCode)
         {
-            var response = await _quikClient.SendAsync<IResult<string>>(
-                (new Command<string>(classCode, "getTradeAccount"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<string, string>("getTradeAccount", classCode);
         }
 
-        public async Task<List<TradesAccounts>> GetTradeAccountsAsync()
+        /// <inheritdoc/>
+        public Task<IReadOnlyCollection<TradesAccounts>> GetTradeAccountsAsync()
         {
-            var response = await _quikClient.SendAsync<IResult<List<TradesAccounts>>>(
-                (new Command<string>(string.Empty, "getTradeAccounts"))).ConfigureAwait(false);
-            return response.Data;
+            return ExecuteCommandAsync<string, IReadOnlyCollection<TradesAccounts>>("getTradeAccounts", string.Empty);
         }
     }
 }

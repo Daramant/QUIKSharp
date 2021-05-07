@@ -12,6 +12,8 @@ namespace QuikSharp.Quik.Client
 
         bool TryRemove(long commandId, out PendingResult pendingResult);
 
+        bool TryGet(long commandId, out PendingResult pendingResult);
+
         void CancelAll();
     }
 }

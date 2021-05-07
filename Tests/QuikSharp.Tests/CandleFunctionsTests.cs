@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using QuikSharp.DataStructures;
 using QuikSharp.Quik;
@@ -18,39 +19,39 @@ namespace QuikSharp.Tests
         }
 
         [Test]
-        public void GetCandlesTest()
+        public async Task GetCandlesTest()
         {
             //Quik quik = new Quik();
             string graphicTag = "RIU5M1";//В квике должен быть открыт график с этим (SBER2M) идентификатором.
 
-            List<Candle> allCandles = Quik.Functions.Candles.GetAllCandlesAsync(graphicTag).Result;
+            var allCandles = await Quik.Functions.Candles.GetAllCandlesAsync(graphicTag);
             Console.WriteLine("All candles count: " + allCandles.Count);
 
-            List<Candle> partCandles = Quik.Functions.Candles.GetCandlesAsync(graphicTag, 0, 100, 250).Result;
+            var partCandles = await Quik.Functions.Candles.GetCandlesAsync(graphicTag, 0, 100, 250);
             Console.WriteLine("Part candles count:" + partCandles.Count);
         }
 
         [Test]
-        public void GetAllCandlesTest()
+        public async Task GetAllCandlesTest()
         {
             //Получаем месячные свечки по инструменту "Северсталь"
-            List<Candle> candles = Quik.Functions.Candles.GetAllCandlesAsync("TQBR", "CHMF", CandleInterval.MN).Result;
+            var candles = await Quik.Functions.Candles.GetAllCandlesAsync("TQBR", "CHMF", CandleInterval.MN);
             Trace.WriteLine("Candles count: " + candles.Count);
         }
 
         [Test]
-        public void GetLastCandlesTest()
+        public async Task GetLastCandlesTest()
         {
             int Days = 7;
-            List<Candle> candles = Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days).Result;
+            var candles = await Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days);
             Assert.AreEqual(Days, candles.Count);
 
             Days = 77;
-            candles = Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days).Result;
+            candles = await Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days);
             Assert.AreEqual(Days, candles.Count);
 
             Days = 1;
-            candles = Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days).Result;
+            candles = await Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days);
             Assert.AreEqual(Days, candles.Count);
         }
 

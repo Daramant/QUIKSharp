@@ -33,11 +33,11 @@ namespace QuikSharpDemo
         decimal offer;
         Tool tool;
         OrderBook toolOrderBook;
-        List<Candle> toolCandles;
-        List<Order> listOrders;
-        List<Trade> listTrades;
+        IReadOnlyCollection<Candle> toolCandles;
+        IReadOnlyCollection<Order> listOrders;
+        IReadOnlyCollection<Trade> listTrades;
         List<SecurityInfo> listSecurityInfo;
-        List<DepoLimitEx> listDepoLimits;
+        IReadOnlyCollection<DepoLimitEx> listDepoLimits;
         List<FuturesLimits> listFuturesLimits;
         List<PortfolioInfoEx> listPortfolio;
         List<MoneyLimit> listMoneyLimits;
