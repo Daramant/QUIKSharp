@@ -4,97 +4,29 @@
 local json = require ("dkjson")
 local qsfunctions = {}
 
-function qsfunctions.dispatch_and_process(msg)
-    if qsfunctions[msg.n] then
-        -- dispatch a command simply by a table lookup
-        -- in qsfunctions method names must match commands
-        local status, result = pcall(qsfunctions[msg.n], msg)
-        if status then
-            return result
-        else
-            msg.n = "Error"
-            msg.error = "Lua error: " .. result
-            return msg
-        end
-    else
-		log(to_json(msg), 3)
-		msg.error = "Command not implemented in Lua qsfunctions module: " .. msg.n
-        msg.n = "Error"
-        return msg
-    end
-end
-
----------------------
--- Debug functions --
----------------------
-
---- Returns Pong to Ping
--- @param msg message table
--- @return same msg table
-function qsfunctions.ping(msg)
-    -- need to know data structure the caller gives
-    msg.t = 0 -- avoid time generation. Could also leave original
-    if msg.data == "Ping" then
-        msg.data = "Pong"
-        return msg
-    else
-        msg.data = msg.data .. " is not Ping"
-        return msg
-    end
-end
-
---- Echoes its message
-function qsfunctions.echo(msg)
-    return msg
-end
-
---- Test error handling
-function qsfunctions.divide_string_by_zero(msg)
-    msg.data = "asd" / 0
-    return msg
-end
-
---- Is running inside quik
-function qsfunctions.is_quik(msg)
-    if getScriptPath then msg.data = 1 else msg.data = 0 end
-    return msg
-end
-
 -----------------------
 -- Service functions --
 -----------------------
 
 --- Функция предназначена для определения состояния подключения клиентского места к
--- серверу. Возвращает «1», если клиентское место подключено и «0», если не подключено.
+--- серверу. Возвращает «1», если клиентское место подключено и «0», если не подключено.
 function qsfunctions.isConnected(msg)
-    -- set time when function was called
     msg.t = timemsec()
-    msg.data = isConnected()
-    return msg
-end
-
---- Функция возвращает путь, по которому находится файл info.exe, исполняющий данный
--- скрипт, без завершающего обратного слэша («\»). Например, C:\QuikFront.
-function qsfunctions.getWorkingFolder(msg)
-    -- set time when function was called
-    msg.t = timemsec()
-    msg.data = getWorkingFolder()
+    msg.data = isConnected() == 1
     return msg
 end
 
 --- Функция возвращает путь, по которому находится запускаемый скрипт, без завершающего
--- обратного слэша («\»). Например, C:\QuikFront\Scripts.
+--- обратного слэша («\»). Например, C:\QuikFront\Scripts.
 function qsfunctions.getScriptPath(msg)
-    -- set time when function was called
     msg.t = timemsec()
     msg.data = getScriptPath()
     return msg
 end
 
 --- Функция возвращает значения параметров информационного окна (пункт меню
--- Связь / Информационное окно…).
+--- Связь / Информационное окно…).
 function qsfunctions.getInfoParam(msg)
-    -- set time when function was called
     msg.t = timemsec()
     msg.data = getInfoParam(msg.data)
     return msg
@@ -104,7 +36,7 @@ end
 function qsfunctions.message(msg)
 	local text, level = msg.data[1], msg.data[2]
     log(text, level)
-    msg.data = ""
+    msg.data = true -- TODO: Заполнить.
     return msg
 end
 
@@ -115,6 +47,14 @@ function qsfunctions.sleep(msg)
     return msg
 end
 
+--- Функция возвращает путь, по которому находится файл info.exe, исполняющий данный
+-- скрипт, без завершающего обратного слэша («\»). Например, C:\QuikFront.
+function qsfunctions.getWorkingFolder(msg)
+    msg.t = timemsec()
+    msg.data = getWorkingFolder()
+    return msg
+end
+
 --- Функция для вывода отладочной информации.
 function qsfunctions.PrintDbgStr(msg)
     log(msg.data, 0)
@@ -122,44 +62,11 @@ function qsfunctions.PrintDbgStr(msg)
     return msg
 end
 
--- Выводит на график метку
-function qsfunctions.addLabel(msg)
-	local price, curdate, curtime, qty, path, id, algmnt, bgnd = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7], msg.data[8]
-	label = {
-			TEXT = "",
-			IMAGE_PATH = path,
-			ALIGNMENT = algmnt,
-			YVALUE = tostring(price),
-			DATE = tostring(curdate),
-			TIME = tostring(curtime),
-			R = 255,
-			G = 255,
-			B = 255,
-			TRANSPARENCY = 0,
-			TRANSPARENT_BACKGROUND = bgnd,
-			FONT_FACE_NAME = "Arial",
-			FONT_HEIGHT = "15",
-			HINT = " " .. tostring(price) .. " " .. tostring(qty)
-			}
-	local res = AddLabel(id, label)
-	msg.data = res
-	return msg
-end
-
--- Удаляем выбранную метку
-function qsfunctions.delLabel(msg)
-	local tag, id = msg.data[1], msg.data[2]
-	DelLabel(tag, tonumber(id))
-	msg.data = ""
-	return msg
-end
-
--- Удаляем все метки с графика
-function qsfunctions.delAllLabels(msg)
-	local id = msg.data[1]
-	DelAllLabels(id)
-	msg.data = ""
-	return msg
+--- Функция возвращает системные дату и время с точностью до микросекунд. 
+function qsfunctions.sysdate(msg)
+    log(msg.data, 0)
+    msg.data = sysdate()
+    return msg
 end
 
 ---------------------
@@ -880,6 +787,108 @@ function qsfunctions.IsUcpClient(msg)
     local firmId, client = msg.data[1], msg.data[2]
     msg.data = isUcpClient(firmId, client)
     return msg
+end
+
+
+-------------------------
+---  Label functions  ---
+-------------------------
+function qsfunctions.addLabel(msg)
+	local price, curdate, curtime, qty, path, id, algmnt, bgnd = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7], msg.data[8]
+	label = {
+			TEXT = "",
+			IMAGE_PATH = path,
+			ALIGNMENT = algmnt,
+			YVALUE = tostring(price),
+			DATE = tostring(curdate),
+			TIME = tostring(curtime),
+			R = 255,
+			G = 255,
+			B = 255,
+			TRANSPARENCY = 0,
+			TRANSPARENT_BACKGROUND = bgnd,
+			FONT_FACE_NAME = "Arial",
+			FONT_HEIGHT = "15",
+			HINT = " " .. tostring(price) .. " " .. tostring(qty)
+			}
+	local res = AddLabel(id, label)
+	msg.data = res
+	return msg
+end
+
+-- Удаляем выбранную метку
+function qsfunctions.delLabel(msg)
+	local tag, id = msg.data[1], msg.data[2]
+	DelLabel(tag, tonumber(id))
+	msg.data = ""
+	return msg
+end
+
+-- Удаляем все метки с графика
+function qsfunctions.delAllLabels(msg)
+	local id = msg.data[1]
+	DelAllLabels(id)
+	msg.data = ""
+	return msg
+end
+
+---------------------
+-- Debug functions --
+---------------------
+
+--- Returns Pong to Ping
+-- @param msg message table
+-- @return same msg table
+function qsfunctions.ping(msg)
+    -- need to know data structure the caller gives
+    msg.t = 0 -- avoid time generation. Could also leave original
+    if msg.data == "Ping" then
+        msg.data = "Pong"
+        return msg
+    else
+        msg.data = msg.data .. " is not Ping"
+        return msg
+    end
+end
+
+--- Echoes its message
+function qsfunctions.echo(msg)
+    return msg
+end
+
+--- Test error handling
+function qsfunctions.divide_string_by_zero(msg)
+    msg.data = "asd" / 0
+    return msg
+end
+
+--- Is running inside quik
+function qsfunctions.is_quik(msg)
+    if getScriptPath then msg.data = 1 else msg.data = 0 end
+    return msg
+end
+
+
+-------------------------------
+
+function qsfunctions.dispatch_and_process(msg)
+    if qsfunctions[msg.n] then
+        -- dispatch a command simply by a table lookup
+        -- in qsfunctions method names must match commands
+        local status, result = pcall(qsfunctions[msg.n], msg)
+        if status then
+            return result
+        else
+            msg.n = "Error"
+            msg.error = "Lua error: " .. result
+            return msg
+        end
+    else
+		log(to_json(msg), 3)
+		msg.error = "Command not implemented in Lua qsfunctions module: " .. msg.n
+        msg.n = "Error"
+        return msg
+    end
 end
 
 return qsfunctions

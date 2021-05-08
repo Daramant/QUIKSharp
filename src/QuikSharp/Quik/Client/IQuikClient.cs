@@ -23,9 +23,22 @@ namespace QuikSharp.Quik.Client
 
         #endregion Events
 
+        /// <summary>
+        /// 
+        /// </summary>
         void Start();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         Task StopAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task WaitForConnectionAsync();
 
         Task<TResult> SendAsync<TResult>(ICommand request, TimeSpan? timeout = null)
             where TResult : class, IResult;

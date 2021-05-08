@@ -7,7 +7,7 @@ namespace QuikSharp.Quik.Functions.Services
     /// <summary>
     ///
     /// </summary>
-    public enum NotificationType
+    public enum IconType
     {
         /// <summary>
         ///

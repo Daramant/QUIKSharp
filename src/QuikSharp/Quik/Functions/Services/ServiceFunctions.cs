@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace QuikSharp.Quik.Functions.Services
 {
     /// <summary>
-    /// Service functions implementations
+    /// Сервисные функции.
     /// </summary>
     public class ServiceFunctions : FunctionsBase, IServiceFunctions
     {
@@ -25,15 +25,9 @@ namespace QuikSharp.Quik.Functions.Services
         { }
 
         /// <inheritdoc/>
-        public Task<string> GetWorkingFolderAsync()
+        public Task<bool> IsConnectedAsync(TimeSpan? timeout = null)
         {
-            return ExecuteCommandAsync<string, string>("getWorkingFolder", string.Empty);
-        }
-
-        /// <inheritdoc/>
-        public async Task<bool> IsConnectedAsync(TimeSpan? timeout = null)
-        {
-            return await ExecuteCommandAsync<string, string>("isConnected", string.Empty) == "1";
+            return ExecuteCommandAsync<string, bool>("isConnected", string.Empty);
         }
 
         /// <inheritdoc/>
@@ -43,21 +37,33 @@ namespace QuikSharp.Quik.Functions.Services
         }
 
         /// <inheritdoc/>
-        public Task<string> GetInfoParamAsync(InfoParams param)
+        public Task<string> GetInfoParamAsync(InfoParamName paramName)
         {
-            return ExecuteCommandAsync<string, string>("getInfoParam", TypeConverter.ToString(param));
+            return ExecuteCommandAsync<string, string>("getInfoParam", TypeConverter.ToString(paramName));
         }
 
         /// <inheritdoc/>
-        public Task MessageAsync(string message, NotificationType iconType = NotificationType.Info)
+        public Task<bool> MessageAsync(string message, IconType iconType = IconType.Info)
         {
-            return ExecuteCommandAsync<string>("message", new[] { message, TypeConverter.ToStringLookup((int)iconType) });
+            return ExecuteCommandAsync<bool>("message", new[] { message, TypeConverter.ToStringLookup((int)iconType) });
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetWorkingFolderAsync()
+        {
+            return ExecuteCommandAsync<string, string>("getWorkingFolder", string.Empty);
         }
 
         /// <inheritdoc/>
         public Task PrintDbgStrAsync(string message)
         {
             return ExecuteCommandAsync<string, string>("PrintDbgStr", message);
+        }
+
+        /// <inheritdoc/>
+        public Task<QuikDateTime> SysDateAsync()
+        {
+            return ExecuteCommandAsync<string, QuikDateTime>("sysdate", string.Empty);
         }
     }
 }

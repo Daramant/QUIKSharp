@@ -6,7 +6,7 @@ namespace QuikSharp.Quik.Functions.Services
     /// <summary>
     ///
     /// </summary>
-    public enum InfoParams
+    public enum InfoParamName
     {
         // ReSharper disable InconsistentNaming
         /// <summary>

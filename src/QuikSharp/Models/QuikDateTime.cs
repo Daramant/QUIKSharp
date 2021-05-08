@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2014-2020 QUIKSharp Authors https://github.com/finsight/QUIKSharp/blob/master/AUTHORS.md. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
+using Newtonsoft.Json;
 using System;
 
 namespace QuikSharp.DataStructures
@@ -12,50 +13,60 @@ namespace QuikSharp.DataStructures
     public class QuikDateTime
     {
         // ReSharper disable InconsistentNaming
+
         /// <summary>
         /// Микросекунды игнорируются в текущей версии.
         /// </summary>
-        public int mcs { get; set; }
+        [JsonProperty("mcs")]
+        public int Microsecond { get; set; }
 
         /// <summary>
-        ///
+        /// Миллисекунды.
         /// </summary>
-        public int ms { get; set; }
+        [JsonProperty("ms")]
+        public int Millisecond { get; set; }
 
         /// <summary>
-        ///
+        /// Секунды.
         /// </summary>
-        public int sec { get; set; }
+        [JsonProperty("sec")]
+        public int Second { get; set; }
 
         /// <summary>
-        ///
+        /// Минуты.
         /// </summary>
-        public int min { get; set; }
+        [JsonProperty("min")]
+        public int Minute { get; set; }
 
         /// <summary>
-        ///
+        /// Часы.
         /// </summary>
-        public int hour { get; set; }
+        [JsonProperty("hour")]
+        public int Hour { get; set; }
 
         /// <summary>
-        ///
+        /// День.
         /// </summary>
-        public int day { get; set; }
+        [JsonProperty("day")]
+        public int Day { get; set; }
 
         /// <summary>
-        /// Monday is 1
+        /// Номер дня недели (Monday is 1).
         /// </summary>
-        public int week_day { get; set; }
+        [JsonProperty("week_day")]
+        public int WeekDay { get; set; }
 
         /// <summary>
-        ///
+        /// Месяц.
         /// </summary>
-        public int month { get; set; }
+        [JsonProperty("month")]
+        public int Month { get; set; }
 
         /// <summary>
-        ///
+        /// Год.
         /// </summary>
-        public int year { get; set; }
+        [JsonProperty("year")]
+        public int Year { get; set; }
 
         // ReSharper restore InconsistentNaming
 
@@ -66,8 +77,7 @@ namespace QuikSharp.DataStructures
         /// <returns></returns>
         public static explicit operator DateTime(QuikDateTime qdt)
         {
-            var dt = new DateTime(qdt.year, qdt.month, qdt.day, qdt.hour, qdt.min, qdt.sec, qdt.ms);
-            return dt; //dt.AddTicks(qdt.mcs * 10);
+            return new DateTime(qdt.Year, qdt.Month, qdt.Day, qdt.Hour, qdt.Minute, qdt.Second, qdt.Millisecond);
         }
 
         /// <summary>
@@ -79,15 +89,15 @@ namespace QuikSharp.DataStructures
         {
             return new QuikDateTime
             {
-                year = dt.Year,
-                month = dt.Month,
-                day = dt.Day,
-                hour = dt.Hour,
-                min = dt.Minute,
-                sec = dt.Second,
-                ms = dt.Millisecond,
-                mcs = 0, // ((int)(dt.TimeOfDay.Ticks) - ((dt.Hour * 60 + dt.Minute) * 60 + dt.Second) * 1000 * 10000) / 10,
-                week_day = (int) dt.DayOfWeek
+                Year = dt.Year,
+                Month = dt.Month,
+                Day = dt.Day,
+                Hour = dt.Hour,
+                Minute = dt.Minute,
+                Second = dt.Second,
+                Millisecond = dt.Millisecond,
+                Microsecond = 0,
+                WeekDay = (int)dt.DayOfWeek
             };
         }
     }

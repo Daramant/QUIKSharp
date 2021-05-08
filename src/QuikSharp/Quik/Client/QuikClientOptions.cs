@@ -15,9 +15,9 @@ namespace QuikSharp.Quik.Client
 
         public Encoding Encoding { get; set; }
 
-        public TimeSpan ConnectTimeout { get; set; }
+        public TimeSpan ConnectionAttemptTimeout { get; set; }
 
-        public int ConnectAttemptCount { get; set; }
+        public int ConnectionAttemptCount { get; set; }
 
         public TimeSpan SendCommandTimeout { get; set; }
 
@@ -31,9 +31,9 @@ namespace QuikSharp.Quik.Client
                 CommandPort = 34130,
                 EventPort = 34131,
                 Encoding = Encoding.GetEncoding(1251),
-                ConnectTimeout = TimeSpan.FromMilliseconds(100),
-                ConnectAttemptCount = 0,
-                SendCommandTimeout = TimeSpan.Zero,
+                ConnectionAttemptTimeout = TimeSpan.FromMilliseconds(100),
+                ConnectionAttemptCount = 600,
+                SendCommandTimeout = TimeSpan.FromMinutes(1),
                 StopTimeout = TimeSpan.FromSeconds(5),
             };
         }

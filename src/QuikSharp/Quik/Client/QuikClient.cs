@@ -32,8 +32,8 @@ namespace QuikSharp.Quik.Client
 
         private IQuik _quik;
 
-        private readonly object _commandClientSyncRoot = new object();
-        private readonly object _eventClientSyncRoot = new object();
+        private readonly SemaphoreSlim _commandClientSemaphoreSlim = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _eventClientSemaphoreSlim = new SemaphoreSlim(1, 1);
 
         private TcpClient _commandClient;
         private TcpClient _eventClient;
@@ -100,46 +100,13 @@ namespace QuikSharp.Quik.Client
 
         #endregion
 
+        /// <inheritdoc/>
         public void SetEventSender(IQuik quik)
         {
             _quik = quik;
         }
-        
-        /// <summary>
-        ///
-        /// </summary>
-        public async Task StopAsync()
-        {
-            if (State == ClientState.Stopping || State == ClientState.Stopped)
-                return;
 
-            State = ClientState.Stopping;
-
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenRegistration.Dispose();
-
-            try
-            {
-                var stoppingTasks = Task.WhenAll(_commandTask, _resultTask, _eventReceiverTask, _eventInvokerTask);
-                await Task.WhenAny(stoppingTasks, Task.Delay(_options.StopTimeout));
-
-                if (!stoppingTasks.IsCompleted)
-                {
-                    _logger.LogWarning($"Не все задачи были отменены после остановки клиента (CommandTask: {_commandTask.Status}, ResultTask: {_resultTask.Status}, EventRecevierTask: {_eventReceiverTask.Status}, EventInvokerTask: {_eventInvokerTask.Status}, Timeout: {_options.StopTimeout}).");
-                }
-            }
-            finally
-            {
-                _pendingResultContainer.CancelAll();
-            }
-
-            State = ClientState.Stopped;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <exception cref="ApplicationException">Response message id does not exists in results dictionary</exception>
+        /// <inheritdoc/>
         public void Start()
         {
             if (State == ClientState.Starting || State == ClientState.Started)
@@ -174,14 +141,14 @@ namespace QuikSharp.Quik.Client
             State = ClientState.Started;
         }
 
-        private void SendCommandAction()
+        private async Task SendCommandAction()
         {
             try
             {
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {
                     _logger.LogTrace("Подключение к терминалу Quik для отправки команд...");
-                    ReconnectIfMissingConnection(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
+                    _commandClient = await ReconnectIfMissingConnectionAsync(_commandClient, _commandClientSemaphoreSlim, _cancellationTokenSource.Token);
                     _logger.LogTrace("Подключение к терминалу Quik для отправки команд установлено.");
                     
                     try
@@ -218,8 +185,8 @@ namespace QuikSharp.Quik.Client
 
                                     try
                                     {
-                                        writer.WriteLine(serializedCommandEnvelope);
-                                        writer.Flush();
+                                        await writer.WriteLineAsync(serializedCommandEnvelope);
+                                        await writer.FlushAsync();
                                     }
                                     catch (IOException)
                                     {
@@ -253,7 +220,7 @@ namespace QuikSharp.Quik.Client
             }
             finally
             {
-                CloseClient(ref _commandClient, _commandClientSyncRoot);
+                _commandClient = await CloseClientAsync(_commandClient, _commandClientSemaphoreSlim);
             }
         }
 
@@ -264,7 +231,7 @@ namespace QuikSharp.Quik.Client
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {
                     _logger.LogTrace("Подключение к терминалу Quik для получения результатов команд...");
-                    ReconnectIfMissingConnection(ref _commandClient, _commandClientSyncRoot, _cancellationTokenSource.Token);
+                    _commandClient = await ReconnectIfMissingConnectionAsync(_commandClient, _commandClientSemaphoreSlim, _cancellationTokenSource.Token);
                     _logger.LogTrace("Подключение к терминалу Quik для получения результатов команд установлено.");
 
                     try
@@ -323,7 +290,7 @@ namespace QuikSharp.Quik.Client
             }
             finally
             {
-                CloseClient(ref _commandClient, _commandClientSyncRoot);
+                _commandClient = await CloseClientAsync(_commandClient, _commandClientSemaphoreSlim);
             }
         }
 
@@ -334,7 +301,7 @@ namespace QuikSharp.Quik.Client
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {
                     _logger.LogTrace("Подключение к терминалу Quik для получения событий...");
-                    ReconnectIfMissingConnection(ref _eventClient, _eventClientSyncRoot, _cancellationTokenSource.Token);
+                    _eventClient = await ReconnectIfMissingConnectionAsync(_eventClient, _eventClientSemaphoreSlim, _cancellationTokenSource.Token);
                     _logger.LogTrace("Подключение к терминалу Quik для получения событий установлено.");
                     
                     OnConnected(_options.CommandPort);
@@ -383,7 +350,7 @@ namespace QuikSharp.Quik.Client
             }
             finally
             {
-                CloseClient(ref _eventClient, _eventClientSyncRoot);
+                _eventClient = await CloseClientAsync(_eventClient, _eventClientSemaphoreSlim);
                 OnDisconnected();
             }
         }
@@ -458,6 +425,42 @@ namespace QuikSharp.Quik.Client
         }
 
         /// <inheritdoc/>
+        public async Task StopAsync()
+        {
+            if (State == ClientState.Stopping || State == ClientState.Stopped)
+                return;
+
+            State = ClientState.Stopping;
+
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenRegistration.Dispose();
+
+            try
+            {
+                var stoppingTasks = Task.WhenAll(_commandTask, _resultTask, _eventReceiverTask, _eventInvokerTask);
+                await Task.WhenAny(stoppingTasks, Task.Delay(_options.StopTimeout));
+
+                if (!stoppingTasks.IsCompleted)
+                {
+                    _logger.LogWarning($"Не все задачи были отменены после остановки клиента (CommandTask: {_commandTask.Status}, ResultTask: {_resultTask.Status}, EventRecevierTask: {_eventReceiverTask.Status}, EventInvokerTask: {_eventInvokerTask.Status}, Timeout: {_options.StopTimeout}).");
+                }
+            }
+            finally
+            {
+                _pendingResultContainer.CancelAll();
+            }
+
+            State = ClientState.Stopped;
+        }
+
+        /// <inheritdoc/>
+        public async Task WaitForConnectionAsync()
+        {
+            _commandClient = await ReconnectIfMissingConnectionAsync(_commandClient, _commandClientSemaphoreSlim, _cancellationTokenSource.Token);
+            _eventClient = await ReconnectIfMissingConnectionAsync(_eventClient, _eventClientSemaphoreSlim, _cancellationTokenSource.Token);
+        }
+
+        /// <inheritdoc/>
         public async Task<TResult> SendAsync<TResult>(ICommand command, TimeSpan? timeout = null)
             where TResult : class, IResult
         {
@@ -507,15 +510,19 @@ namespace QuikSharp.Quik.Client
             }
         }
 
-        private void ReconnectIfMissingConnection(ref TcpClient tcpClient, object syncRoot, CancellationToken cancellationToken)
+        private async Task<TcpClient> ReconnectIfMissingConnectionAsync(TcpClient tcpClient, SemaphoreSlim semaphoreSlim, CancellationToken cancellationToken)
         {
-            lock (syncRoot)
+            if (tcpClient?.Client.IsConnected() == true)
+                return tcpClient;
+
+            await semaphoreSlim.WaitAsync(cancellationToken);
+            try
             {
                 if (tcpClient?.Client.IsConnected() == true)
-                    return;
+                    return tcpClient;
 
                 var attemptCount = 0;
-                var maxAttemptCount = _options.ConnectAttemptCount;
+                var maxAttemptCount = _options.ConnectionAttemptCount;
                 
                 if (tcpClient == null)
                 {
@@ -532,7 +539,7 @@ namespace QuikSharp.Quik.Client
                     cancellationToken.ThrowIfCancellationRequested();
                     try
                     {
-                        _commandClient.Connect(_options.Host, _options.CommandPort);
+                        await _commandClient.ConnectAsync(_options.Host, _options.CommandPort);
                         isConnected = true;
                     }
                     catch
@@ -542,7 +549,7 @@ namespace QuikSharp.Quik.Client
                         if (maxAttemptCount > 0 && attemptCount >= maxAttemptCount)
                             throw new QuikSharpException($"Не удалось подключиться к '{_options.Host}:{_options.CommandPort}' за {maxAttemptCount} попыток.");
 
-                        Thread.Sleep(_options.ConnectTimeout);
+                        await Task.Delay(_options.ConnectionAttemptTimeout);
 
                         if (attemptCount % 10 == 0)
                         {
@@ -550,22 +557,35 @@ namespace QuikSharp.Quik.Client
                         }
                     }
                 }
+
+                return tcpClient;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
             }
         }
 
-        private void CloseClient(ref TcpClient tcpClient, object syncRoot)
+        private async Task<TcpClient> CloseClientAsync(TcpClient tcpClient, SemaphoreSlim semaphoreSlim)
         {
             if (tcpClient == null)
-                return;
+                return tcpClient;
 
-            lock (syncRoot)
+            await semaphoreSlim.WaitAsync();
+            try
             {
                 if (tcpClient == null)
-                    return;
+                    return tcpClient;
 
                 tcpClient.Client.Shutdown(SocketShutdown.Both);
                 tcpClient.Close();
                 tcpClient = null; // У нас два потока работают с одним сокетом, но только один из них должен его закрыть.
+
+                return tcpClient;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
             }
         }
     }

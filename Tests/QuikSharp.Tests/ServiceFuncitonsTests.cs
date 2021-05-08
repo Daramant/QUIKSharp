@@ -37,7 +37,7 @@ namespace QuikSharp.Tests
         [Test]
         public void GetInfoParam()
         {
-            var values = Enum.GetValues(typeof(InfoParams)).Cast<InfoParams>().ToArray();
+            var values = Enum.GetValues(typeof(InfoParamName)).Cast<InfoParamName>().ToArray();
             foreach (var value in values)
             {
                 Console.WriteLine(value
@@ -48,9 +48,9 @@ namespace QuikSharp.Tests
         [Test]
         public async Task Message()
         {
-            await Quik.Functions.Service.MessageAsync("This is a message", NotificationType.Info);
-            await Quik.Functions.Service.MessageAsync("This is a warning", NotificationType.Warning);
-            await Quik.Functions.Service.MessageAsync("This is an error", NotificationType.Error);
+            await Quik.Functions.Service.MessageAsync("This is a message", IconType.Info);
+            await Quik.Functions.Service.MessageAsync("This is a warning", IconType.Warning);
+            await Quik.Functions.Service.MessageAsync("This is an error", IconType.Error);
         }
 
         [Test]
