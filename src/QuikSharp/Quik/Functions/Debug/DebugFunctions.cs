@@ -21,7 +21,7 @@ namespace QuikSharp.Quik.Functions.Debug
         private class PingRequest : Command<string>
         {
             public PingRequest()
-                : base("Ping", "ping", null)
+                : base("Ping", "ping")
             {
             }
         }

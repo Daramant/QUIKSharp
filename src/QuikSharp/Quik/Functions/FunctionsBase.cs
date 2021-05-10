@@ -29,14 +29,14 @@ namespace QuikSharp.Quik.Functions
             TypeConverter = typeConverter;
         }
 
-        protected Task<TResult> ExecuteCommandAsync<TResult>(string name, string[] data = null, DateTime? validUntil = null, TimeSpan? timeout = null)
+        protected Task<TResult> ExecuteCommandAsync<TResult>(string name, string[] data = null, TimeSpan? timeout = null)
         {
-            return ExecuteCommandAsync<string[], TResult>(name, data, validUntil, timeout);
+            return ExecuteCommandAsync<string[], TResult>(name, data, timeout);
         }
 
-        protected async Task<TResult> ExecuteCommandAsync<TData, TResult>(string name, TData data = default, DateTime? validUntil = null, TimeSpan? timeout = null)
+        protected async Task<TResult> ExecuteCommandAsync<TData, TResult>(string name, TData data = default, TimeSpan? timeout = null)
         {
-            var command = MessageFactory.CreateCommand(name, data, validUntil);
+            var command = MessageFactory.CreateCommand(name, data);
             var response = await QuikClient.SendAsync<IResult<TResult>>(command, timeout).ConfigureAwait(false);
             return response.Data;
         }

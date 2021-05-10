@@ -80,14 +80,14 @@ namespace QuikSharp.Quik.Functions.Workplace
         public Task<ParamTable> GetParamExAsync(string classCode, string secCode, ParamName paramName, TimeSpan? timeout = null)
         {
             return ExecuteCommandAsync<ParamTable>("getParamEx", 
-                new[] { classCode, secCode, TypeConverter.ToString(paramName) }, timeout: timeout);
+                new[] { classCode, secCode, TypeConverter.ToString(paramName) }, timeout);
         }
 
         /// <inheritdoc/>
         public Task<ParamTable> GetParamEx2Async(string classCode, string secCode, ParamName paramName, TimeSpan? timeout = null)
         {
             return ExecuteCommandAsync<ParamTable>("getParamEx2", 
-                new[] { classCode, secCode, TypeConverter.ToString(paramName) }, timeout: timeout);
+                new[] { classCode, secCode, TypeConverter.ToString(paramName) }, timeout);
         }
 
         /// <inheritdoc/>

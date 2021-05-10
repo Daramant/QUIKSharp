@@ -25,7 +25,6 @@ namespace QuikSharp.Quik.Client
     {
         private readonly IEventInvoker _eventInvoker;
         private readonly ISerializer _serializer;
-        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPendingResultContainer _pendingResultContainer;
         private readonly QuikClientOptions _options;
         private readonly ILogger<QuikClient> _logger;
@@ -63,14 +62,12 @@ namespace QuikSharp.Quik.Client
         public QuikClient(
             IEventInvoker eventInvoker,
             ISerializer serializer,
-            IDateTimeProvider dateTimeProvider,
             IPendingResultContainer pendingResultContainer,
             QuikClientOptions options,
             ILogger<QuikClient> logger)
         {
             _eventInvoker = eventInvoker;
             _serializer = serializer;
-            _dateTimeProvider = dateTimeProvider;
             _pendingResultContainer = pendingResultContainer;
             _options = options;
             _logger = logger;
@@ -165,38 +162,21 @@ namespace QuikSharp.Quik.Client
                                     _logger.LogWarning($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {command.Id}.");
                                 }
 
-                                var utcNow = _dateTimeProvider.UtcNow;
+                                var serializedCommandEnvelope = _serializer.Serialize(command);
 
-                                if (command.ValidUntil < utcNow)
+                                try
                                 {
-                                    if (_pendingResultContainer.TryRemove(command.Id, out pendingResult))
-                                    {
-                                        pendingResult.TaskCompletionSource.SetException(
-                                            new CommandTimeoutException($"Результат выполнения команды с идентификатором: {command.Id} получен в: '{utcNow}' после крайнего срока: '{pendingResult.Command.ValidUntil}'."));
-                                    }
-                                    else
-                                    {
-                                        _logger.LogWarning($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {command.Id}.");
-                                    }
+                                    await writer.WriteLineAsync(serializedCommandEnvelope);
+                                    await writer.FlushAsync();
                                 }
-                                else
+                                catch (IOException)
                                 {
-                                    var serializedCommandEnvelope = _serializer.Serialize(command);
+                                    // При ошибке ввода/вывода (например при перезапуске терминала Quik или остановке скрипта)
+                                    // возвращаем команду обратно в очередь, чтобы отправить повторно после установки
+                                    // соединения с терминалом Quik.
+                                    _commandEnvelopeQueue.Add(command);
 
-                                    try
-                                    {
-                                        await writer.WriteLineAsync(serializedCommandEnvelope);
-                                        await writer.FlushAsync();
-                                    }
-                                    catch (IOException)
-                                    {
-                                        // При ошибке ввода/вывода (например при перезапуске терминала Quik или остановке скрипта)
-                                        // возвращаем команду обратно в очередь, чтобы отправить повторно после установки
-                                        // соединения с терминалом Quik.
-                                        _commandEnvelopeQueue.Add(command);
-
-                                        throw;
-                                    }
+                                    throw;
                                 }
                             }
                         }
@@ -400,16 +380,7 @@ namespace QuikSharp.Quik.Client
 
             if (envelope.Header.Status == ResultStatus.Ok)
             {
-                var utcNow = _dateTimeProvider.UtcNow;
-                if (pendingResult.Command.ValidUntil < utcNow)
-                {
-                    pendingResult.TaskCompletionSource.SetException(
-                        new CommandTimeoutException($"Результат выполнения команды с идентификатором: {envelope.Header.CommandId} получен в: {utcNow} после крайнего срока: {pendingResult.Command.ValidUntil}."));
-                }
-                else
-                {
-                    pendingResult.TaskCompletionSource.SetResult(envelope.Body);
-                }
+                pendingResult.TaskCompletionSource.SetResult(envelope.Body);
             }
             else
             {

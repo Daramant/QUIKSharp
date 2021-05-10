@@ -18,9 +18,9 @@ namespace QuikSharp.Messages
             _dateTimeProvider = dateTimeProvider;
         }
 
-        public ICommand<T> CreateCommand<T>(string name, T data = default, DateTime? validUntil = null)
+        public ICommand<T> CreateCommand<T>(string name, T data = default)
         {
-            var command = new Command<T>(name, data, validUntil);
+            var command = new Command<T>(name, data);
 
             command.Id = _idProvider.GetUniqueCommandId();
             command.CreatedTime = _dateTimeProvider.NowInMilliseconds;

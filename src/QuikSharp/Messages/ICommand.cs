@@ -15,11 +15,6 @@ namespace QuikSharp.Messages
         /// A name of a function to call for requests
         /// </summary>
         string Name { get; set; }
-
-        /// <summary>
-        /// Some messages are valid only for a short time, e.g. buy/sell orders
-        /// </summary>
-        DateTime? ValidUntil { get; set; }
     }
 
     public interface ICommand<T> : IMessage<T>, ICommand

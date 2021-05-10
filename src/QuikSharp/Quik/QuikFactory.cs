@@ -45,8 +45,8 @@ namespace QuikSharp.Quik
 
             var quikEvents = new QuikEvents();
             var eventHandler = new EventInvoker(quikEvents);
-            var quikClient = new QuikClient(eventHandler, serializer, dateTimeProvider, 
-                pendingResultContainer, options, _loggerFactory.CreateLogger<QuikClient>());
+            var quikClient = new QuikClient(eventHandler, serializer, pendingResultContainer, options, 
+                _loggerFactory.CreateLogger<QuikClient>());
 
             var tradingFunctions = new TradingFunctions(messageFactory, quikClient, typeConverter, persistentStorage, idProvider);
 

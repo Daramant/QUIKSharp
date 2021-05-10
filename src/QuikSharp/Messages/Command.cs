@@ -17,22 +17,15 @@ namespace QuikSharp.Messages
         [JsonProperty(PropertyName = "n")]
         public string Name { get; set; }
 
-        /// <summary>
-        /// Some messages are valid only for a short time, e.g. buy/sell orders
-        /// </summary>
-        [JsonProperty(PropertyName = "v")]
-        public DateTime? ValidUntil { get; set; }
-
         public Command()
             : base()
         {
         }
 
-        public Command(string name, T data, DateTime? validUntil = null)
+        public Command(string name, T data)
             : base(data)
         {
             Name = name;
-            ValidUntil = validUntil;
         }
     }
 }

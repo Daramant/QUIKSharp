@@ -6,6 +6,6 @@ namespace QuikSharp.Messages
 {
     public interface IMessageFactory
     {
-        ICommand<T> CreateCommand<T>(string name, T data = default(T), DateTime? validUntil = null);
+        ICommand<T> CreateCommand<T>(string name, T data = default(T));
     }
 }
