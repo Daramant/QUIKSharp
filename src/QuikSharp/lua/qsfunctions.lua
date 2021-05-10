@@ -4,35 +4,35 @@
 local json = require ("dkjson")
 local qsfunctions = {}
 
------------------------
--- Service functions --
------------------------
+---------------------------------
+-- Сервисные функции (Service functions)
+---------------------------------
 
---- Функция предназначена для определения состояния подключения клиентского места к
---- серверу. Возвращает «1», если клиентское место подключено и «0», если не подключено.
+-- Функция предназначена для определения состояния подключения клиентского места к
+-- серверу. Возвращает «1», если клиентское место подключено и «0», если не подключено.
 function qsfunctions.isConnected(msg)
     msg.t = timemsec()
     msg.data = isConnected() == 1
     return msg
 end
 
---- Функция возвращает путь, по которому находится запускаемый скрипт, без завершающего
---- обратного слэша («\»). Например, C:\QuikFront\Scripts.
+--Функция возвращает путь, по которому находится запускаемый скрипт, без завершающего
+-- обратного слэша («\»). Например, C:\QuikFront\Scripts.
 function qsfunctions.getScriptPath(msg)
     msg.t = timemsec()
     msg.data = getScriptPath()
     return msg
 end
 
---- Функция возвращает значения параметров информационного окна (пункт меню
---- Связь / Информационное окно…).
+-- Функция возвращает значения параметров информационного окна (пункт меню
+-- Связь / Информационное окно…).
 function qsfunctions.getInfoParam(msg)
     msg.t = timemsec()
     msg.data = getInfoParam(msg.data)
     return msg
 end
 
---- Функция отображает сообщения в терминале QUIK.
+-- Функция отображает сообщения в терминале QUIK.
 function qsfunctions.message(msg)
 	local text, level = msg.data[1], msg.data[2]
     log(text, level)
@@ -40,14 +40,14 @@ function qsfunctions.message(msg)
     return msg
 end
 
---- Функция приостанавливает выполнение скрипта.
+-- Функция приостанавливает выполнение скрипта.
 function qsfunctions.sleep(msg)
     delay(msg.data)
     msg.data = ""
     return msg
 end
 
---- Функция возвращает путь, по которому находится файл info.exe, исполняющий данный
+-- Функция возвращает путь, по которому находится файл info.exe, исполняющий данный
 -- скрипт, без завершающего обратного слэша («\»). Например, C:\QuikFront.
 function qsfunctions.getWorkingFolder(msg)
     msg.t = timemsec()
@@ -55,14 +55,14 @@ function qsfunctions.getWorkingFolder(msg)
     return msg
 end
 
---- Функция для вывода отладочной информации.
+-- Функция для вывода отладочной информации.
 function qsfunctions.PrintDbgStr(msg)
     log(msg.data, 0)
     msg.data = ""
     return msg
 end
 
---- Функция возвращает системные дату и время с точностью до микросекунд. 
+-- Функция возвращает системные дату и время с точностью до микросекунд. 
 function qsfunctions.sysdate(msg)
     log(msg.data, 0)
     msg.data = sysdate()
@@ -70,37 +70,407 @@ function qsfunctions.sysdate(msg)
 end
 
 ---------------------
--- Class functions --
+-- Функции для обращения к строкам произвольных таблиц QUIK (TableRow functions)
 ---------------------
 
---- Функция предназначена для получения списка кодов классов, переданных с сервера в ходе сеанса связи.
+-- TODO:
+
+---------------------
+-- Функции для обращения к спискам доступных параметров (Class  functions)
+---------------------
+
+-- Функция предназначена для получения списка кодов классов, переданных с сервера в ходе сеанса связи.
 function qsfunctions.getClassesList(msg)
     msg.data = getClassesList()
---    if  msg.data then log(msg.data) else log("getClassesList returned nil") end
     return msg
 end
 
---- Функция предназначена для получения информации о классе.
+-- Функция предназначена для получения информации о классе.
 function qsfunctions.getClassInfo(msg)
     msg.data = getClassInfo(msg.data)
---    if msg.data then log(msg.data.name) else log("getClassInfo  returned nil") end
     return msg
 end
 
---- Функция предназначена для получения списка кодов бумаг для списка классов, заданного списком кодов.
+-- Функция предназначена для получения списка кодов бумаг для списка классов, заданного списком кодов.
 function qsfunctions.getClassSecurities(msg)
     msg.data = getClassSecurities(msg.data)
---    if msg.data then log(msg.data) else log("getClassSecurities returned nil") end
     return msg
 end
 
---- Функция получает информацию по указанному классу и бумаге.
-function qsfunctions.getSecurityInfo(msg)
+-------------------------
+-- Функции взаимодействия скрипта Lua и Рабочего места QUIK (Workstation functions)
+-------------------------
+
+-- Функция предназначена для получения информации по денежным позициям. 
+function qsfunctions.getMoney(msg)
+    local client_code, firm_id, tag, curr_code = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
+    msg.data = getMoney(client_code, firm_id, tag, curr_code)
+    return msg
+end
+
+-- Функция предназначена для получения информации по денежным позициям указанного типа.
+function qsfunctions.getMoneyEx(msg)
+    local firm_id, client_code, tag, curr_code, limit_kind = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5]
+    msg.data = getMoneyEx(firm_id, client_code, tag, curr_code, tonumber(limit_kind))
+    return msg
+end
+
+-- Функция предназначена для получения позиций по инструментам. 
+function qsfunctions.getDepo(msg)
+    local clientCode, firmId, secCode, account = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
+    msg.data = getDepo(clientCode, firmId, secCode, account)
+    return msg
+end
+
+-- Функция предназначена для получения позиций по инструментам указанного типа.
+function qsfunctions.getDepoEx(msg)
+    local firmId, clientCode, secCode, account, limit_kind = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5]
+    msg.data = getDepoEx(firmId, clientCode, secCode, account, tonumber(limit_kind))
+    return msg
+end
+
+-- Функция предназначена для получения информации по фьючерсным лимитам.
+function qsfunctions.getFuturesLimit(msg)
+    local firmId, accId, limitType, currCode = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
+	local result, err = getFuturesLimit(firmId, accId, limitType*1, currCode)
+	if result then
+		msg.data = result
+	else
+		log("Futures limit returns nil", 3)
+		msg.data = nil
+	end
+    return msg
+end
+
+-- Функция предназначена для получения информации по фьючерсным позициям.
+function qsfunctions.getFuturesHolding(msg)
     
+    local firmId, accId, secCode, posType = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
+	local result, err = getFuturesHolding(firmId, accId, secCode, posType*1)
+	if result then
+		msg.data = result
+	else
+		--log("Futures holding returns nil", 3)
+		msg.data = nil
+	end
+    return msg
+end
+
+-- Функция предназначена для получения информации по инструменту.
+function qsfunctions.getSecurityInfo(msg)
     local class_code, sec_code = msg.data[1], msg.data[2]
     msg.data = getSecurityInfo(class_code, sec_code)
     return msg
 end
+
+-- Функция возвращает дату текущей торговой сессии. 
+function qsfunctions.getTradeDate(msg)
+    msg.data = getTradeDate()
+    return msg
+end
+
+-- Функция предназначена для получения стакана по указанному классу и инструменту.
+function qsfunctions.getQuoteLevel2(msg)
+    
+    local class_code, sec_code = msg.data[1], msg.data[2]
+    local server_time = getInfoParam("SERVERTIME")
+    local status, ql2 = pcall(getQuoteLevel2, class_code, sec_code)
+    if status then
+        msg.data				= ql2
+        msg.data.class_code		= class_code
+        msg.data.sec_code		= sec_code
+        msg.data.server_time	= server_time
+        sendCallback(msg)
+    else
+        OnError(ql2)
+    end
+    return msg
+end
+
+--
+-- Функции получения значений таблицы «Текущие торги».
+-- 
+
+-- Функция предназначена для получения значений всех параметров биржевой информации из таблицы «Текущие торги». 
+-- С помощью этой функции можно получить любое из значений Таблицы текущих торгов для заданных кодов класса и инструмента.
+function qsfunctions.getParamEx(msg)
+    local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
+    msg.data = getParamEx(class_code, sec_code, param_name)
+    return msg
+end
+
+-- Функция предназначена для получения значений всех параметров биржевой информации из Таблицы текущих торгов с возможностью 
+-- в дальнейшем отказаться от получения определенных параметров, заказанных с помощью функции ParamRequest. 
+-- Для отказа от получения какого-либо параметра воспользуйтесь функцией CancelParamRequest. 
+function qsfunctions.getParamEx2(msg)
+    local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
+    msg.data = getParamEx2(class_code, sec_code, param_name)
+    return msg
+end
+
+-- Функция принимает список строк (JSON Array) в формате class_code|sec_code|param_name и возвращает результаты вызова
+-- функции getParamEx2 для каждой строки запроса в виде списка в таком же порядке, как в запросе
+function qsfunctions.getParamEx2Bulk(msg)
+	local result = {}
+	for i=1,#msg.data do
+		local spl = msg.data[i]
+		local class_code, sec_code, param_name = spl[1], spl[2], spl[3]
+		table.insert(result, getParamEx2(class_code, sec_code, param_name))
+	end
+	msg.data = result
+    return msg
+end
+
+--
+
+-- Функция предназначена для отправки транзакций в торговую систему.
+-- Функция отправляет транзакцию на сервер QUIK. В случае ошибки обработки транзакции в терминале QUIK возвращает 
+-- строку с диагностикой ошибки. В остальных случаях транзакция отправляется на сервер. 
+-- Результат транзакции можно получить, воспользовавшись функцией обратного вызова OnTransReply.
+
+-- отправляет транзакцию на сервер и возвращает пустое сообщение, которое
+-- будет проигноировано. Вместо него, отправитель будет ждать события
+-- OnTransReply, из которого по TRANS_ID он получит результат отправленной транзакции
+function qsfunctions.sendTransaction(msg)
+    local res = sendTransaction(msg.data)
+    if res~="" then
+        -- error handling
+        msg.n = "lua_transaction_error"
+        msg.error = res
+        return msg
+    else
+        -- transaction sent
+        msg.data = true
+        return msg
+    end
+end
+
+-- Функция предназначена для получения значений параметров таблицы «Клиентский портфель», соответствующих идентификатору 
+-- участника торгов «firmid» и коду клиента «client_code». 
+function qsfunctions.getPortfolioInfo(msg)
+    
+    local firmId, clientCode = msg.data[1], msg.data[2]
+    msg.data = getPortfolioInfo(firmId, clientCode)
+    return msg
+end
+
+-- Функция предназначена для получения значений параметров таблицы «Клиентский портфель», соответствующих идентификатору 
+-- участника торгов «firmid», коду клиента «client_code» и сроку расчётов «limit_kind». 
+function qsfunctions.getPortfolioInfoEx(msg)
+    
+    local firmId, clientCode, limit_kind = msg.data[1], msg.data[2], msg.data[3]
+    msg.data = getPortfolioInfoEx(firmId, clientCode, tonumber(limit_kind))
+    return msg
+end
+
+--
+-- Функции получения информации по единой денежной позиции.
+--
+
+-- Функция возвращает торговый счет срочного рынка, соответствующий коду клиента фондового рынка с единой денежной позицией
+function qsfunctions.getTrdAccByClientCode(msg)
+    
+    local firmId, clientCode = msg.data[1], msg.data[2]
+    msg.data = getTrdAccByClientCode(firmId, clientCode)
+    return msg
+end
+
+-- Функция возвращает код клиента фондового рынка с единой денежной позицией, соответствующий торговому счету срочного рынка
+function qsfunctions.getClientCodeByTrdAcc(msg)
+    
+    local firmId, trdAccId = msg.data[1], msg.data[2]
+    msg.data = getClientCodeByTrdAcc(firmId, trdAccId)
+    return msg
+end
+
+-- Функция предназначена для получения признака, указывающего имеет ли клиент единую денежную позицию
+function qsfunctions.isUcpClient(msg)
+    
+    local firmId, client = msg.data[1], msg.data[2]
+    msg.data = isUcpClient(firmId, client)
+    return msg
+end
+
+---------------------
+-- Функции для работы с таблицами Рабочего места QUIK (Table functions)
+---------------------
+
+-- TODO:
+
+
+-------------------------
+-- Функции для работы с метками (Label functions)
+-------------------------
+
+-- Добавляет метку с заданными параметрами. 
+function qsfunctions.addLabel(msg)
+	local price, curdate, curtime, qty, path, id, algmnt, bgnd = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7], msg.data[8]
+	label = {
+			TEXT = "",
+			IMAGE_PATH = path,
+			ALIGNMENT = algmnt,
+			YVALUE = tostring(price),
+			DATE = tostring(curdate),
+			TIME = tostring(curtime),
+			R = 255,
+			G = 255,
+			B = 255,
+			TRANSPARENCY = 0,
+			TRANSPARENT_BACKGROUND = bgnd,
+			FONT_FACE_NAME = "Arial",
+			FONT_HEIGHT = "15",
+			HINT = " " .. tostring(price) .. " " .. tostring(qty)
+			}
+	local res = AddLabel(id, label)
+	msg.data = res
+	return msg
+end
+
+-- Удаляет метку с заданными параметрами. 
+function qsfunctions.delLabel(msg)
+	local tag, id = msg.data[1], msg.data[2]
+	DelLabel(tag, tonumber(id))
+	msg.data = ""
+	return msg
+end
+
+-- Команда удаляет все метки на диаграмме с указанным графиком.
+function qsfunctions.delAllLabels(msg)
+	local id = msg.data[1]
+	DelAllLabels(id)
+	msg.data = ""
+	return msg
+end
+
+---------------------
+-- Функции для заказа стакана котировок (OrderBook functions)
+---------------------
+
+-- Функция заказывает на сервер получение стакана по указанному классу и инструменту.
+function qsfunctions.Subscribe_Level_II_Quotes(msg)
+    local class_code, sec_code = msg.data[1], msg.data[2]
+    msg.data = Subscribe_Level_II_Quotes(class_code, sec_code)
+    return msg
+end
+
+-- Функция отменяет заказ на получение с сервера стакана по указанному классу и инструменту.
+function qsfunctions.Unsubscribe_Level_II_Quotes(msg)
+    local class_code, sec_code = msg.data[1], msg.data[2]
+    msg.data = Unsubscribe_Level_II_Quotes(class_code, sec_code)
+    return msg
+end
+
+-- Функция позволяет узнать, заказан ли с сервера стакан по указанному классу и инструменту.
+function qsfunctions.IsSubscribed_Level_II_Quotes(msg)
+    local class_code, sec_code = msg.data[1], msg.data[2]
+    msg.data = IsSubscribed_Level_II_Quotes(class_code, sec_code)
+    return msg
+end
+
+---------------------
+-- Функции для заказа параметров Таблицы текущих торгов (QuotesTableParameters functions)
+---------------------
+
+-- Функция заказывает получение параметров Таблицы текущих торгов. 
+-- В случае успешного завершения функция возвращает «true», иначе – «false»
+function qsfunctions.paramRequest(msg)
+    
+    local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
+    msg.data = ParamRequest(class_code, sec_code, param_name)
+    return msg
+end
+
+-- Функция принимает список строк (JSON Array) в формате class_code|sec_code|param_name, вызывает функцию paramRequest для каждой строки.
+-- Возвращает список ответов в том же порядке
+function qsfunctions.paramRequestBulk(msg)
+	local result = {}
+	for i=1,#msg.data do
+		local spl = msg.data[i]
+		local class_code, sec_code, param_name = spl[1], spl[2], spl[3]
+		table.insert(result, ParamRequest(class_code, sec_code, param_name))
+	end
+	msg.data = result
+	return msg
+end
+
+-- Функция отменяет заказ на получение параметров Таблицы текущих торгов. 
+-- В случае успешного завершения функция возвращает «true», иначе – «false»
+function qsfunctions.cancelParamRequest(msg)
+    
+    local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
+    msg.data = CancelParamRequest(class_code, sec_code, param_name)
+    return msg
+end
+
+--- Функция принимает список строк (JSON Array) в формате class_code|sec_code|param_name, вызывает функцию CancelParamRequest для каждой строки.
+-- Возвращает список ответов в том же порядке
+function qsfunctions.cancelParamRequestBulk(msg)
+	local result = {}
+	for i=1,#msg.data do
+		local spl = msg.data[i]
+		local class_code, sec_code, param_name = spl[1], spl[2], spl[3]
+		table.insert(result, CancelParamRequest(class_code, sec_code, param_name))
+	end
+	msg.data = result
+	return msg
+end
+
+---------------------
+-- Функции для отладки работы QuikSharp (Debug functions)
+---------------------
+
+--- Returns Pong to Ping
+-- @param msg message table
+-- @return same msg table
+function qsfunctions.ping(msg)
+    -- need to know data structure the caller gives
+    msg.t = 0 -- avoid time generation. Could also leave original
+    if msg.data == "Ping" then
+        msg.data = "Pong"
+        return msg
+    else
+        msg.data = msg.data .. " is not Ping"
+        return msg
+    end
+end
+
+--- Echoes its message
+function qsfunctions.echo(msg)
+    return msg
+end
+
+--- Test error handling
+function qsfunctions.divide_string_by_zero(msg)
+    msg.data = "asd" / 0
+    return msg
+end
+
+--- Is running inside quik
+function qsfunctions.is_quik(msg)
+    if getScriptPath then msg.data = 1 else msg.data = 0 end
+    return msg
+end
+
+---------------------
+--  ()
+---------------------
+
+
+
+
+
+
+-- ========================================================================================================
+
+
+
+-------------------------
+-- Функции взаимодействия скрипта Lua и Рабочего места QUIK (Workstation functions)
+-------------------------
+
+
+
+
 
 --- Функция берет на вход список из элементов в формате class_code|sec_code и возвращает список ответов функции getSecurityInfo. 
 -- Если какая-то из бумаг не будет найдена, вместо ее значения придет null
@@ -182,175 +552,23 @@ end
 -- Order Book functions (Р¤СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃРѕ СЃС‚Р°РєР°РЅРѕРј РєРѕС‚РёСЂРѕРІРѕРє) --
 ---------------------------------------------------------------------
 
---- Функция заказывает на сервер получение стакана по указанному классу и бумаге.
-function qsfunctions.Subscribe_Level_II_Quotes(msg)
-    
-    local class_code, sec_code = msg.data[1], msg.data[2]
-    msg.data = Subscribe_Level_II_Quotes(class_code, sec_code)
-    return msg
-end
 
---- Функция отменяет заказ на получение с сервера стакана по указанному классу и бумаге.
-function qsfunctions.Unsubscribe_Level_II_Quotes(msg)
-    
-    local class_code, sec_code = msg.data[1], msg.data[2]
-    msg.data = Unsubscribe_Level_II_Quotes(class_code, sec_code)
-    return msg
-end
 
---- Функция позволяет узнать, заказан ли с сервера стакан по указанному классу и бумаге.
-function qsfunctions.IsSubscribed_Level_II_Quotes(msg)
-    
-    local class_code, sec_code = msg.data[1], msg.data[2]
-    msg.data = IsSubscribed_Level_II_Quotes(class_code, sec_code)
-    return msg
-end
 
---- Функция предназначена для получения стакана по указанному классу и инструменту.
-function qsfunctions.GetQuoteLevel2(msg)
-    
-    local class_code, sec_code = msg.data[1], msg.data[2]
-    local server_time = getInfoParam("SERVERTIME")
-    local status, ql2 = pcall(getQuoteLevel2, class_code, sec_code)
-    if status then
-        msg.data				= ql2
-        msg.data.class_code		= class_code
-        msg.data.sec_code		= sec_code
-        msg.data.server_time	= server_time
-        sendCallback(msg)
-    else
-        OnError(ql2)
-    end
-    return msg
-end
 
 -----------------------
 -- Trading functions --
 -----------------------
 
---- отправляет транзакцию на сервер и возвращает пустое сообщение, которое
--- будет проигноировано. Вместо него, отправитель будет ждать события
--- OnTransReply, из которого по TRANS_ID он получит результат отправленной транзакции
-function qsfunctions.sendTransaction(msg)
-    local res = sendTransaction(msg.data)
-    if res~="" then
-        -- error handling
-        msg.n = "lua_transaction_error"
-        msg.error = res
-        return msg
-    else
-        -- transaction sent
-        msg.data = true
-        return msg
-    end
-end
 
---- Функция заказывает получение параметров Таблицы текущих торгов. В случае успешного завершения функция возвращает «true», иначе – «false»
-function qsfunctions.paramRequest(msg)
-    
-    local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
-    msg.data = ParamRequest(class_code, sec_code, param_name)
-    return msg
-end
 
---- Функция принимает список строк (JSON Array) в формате class_code|sec_code|param_name, вызывает функцию paramRequest для каждой строки. 
--- Возвращает список ответов в том же порядке
-function qsfunctions.paramRequestBulk(msg)
-	local result = {}
-	for i=1,#msg.data do
-		local spl = msg.data[i]
-		local class_code, sec_code, param_name = spl[1], spl[2], spl[3]
-		table.insert(result, ParamRequest(class_code, sec_code, param_name))
-	end
-	msg.data = result
-	return msg
-end
 
---- Функция отменяет заказ на получение параметров Таблицы текущих торгов. В случае успешного завершения функция возвращает «true», иначе – «false»
-function qsfunctions.cancelParamRequest(msg)
-    
-    local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
-    msg.data = CancelParamRequest(class_code, sec_code, param_name)
-    return msg
-end
 
---- Функция принимает список строк (JSON Array) в формате class_code|sec_code|param_name, вызывает функцию CancelParamRequest для каждой строки.
--- Возвращает список ответов в том же порядке
-function qsfunctions.cancelParamRequestBulk(msg)
-	local result = {}
-	for i=1,#msg.data do
-		local spl = msg.data[i]
-		local class_code, sec_code, param_name = spl[1], spl[2], spl[3]
-		table.insert(result, CancelParamRequest(class_code, sec_code, param_name))
-	end
-	msg.data = result
-	return msg
-end
 
---- Функция предназначена для получения значений всех параметров биржевой информации из Таблицы текущих значений параметров.
--- С помощью этой функции можно получить любое из значений Таблицы текущих значений параметров для заданных кодов класса и бумаги.
-function qsfunctions.getParamEx(msg)
-    
-    local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
-    msg.data = getParamEx(class_code, sec_code, param_name)
-    return msg
-end
 
---- Функция предназначена для получения значении? всех параметров биржевои? информации из Таблицы текущих торгов
--- с возможностью в дальнеи?шем отказаться от получения определенных параметров, заказанных с помощью функции ParamRequest.
--- Для отказа от получения какого-либо параметра воспользуи?тесь функциеи? CancelParamRequest.
--- Функция возвращает таблицу Lua с параметрами, аналогичными параметрам, возвращаемым функциеи? getParamEx
-function qsfunctions.getParamEx2(msg)
-    
-    local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
-    msg.data = getParamEx2(class_code, sec_code, param_name)
-    return msg
-end
 
---- Функция принимает список строк (JSON Array) в формате class_code|sec_code|param_name и возвращает результаты вызова
--- функции getParamEx2 для каждой строки запроса в виде списка в таком же порядке, как в запросе
-function qsfunctions.getParamEx2Bulk(msg)
-	local result = {}
-	for i=1,#msg.data do
-		local spl = msg.data[i]
-		local class_code, sec_code, param_name = spl[1], spl[2], spl[3]
-		table.insert(result, getParamEx2(class_code, sec_code, param_name))
-	end
-	msg.data = result
-    return msg
-end
 
--- Функция предназначена для получения информации по бумажным лимитам.
-function qsfunctions.getDepo(msg)
-    
-    local clientCode, firmId, secCode, account = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
-    msg.data = getDepo(clientCode, firmId, secCode, account)
-    return msg
-end
 
--- Функция предназначена для получения информации по бумажным лимитам.
-function qsfunctions.getDepoEx(msg)
-    
-    local firmId, clientCode, secCode, account, limit_kind = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5]
-    msg.data = getDepoEx(firmId, clientCode, secCode, account, tonumber(limit_kind))
-    return msg
-end
-
--- Функция для получения информации по денежным лимитам.
-function qsfunctions.getMoney(msg)
-    
-    local client_code, firm_id, tag, curr_code = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
-    msg.data = getMoney(client_code, firm_id, tag, curr_code)
-    return msg
-end
-
--- Функция для получения информации по денежным лимитам указанного типа.
-function qsfunctions.getMoneyEx(msg)
-    
-    local firm_id, client_code, tag, curr_code, limit_kind = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5]
-    msg.data = getMoneyEx(firm_id, client_code, tag, curr_code, tonumber(limit_kind))
-    return msg
-end
 
 -- Функция возвращает информацию по всем денежным лимитам.
 function qsfunctions.getMoneyLimits(msg)
@@ -363,19 +581,7 @@ function qsfunctions.getMoneyLimits(msg)
     return msg
 end
 
--- Функция предназначена для получения информации по фьючерсным лимитам.
-function qsfunctions.getFuturesLimit(msg)
-    
-    local firmId, accId, limitType, currCode = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
-	local result, err = getFuturesLimit(firmId, accId, limitType*1, currCode)
-	if result then
-		msg.data = result
-	else
-		log("Futures limit returns nil", 3)
-		msg.data = nil
-	end
-    return msg
-end
+
 
 -- Функция возвращает информацию по фьючерсным лимитам для всех торговых счетов.
 function qsfunctions.getFuturesClientLimits(msg)
@@ -388,18 +594,7 @@ function qsfunctions.getFuturesClientLimits(msg)
     return msg
 end
 
-function qsfunctions.getFuturesHolding(msg)
-    
-    local firmId, accId, secCode, posType = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
-	local result, err = getFuturesHolding(firmId, accId, secCode, posType*1)
-	if result then
-		msg.data = result
-	else
-		--log("Futures holding returns nil", 3)
-		msg.data = nil
-	end
-    return msg
-end
+
 
 -- Функция возвращает таблицу заявок (всю или по заданному инструменту)
 function qsfunctions.get_orders(msg)
@@ -509,21 +704,7 @@ function qsfunctions.get_Trades_by_OrderNumber(msg)
 	return msg
 end
 
--- Функция предназначена для получения значений параметров таблицы «Клиентский портфель», соответствующих идентификатору участника торгов «firmid» и коду клиента «client_code».
-function qsfunctions.getPortfolioInfo(msg)
-    
-    local firmId, clientCode = msg.data[1], msg.data[2]
-    msg.data = getPortfolioInfo(firmId, clientCode)
-    return msg
-end
 
--- Функция предназначена для получения значений параметров таблицы «Клиентский портфель», соответствующих идентификатору участника торгов «firmid», коду клиента «client_code» и виду лимита «limit_kind».
-function qsfunctions.getPortfolioInfoEx(msg)
-    
-    local firmId, clientCode, limit_kind = msg.data[1], msg.data[2], msg.data[3]
-    msg.data = getPortfolioInfoEx(firmId, clientCode, tonumber(limit_kind))
-    return msg
-end
 
 
 --------------------------
@@ -761,112 +942,6 @@ function get_key(class, sec, interval)
 	return class .. "|" .. sec .. "|" .. tostring(interval)
 end
 
--------------------------
---- UCP functions ---
--------------------------
-
---- Функция возвращает торговый счет срочного рынка, соответствующий коду клиента фондового рынка с единой денежной позицией
-function qsfunctions.GetTrdAccByClientCode(msg)
-    
-    local firmId, clientCode = msg.data[1], msg.data[2]
-    msg.data = getTrdAccByClientCode(firmId, clientCode)
-    return msg
-end
-
---- Функция возвращает код клиента фондового рынка с единой денежной позицией, соответствующий торговому счету срочного рынка
-function qsfunctions.GetClientCodeByTrdAcc(msg)
-    
-    local firmId, trdAccId = msg.data[1], msg.data[2]
-    msg.data = getClientCodeByTrdAcc(firmId, trdAccId)
-    return msg
-end
-
---- Функция предназначена для получения признака, указывающего имеет ли клиент единую денежную позицию
-function qsfunctions.IsUcpClient(msg)
-    
-    local firmId, client = msg.data[1], msg.data[2]
-    msg.data = isUcpClient(firmId, client)
-    return msg
-end
-
-
--------------------------
----  Label functions  ---
--------------------------
-function qsfunctions.addLabel(msg)
-	local price, curdate, curtime, qty, path, id, algmnt, bgnd = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7], msg.data[8]
-	label = {
-			TEXT = "",
-			IMAGE_PATH = path,
-			ALIGNMENT = algmnt,
-			YVALUE = tostring(price),
-			DATE = tostring(curdate),
-			TIME = tostring(curtime),
-			R = 255,
-			G = 255,
-			B = 255,
-			TRANSPARENCY = 0,
-			TRANSPARENT_BACKGROUND = bgnd,
-			FONT_FACE_NAME = "Arial",
-			FONT_HEIGHT = "15",
-			HINT = " " .. tostring(price) .. " " .. tostring(qty)
-			}
-	local res = AddLabel(id, label)
-	msg.data = res
-	return msg
-end
-
--- Удаляем выбранную метку
-function qsfunctions.delLabel(msg)
-	local tag, id = msg.data[1], msg.data[2]
-	DelLabel(tag, tonumber(id))
-	msg.data = ""
-	return msg
-end
-
--- Удаляем все метки с графика
-function qsfunctions.delAllLabels(msg)
-	local id = msg.data[1]
-	DelAllLabels(id)
-	msg.data = ""
-	return msg
-end
-
----------------------
--- Debug functions --
----------------------
-
---- Returns Pong to Ping
--- @param msg message table
--- @return same msg table
-function qsfunctions.ping(msg)
-    -- need to know data structure the caller gives
-    msg.t = 0 -- avoid time generation. Could also leave original
-    if msg.data == "Ping" then
-        msg.data = "Pong"
-        return msg
-    else
-        msg.data = msg.data .. " is not Ping"
-        return msg
-    end
-end
-
---- Echoes its message
-function qsfunctions.echo(msg)
-    return msg
-end
-
---- Test error handling
-function qsfunctions.divide_string_by_zero(msg)
-    msg.data = "asd" / 0
-    return msg
-end
-
---- Is running inside quik
-function qsfunctions.is_quik(msg)
-    if getScriptPath then msg.data = 1 else msg.data = 0 end
-    return msg
-end
 
 
 -------------------------------

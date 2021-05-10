@@ -3,41 +3,39 @@
 
 using Newtonsoft.Json;
 
-namespace QuikSharp.DataStructures
+namespace QuikSharp.Quik.Functions.Classes
 {
     /// <summary>
-    /// Описание класса
+    /// Описание класса.
     /// </summary>
     public class ClassInfo
     {
-        // ReSharper disable InconsistentNaming
-
         /// <summary>
-        /// Код фирмы
+        /// Код фирмы.
         /// </summary>
         [JsonProperty("firmid")]
         public string FirmId { get; set; }
 
         /// <summary>
-        /// Наименование класса
+        /// Наименование класса.
         /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
 
         /// <summary>
-        /// Код класса
+        /// Код класса.
         /// </summary>
         [JsonProperty("code")]
         public string Code { get; set; }
 
         /// <summary>
-        /// Количество параметров в классе
+        /// Количество параметров в классе.
         /// </summary>
         [JsonProperty("npars")]
         public int NPars { get; set; }
 
         /// <summary>
-        /// Количество бумаг в классе
+        /// Количество бумаг в классе.
         /// </summary>
         [JsonProperty("nsecs")]
         public int NSecs { get; set; }

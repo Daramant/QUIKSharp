@@ -15,29 +15,27 @@ namespace QuikSharp.Quik.Functions.Classes
         /// <summary>
         /// Функция предназначена для получения списка кодов классов, переданных с сервера в ходе сеанса связи.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Список кодов классов.</returns>
         Task<string[]> GetClassesListAsync();
 
         /// <summary>
         /// Функция предназначена для получения информации о классе.
         /// </summary>
-        /// <param name="classID"></param>
-        Task<ClassInfo> GetClassInfoAsync(string classID);
+        /// <param name="classCode">Код класса.</param>
+        /// <returns>Описание класса.</returns>
+        Task<ClassInfo> GetClassInfoAsync(string classCode);
 
         /// <summary>
-        /// Функция предназначена для получения информации по бумаге.
+        /// Функция предназначена для получения списка кодов инструментов для списка классов, заданного списком кодов.
         /// </summary>
-        Task<SecurityInfo> GetSecurityInfoAsync(string classCode, string secCode);
+        /// <param name="classCode">Код класса.</param>
+        /// <returns>Список кодов инструментов.</returns>
+        Task<string[]> GetClassSecuritiesAsync(string classCode);
 
-        /// <summary>
-        /// Функция предназначена для получения информации по бумаге.
-        /// </summary>
-        Task<SecurityInfo> GetSecurityInfoAsync(ISecurity security);
 
-        /// <summary>
-        /// Функция предназначена для получения списка кодов бумаг для списка классов, заданного списком кодов.
-        /// </summary>
-        Task<string[]> GetClassSecuritiesAsync(string classID);
+
+
+        
 
         /// <summary>
         /// Функция предназначена для определения класса по коду инструмента из заданного списка классов.

@@ -10,7 +10,7 @@ using QuikSharp.TypeConverters;
 namespace QuikSharp.Quik.Functions.OrderBooks
 {
     /// <summary>
-    /// Функции для работы со стаканом котировок.
+    /// Функции для заказа стакана котировок.
     /// </summary>
     public class OrderBookFunctions : FunctionsBase, IOrderBookFunctions
     {
@@ -22,45 +22,21 @@ namespace QuikSharp.Quik.Functions.OrderBooks
         { }
         
         /// <inheritdoc/>
-        public Task<bool> SubscribeAsync(ISecurity security)
+        public Task<bool> SubscribeAsync(string classCode, string secCode)
         {
-            return SubscribeAsync(security.ClassCode, security.SecCode);
+            return ExecuteCommandAsync<bool>("Subscribe_Level_II_Quotes", new[] { classCode, secCode });
         }
 
         /// <inheritdoc/>
-        public Task<bool> SubscribeAsync(string class_code, string sec_code)
+        public Task<bool> UnsubscribeAsync(string classCode, string secCode)
         {
-            return ExecuteCommandAsync<bool>("Subscribe_Level_II_Quotes", new[] { class_code, sec_code });
+            return ExecuteCommandAsync<bool>("Unsubscribe_Level_II_Quotes", new[] { classCode, secCode });
         }
 
         /// <inheritdoc/>
-        public Task<bool> UnsubscribeAsync(ISecurity security)
+        public Task<bool> IsSubscribedAsync(string classCode, string secCode)
         {
-            return UnsubscribeAsync(security.ClassCode, security.SecCode);
-        }
-
-        /// <inheritdoc/>
-        public Task<bool> UnsubscribeAsync(string class_code, string sec_code)
-        {
-            return ExecuteCommandAsync<bool>("Unsubscribe_Level_II_Quotes", new[] { class_code, sec_code });
-        }
-
-        /// <inheritdoc/>
-        public Task<bool> IsSubscribedAsync(ISecurity security)
-        {
-            return IsSubscribedAsync(security.ClassCode, security.SecCode);
-        }
-
-        /// <inheritdoc/>
-        public Task<bool> IsSubscribedAsync(string class_code, string sec_code)
-        {
-            return ExecuteCommandAsync<bool>("IsSubscribed_Level_II_Quotes", new[] { class_code, sec_code });
-        }
-
-        /// <inheritdoc/>
-        public Task<OrderBook> GetQuoteLevel2Async(string class_code, string sec_code)
-        {
-            return ExecuteCommandAsync<OrderBook>("GetQuoteLevel2", new[] { class_code, sec_code });
+            return ExecuteCommandAsync<bool>("IsSubscribed_Level_II_Quotes", new[] { classCode, secCode });
         }
     }
 }

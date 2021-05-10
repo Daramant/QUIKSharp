@@ -37,18 +37,7 @@ namespace QuikSharp.Quik.Functions.Trading
             _idProvider = idProvider;
         }
 
-        /// <inheritdoc/>
-        public Task<DepoLimit> GetDepoAsync(string clientCode, string firmId, string secCode, string account)
-        {
-            return ExecuteCommandAsync<DepoLimit>("getDepo", new[] { clientCode, firmId, secCode, account });
-        }
-
-        /// <inheritdoc/>
-        public Task<DepoLimitEx> GetDepoExAsync(string firmId, string clientCode, string secCode, string accID, int limitKind)
-        {
-            return ExecuteCommandAsync<DepoLimitEx>("getDepoEx", 
-                new[] { firmId, clientCode, secCode, accID, TypeConverter.ToStringLookup(limitKind) });
-        }
+        
 
         /// <inheritdoc/>
         public Task<IReadOnlyCollection<DepoLimitEx>> GetDepoLimitsAsync()
@@ -62,18 +51,7 @@ namespace QuikSharp.Quik.Functions.Trading
             return ExecuteCommandAsync<string, IReadOnlyCollection<DepoLimitEx>>("get_depo_limits", secCode);
         }
 
-        /// <inheritdoc/>
-        public Task<MoneyLimit> GetMoneyAsync(string clientCode, string firmId, string tag, string currCode)
-        {
-            return ExecuteCommandAsync<MoneyLimit>("getMoney", new[] { clientCode, firmId, tag, currCode });
-        }
-
-        /// <inheritdoc/>
-        public Task<MoneyLimitEx> GetMoneyExAsync(string firmId, string clientCode, string tag, string currCode, int limitKind)
-        {
-            return ExecuteCommandAsync<MoneyLimitEx>("getMoneyEx", 
-                new[] { firmId, clientCode, tag, currCode, TypeConverter.ToStringLookup(limitKind) });
-        }
+        
 
         /// <inheritdoc/>
         public Task<IReadOnlyCollection<MoneyLimitEx>> GetMoneyLimitsAsync()
@@ -81,72 +59,14 @@ namespace QuikSharp.Quik.Functions.Trading
             return ExecuteCommandAsync<string, IReadOnlyCollection<MoneyLimitEx>>("getMoneyLimits", string.Empty);
         }
 
-        /// <inheritdoc/>
-        public Task<bool> ParamRequestAsync(string classCode, string secCode, string paramName)
-        {
-            return ExecuteCommandAsync<bool>("paramRequest", new[] { classCode, secCode, paramName });
-        }
+        
 
-        /// <inheritdoc/>
-        public Task<bool> ParamRequestAsync(string classCode, string secCode, ParamName paramName)
-        {
-            return ExecuteCommandAsync<bool>("paramRequest", new[] { classCode, secCode, TypeConverter.ToString(paramName) });
-        }
-
-        /// <inheritdoc/>
-        public Task<bool> CancelParamRequestAsync(string classCode, string secCode, string paramName)
-        {
-            return ExecuteCommandAsync<bool>("cancelParamRequest", new[] { classCode, secCode, paramName });
-        }
-
-        /// <inheritdoc/>
-        public Task<bool> CancelParamRequestAsync(string classCode, string secCode, ParamName paramName)
-        {
-            return ExecuteCommandAsync<bool>("cancelParamRequest", new[] { classCode, secCode, TypeConverter.ToString(paramName) });
-        }
-
-        /// <inheritdoc/>
-        public Task<ParamTable> GetParamExAsync(string classCode, string secCode, string paramName, TimeSpan? timeout = null)
-        {
-            return ExecuteCommandAsync<ParamTable>("getParamEx", new[] { classCode, secCode, paramName });
-        }
-
-        /// <inheritdoc/>
-        public Task<ParamTable> GetParamExAsync(string classCode, string secCode, ParamName paramName, TimeSpan? timeout = null)
-        {
-            return ExecuteCommandAsync<ParamTable>("getParamEx", new[] { classCode, secCode, TypeConverter.ToString(paramName) });
-        }
-
-        /// <inheritdoc/>
-        public Task<ParamTable> GetParamEx2Async(string classCode, string secCode, string paramName)
-        {
-            return ExecuteCommandAsync<ParamTable>("getParamEx2", new[] { classCode, secCode, paramName });
-        }
-
-        /// <inheritdoc/>
-        public Task<ParamTable> GetParamEx2Async(string classCode, string secCode, ParamName paramName)
-        {
-            return ExecuteCommandAsync<ParamTable>("getParamEx2", new[] { classCode, secCode, TypeConverter.ToString(paramName) });
-        }
-
-        /// <inheritdoc/>
-        public Task<FuturesLimits> GetFuturesLimitAsync(string firmId, string accId, int limitType, string currCode)
-        {
-            return ExecuteCommandAsync<FuturesLimits>("getFuturesLimit", 
-                new[] { firmId, accId, TypeConverter.ToStringLookup(limitType), currCode });
-        }
+        
 
         /// <inheritdoc/>
         public Task<IReadOnlyCollection<FuturesLimits>> GetFuturesClientLimitsAsync()
         {
             return ExecuteCommandAsync<string, IReadOnlyCollection<FuturesLimits>>("getFuturesClientLimits", string.Empty);
-        }
-
-        /// <inheritdoc/>
-        public Task<FuturesClientHolding> GetFuturesHoldingAsync(string firmId, string accId, string secCode, int posType)
-        {
-            return ExecuteCommandAsync<FuturesClientHolding>("getFuturesHolding", 
-                new[] { firmId, accId, secCode, TypeConverter.ToStringLookup(posType) });
         }
 
         /// <inheritdoc/>
@@ -173,36 +93,9 @@ namespace QuikSharp.Quik.Functions.Trading
             return ExecuteCommandAsync<IReadOnlyCollection<Trade>>("get_Trades_by_OrderNumber", new[] { TypeConverter.ToString(orderNum) });
         }
 
-        /// <inheritdoc/>
-        public Task<PortfolioInfo> GetPortfolioInfoAsync(string firmId, string clientCode)
-        {
-            return ExecuteCommandAsync<PortfolioInfo>("getPortfolioInfo", new[] { firmId, clientCode });
-        }
+        
 
-        /// <inheritdoc/>
-        public Task<PortfolioInfoEx> GetPortfolioInfoExAsync(string firmId, string clientCode, int limitKind)
-        {
-            return ExecuteCommandAsync<PortfolioInfoEx>("getPortfolioInfoEx", 
-                new[] { firmId, clientCode, TypeConverter.ToStringLookup(limitKind) });
-        }
-
-        /// <inheritdoc/>
-        public Task<string> GetTrdAccByClientCodeAsync(string firmId, string clientCode)
-        {
-            return ExecuteCommandAsync<string>("GetTrdAccByClientCode", new[] { firmId, clientCode });
-        }
-
-        /// <inheritdoc/>
-        public Task<string> GetClientCodeByTrdAccAsync(string firmId, string trdAccId)
-        {
-            return ExecuteCommandAsync<string>("GetClientCodeByTrdAcc", new[] { firmId, trdAccId });
-        }
-
-        /// <inheritdoc/>
-        public Task<bool> IsUcpClientAsync(string firmId, string client)
-        {
-            return ExecuteCommandAsync<bool>("IsUcpClient", new[] { firmId, client });
-        }
+        
 
         /// <inheritdoc/>
         public async Task<long> SendTransactionAsync(Transaction transaction)

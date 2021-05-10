@@ -33,21 +33,9 @@ namespace QuikSharp.Quik.Functions.Classes
         }
 
         /// <inheritdoc/>
-        public Task<ClassInfo> GetClassInfoAsync(string classID)
+        public Task<ClassInfo> GetClassInfoAsync(string classCode)
         {
-            return ExecuteCommandAsync<string, ClassInfo>("getClassInfo", classID);
-        }
-
-        /// <inheritdoc/>
-        public Task<SecurityInfo> GetSecurityInfoAsync(string classCode, string secCode)
-        {
-            return ExecuteCommandAsync<SecurityInfo>("getSecurityInfo", new[] { classCode, secCode });
-        }
-
-        /// <inheritdoc/>
-        public Task<SecurityInfo> GetSecurityInfoAsync(ISecurity security)
-        {
-            return GetSecurityInfoAsync(security.ClassCode, security.SecCode);
+            return ExecuteCommandAsync<string, ClassInfo>("getClassInfo", classCode);
         }
 
         /// <inheritdoc/>
@@ -56,6 +44,11 @@ namespace QuikSharp.Quik.Functions.Classes
             var securities = await ExecuteCommandAsync<string, string>("getClassSecurities", classID);
             return securities?.Split(Separators, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
         }
+
+
+
+        
+
 
         /// <inheritdoc/>
         public Task<string> GetSecurityClassAsync(string classesList, string secCode)

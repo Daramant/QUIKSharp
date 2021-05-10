@@ -31,7 +31,7 @@ namespace QuikSharp.Quik.Functions
         IClassFunctions Class { get; }
 
         /// <summary>
-        /// Функции для работы со стаканом котировок
+        /// Функции для заказа стакана котировок.
         /// </summary>
         IOrderBookFunctions OrderBook { get; }
 

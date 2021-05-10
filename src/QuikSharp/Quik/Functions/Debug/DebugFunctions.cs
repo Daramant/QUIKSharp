@@ -37,15 +37,15 @@ namespace QuikSharp.Quik.Functions.Debug
         public async Task<string> PingAsync()
         {
             // could have used StringMessage directly. This is an example of how to define DTOs for custom commands
-            var response = await QuikClient.SendAsync<PingResponse>((new PingRequest())).ConfigureAwait(false);
-            Trace.Assert(response.Data == "Pong");
-            return response.Data;
+            var command = new PingRequest();
+            var result = await QuikClient.SendAsync<PingResponse>(command).ConfigureAwait(false);
+            Trace.Assert(result.Data == "Pong");
+            return result.Data;
         }
 
         /// <inheritdoc/>
         public Task<T> EchoAsync<T>(T msg)
         {
-            // could have used StringMessage directly. This is an example of how to define DTOs for custom commands
             return ExecuteCommandAsync<T, T>("echo", msg);
         }
 
