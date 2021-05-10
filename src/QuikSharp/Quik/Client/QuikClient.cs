@@ -159,10 +159,12 @@ namespace QuikSharp.Quik.Client
 
                                 if (!_pendingResultContainer.TryGet(command.Id, out var pendingResult))
                                 {
-                                    _logger.LogWarning($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {command.Id}.");
+                                    _logger.LogWarning($"Среди находящихся в ожидании результатов команд нет результата для команды с идентификатором: {command.Id}. Возможно истекло время ожидания результата команды.");
+                                    continue;
                                 }
 
-                                var serializedCommandEnvelope = _serializer.Serialize(command);
+                                if (!TrySerializeCommand(command, out var serializedCommandEnvelope))
+                                    continue;
 
                                 try
                                 {
@@ -202,6 +204,28 @@ namespace QuikSharp.Quik.Client
             {
                 _commandClient = await CloseClientAsync(_commandClient, _commandClientSemaphoreSlim);
             }
+        }
+
+        private bool TrySerializeCommand(ICommand command, out string serializedCommandEnvelope)
+        {
+            try
+            {
+                serializedCommandEnvelope = _serializer.Serialize(command);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Не удалось сериализовать команду с id: '{command?.Id}' и name: '{command?.Name}'.");
+
+                if (_pendingResultContainer.TryRemove(command.Id, out var pendingResult))
+                {
+                    pendingResult.TaskCompletionSource.SetException(
+                        new QuikSharpException($"Не удалось сериализовать команду с id: '{command?.Id}' и name: '{command?.Name}'.", ex));
+                }
+            }
+
+            serializedCommandEnvelope = null;
+            return false;
         }
 
         private async Task ReceiveResultAction()
