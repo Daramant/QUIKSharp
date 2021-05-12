@@ -40,6 +40,13 @@ namespace QuikSharp.Quik.Client
         /// <returns></returns>
         Task WaitForConnectionAsync();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="request"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         Task<TResult> SendAsync<TResult>(ICommand request, TimeSpan? timeout = null)
             where TResult : class, IResult;
     }

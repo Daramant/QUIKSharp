@@ -43,15 +43,15 @@ namespace QuikSharp.Tests
         public async Task GetLastCandlesTest()
         {
             int Days = 7;
-            var candles = await Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days);
+            var candles = await Quik.Functions.Candles.GetCandlesFromDataSourceAsync("TQBR", "SBER", CandleInterval.D1, Days);
             Assert.AreEqual(Days, candles.Count);
 
             Days = 77;
-            candles = await Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days);
+            candles = await Quik.Functions.Candles.GetCandlesFromDataSourceAsync("TQBR", "SBER", CandleInterval.D1, Days);
             Assert.AreEqual(Days, candles.Count);
 
             Days = 1;
-            candles = await Quik.Functions.Candles.GetLastCandlesAsync("TQBR", "SBER", CandleInterval.D1, Days);
+            candles = await Quik.Functions.Candles.GetCandlesFromDataSourceAsync("TQBR", "SBER", CandleInterval.D1, Days);
             Assert.AreEqual(Days, candles.Count);
         }
 

@@ -44,34 +44,5 @@ namespace QuikSharp.Quik.Functions.Classes
             var securities = await ExecuteCommandAsync<string, string>("getClassSecurities", classID);
             return securities?.Split(Separators, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
         }
-
-
-
-        
-
-
-        /// <inheritdoc/>
-        public Task<string> GetSecurityClassAsync(string classesList, string secCode)
-        {
-            return ExecuteCommandAsync<string>("getSecurityClass", new[] { classesList, secCode });
-        }
-
-        /// <inheritdoc/>
-        public Task<string> GetClientCodeAsync()
-        {
-            return ExecuteCommandAsync<string, string>("getClientCode", string.Empty);
-        }
-
-        /// <inheritdoc/>
-        public Task<string> GetTradeAccountAsync(string classCode)
-        {
-            return ExecuteCommandAsync<string, string>("getTradeAccount", classCode);
-        }
-
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<TradesAccounts>> GetTradeAccountsAsync()
-        {
-            return ExecuteCommandAsync<string, IReadOnlyCollection<TradesAccounts>>("getTradeAccounts", string.Empty);
-        }
     }
 }

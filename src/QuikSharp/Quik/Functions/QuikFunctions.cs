@@ -4,9 +4,12 @@ using QuikSharp.Quik.Functions.Debug;
 using QuikSharp.Quik.Functions.Labels;
 using QuikSharp.Quik.Functions.OrderBooks;
 using QuikSharp.Quik.Functions.Orders;
+using QuikSharp.Quik.Functions.QuotesTableParameters;
 using QuikSharp.Quik.Functions.Services;
 using QuikSharp.Quik.Functions.StopOrders;
+using QuikSharp.Quik.Functions.TableRows;
 using QuikSharp.Quik.Functions.Trading;
+using QuikSharp.Quik.Functions.Workplace;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,25 +18,35 @@ namespace QuikSharp.Quik.Functions
 {
     public class QuikFunctions : IQuikFunctions
     {
-        /// <summary>
-        /// Debug functions
-        /// </summary>
-        public IDebugFunctions Debug { get; }
-
-        /// <summary>
-        /// Сервисные функции
-        /// </summary>
+        /// <inheritdoc/>
         public IServiceFunctions Service { get; }
 
-        /// <summary>
-        /// Функции для обращения к спискам доступных параметров
-        /// </summary>
+        /// <inheritdoc/>
+        public ITableRowFunctions TableRows { get; set; }
+
+        /// <inheritdoc/>
         public IClassFunctions Class { get; }
 
-        /// <summary>
-        /// Функции для работы со стаканом котировок
-        /// </summary>
+        /// <inheritdoc/>
+        public IWorkstationFunctions Workstation { get; set; }
+
+        /// <inheritdoc/>
+        public ICandleFunctions Candles { get; }
+
+        /// <inheritdoc/>
+        public ILabelFunctions Labels { get; }
+
+        /// <inheritdoc/>
         public IOrderBookFunctions OrderBook { get; }
+
+        /// <inheritdoc/>
+        public IQuotesTableParametersFunctions QuotesTableParameters { get; set; }
+
+        /// <inheritdoc/>
+        public IDebugFunctions Debug { get; }
+
+        
+
 
         /// <summary>
         /// Функции взаимодействия скрипта Lua и Рабочего места QUIK
@@ -50,37 +63,35 @@ namespace QuikSharp.Quik.Functions
         /// </summary>
         public IOrderFunctions Orders { get; }
 
-        /// <summary>
-        /// Функции для работы со свечами
-        /// </summary>
-        public ICandleFunctions Candles { get; }
-
-        /// <summary>
-        /// Функции для работы с метками
-        /// </summary>
-        public ILabelFunctions Labels { get; }
-
         public QuikFunctions(
-            IDebugFunctions debugFunctions,
             IServiceFunctions serviceFunctions,
+            ITableRowFunctions tableRowFunctions,
             IClassFunctions classFunctions,
-            IOrderFunctions orderFunctions,
-            IOrderBookFunctions orderBookFunctions,
-            IStopOrderFunctions stopOrderFunctions,
-            ITradingFunctions tradingFunctions,
+            IWorkstationFunctions workstationFunctions,
             ICandleFunctions candleFunctions,
-            ILabelFunctions labelFunctions
+            ILabelFunctions labelFunctions,
+            IOrderBookFunctions orderBookFunctions,
+            IQuotesTableParametersFunctions quotesTableParametersFunctions,
+            IDebugFunctions debugFunctions,
+
+            IOrderFunctions orderFunctions,
+            IStopOrderFunctions stopOrderFunctions,
+            ITradingFunctions tradingFunctions
             )
         {
-            Debug = debugFunctions;
             Service = serviceFunctions;
+            TableRows = tableRowFunctions;
             Class = classFunctions;
+            Workstation = workstationFunctions;
+            Candles = candleFunctions;
+            Labels = labelFunctions;
             OrderBook = orderBookFunctions;
+            QuotesTableParameters = quotesTableParametersFunctions;
+            Debug = debugFunctions;
+            
             Trading = tradingFunctions;
             StopOrders = stopOrderFunctions;
             Orders = orderFunctions;
-            Candles = candleFunctions;
-            Labels = labelFunctions;
         }
     }
 }

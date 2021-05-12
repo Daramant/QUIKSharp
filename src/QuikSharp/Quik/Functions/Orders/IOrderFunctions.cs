@@ -42,34 +42,6 @@ namespace QuikSharp.Quik.Functions.Orders
         /// <param name="order">Информация по заявке, которую требуется отменить.</param>
         Task<long> KillOrderAsync(Order order);
 
-        /// <summary>
-        /// Возвращает заявку из хранилища терминала по её номеру.
-        /// На основе: http://help.qlua.org/ch4_5_1_1.htm
-        /// </summary>
-        /// <param name="classCode">Класс инструмента.</param>
-        /// <param name="orderId">Номер заявки.</param>
-        /// <returns></returns>
-        Task<Order> GetOrderAsync(string classCode, long orderId);
-
-        /// <summary>
-        /// Возвращает список всех заявок.
-        /// </summary>
-        /// <returns></returns>
-        Task<IReadOnlyCollection<Order>> GetOrdersAsync();
-
-        /// <summary>
-        /// Возвращает список заявок для заданного инструмента.
-        /// </summary>
-        Task<IReadOnlyCollection<Order>> GetOrdersAsync(string classCode, string securityCode);
-
-        /// <summary>
-        /// Возвращает заявку для заданного инструмента по ID.
-        /// </summary>
-        Task<Order> GetOrderByTransactionIdAsync(string classCode, string securityCode, long trans_id);
-
-        /// <summary>
-        /// Возвращает заявку по номеру.
-        /// </summary>
-        Task<Order> GetOrderByNumberAsync(long order_num);
+        
     }
 }

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.Labels
 {
+    /// <summary>
+    /// Функции для работы с метками.
+    /// </summary>
     public interface ILabelFunctions
     {
         /// <summary>

@@ -31,31 +31,5 @@ namespace QuikSharp.Quik.Functions.Classes
         /// <param name="classCode">Код класса.</param>
         /// <returns>Список кодов инструментов.</returns>
         Task<string[]> GetClassSecuritiesAsync(string classCode);
-
-
-
-
-        
-
-        /// <summary>
-        /// Функция предназначена для определения класса по коду инструмента из заданного списка классов.
-        /// </summary>
-        Task<string> GetSecurityClassAsync(string classesList, string secCode);
-
-        /// <summary>
-        /// Функция возвращает код клиента.
-        /// </summary>
-        Task<string> GetClientCodeAsync();
-
-        /// <summary>
-        /// Функция возвращает таблицу с описанием торгового счета для запрашиваемого кода класса.
-        /// </summary>
-        Task<string> GetTradeAccountAsync(string classCode);
-
-        /// <summary>
-        /// Функция возвращает таблицу всех счетов в торговой системе.
-        /// </summary>
-        /// <returns></returns>
-        Task<IReadOnlyCollection<TradesAccounts>> GetTradeAccountsAsync();
     }
 }

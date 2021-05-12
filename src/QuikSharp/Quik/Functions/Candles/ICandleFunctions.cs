@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.Candles
 {
+    /// <summary>
+    /// Функции для работы с графиками.
+    /// </summary>
     public interface ICandleFunctions
     {
         /// <summary>
@@ -49,7 +52,7 @@ namespace QuikSharp.Quik.Functions.Candles
         /// <param name="interval">Интервал свечей.</param>
         /// <param name="count">Количество возвращаемых свечей с конца.</param>
         /// <returns>Список свечей.</returns>
-        Task<IReadOnlyCollection<Candle>> GetLastCandlesAsync(string classCode, string securityCode, CandleInterval interval, int count);
+        Task<IReadOnlyCollection<Candle>> GetCandlesFromDataSourceAsync(string classCode, string securityCode, CandleInterval interval, int count);
 
         /// <summary>
         /// Осуществляет подписку на получение исторических данных (свечи)

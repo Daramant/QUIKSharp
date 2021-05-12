@@ -1,4 +1,6 @@
 ﻿using QuikSharp.DataStructures;
+using QuikSharp.DataStructures.Transaction;
+using QuikSharp.Exceptions;
 using QuikSharp.Messages;
 using QuikSharp.Quik.Client;
 using QuikSharp.TypeConverters;
@@ -9,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.Workplace
 {
+    /// <summary>
+    /// Функции взаимодействия скрипта Lua и Рабочего места QUIK.
+    /// </summary>
     public class WorkstationFunctions : FunctionsBase, IWorkstationFunctions
     {
         public WorkstationFunctions(
@@ -65,6 +70,12 @@ namespace QuikSharp.Quik.Functions.Workplace
         }
 
         /// <inheritdoc/>
+        public Task<string> GetSecurityClassAsync(string classesList, string secCode)
+        {
+            return ExecuteCommandAsync<string>("getSecurityClass", new[] { classesList, secCode });
+        }
+
+        /// <inheritdoc/>
         public Task<TradeDate> GetTradeDateAsync()
         {
             return ExecuteCommandAsync<string, TradeDate>("getTradeDate", string.Empty);
@@ -88,6 +99,19 @@ namespace QuikSharp.Quik.Functions.Workplace
         {
             return ExecuteCommandAsync<ParamTable>("getParamEx2", 
                 new[] { classCode, secCode, TypeConverter.ToString(paramName) }, timeout);
+        }
+
+        /// <inheritdoc/>
+        public Task<string> SendTransactionAsync(Transaction transaction, TimeSpan? timeout = null)
+        {
+            transaction.TRANS_ID = _idProvider.GetUniqueTransactionId();
+
+            if (transaction.CLIENT_CODE == null)
+            {
+                transaction.CLIENT_CODE = TypeConverter.ToString(transaction.TRANS_ID.Value);
+            }
+
+            return ExecuteCommandAsync<Transaction, string>("sendTransaction", transaction, timeout);
         }
 
         /// <inheritdoc/>

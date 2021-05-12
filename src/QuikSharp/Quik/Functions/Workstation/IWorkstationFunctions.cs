@@ -1,4 +1,5 @@
 ﻿using QuikSharp.DataStructures;
+using QuikSharp.DataStructures.Transaction;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.Workplace
 {
+    /// <summary>
+    /// Функции взаимодействия скрипта Lua и Рабочего места QUIK.
+    /// </summary>
     public interface IWorkstationFunctions
     {
         /// <summary>
@@ -79,6 +83,14 @@ namespace QuikSharp.Quik.Functions.Workplace
         Task<SecurityInfo> GetSecurityInfoAsync(string classCode, string secCode);
 
         /// <summary>
+        /// Функция предназначена для определения класса по коду инструмента из заданного списка классов.
+        /// </summary>
+        /// <param name="classesList"></param>
+        /// <param name="secCode"></param>
+        /// <returns></returns>
+        Task<string> GetSecurityClassAsync(string classesList, string secCode);
+
+        /// <summary>
         /// Функция предназначена для получения стакана по указанному классу и инструменту.
         /// </summary>
         /// <param name="classCode"></param>
@@ -108,6 +120,14 @@ namespace QuikSharp.Quik.Functions.Workplace
         /// <param name="timeout"></param>
         /// <returns></returns>
         Task<ParamTable> GetParamEx2Async(string classCode, string secCode, ParamName paramName, TimeSpan? timeout = null);
+
+        /// <summary>
+        /// Функция предназначена для отправки транзакций в торговую систему.
+        /// </summary>
+        /// <param name="transaction">Транзакция.</param>
+        /// <param name="timeout"></param>
+        /// <returns>Строка, содержащая текст ошибки, если она случилась при обработке транзакции.</returns>
+        Task<string> SendTransactionAsync(Transaction transaction, TimeSpan? timeout = null);
 
         /// <summary>
         /// Функция предназначена для получения значений параметров таблицы «Клиентский портфель», соответствующих 

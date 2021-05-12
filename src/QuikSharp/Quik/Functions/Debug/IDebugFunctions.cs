@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.Debug
 {
+    /// <summary>
+    /// Функции для отладки работы QuikSharp.
+    /// </summary>
     public interface IDebugFunctions
     {
         Task<string> PingAsync();

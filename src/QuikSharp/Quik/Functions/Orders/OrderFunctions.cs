@@ -126,34 +126,6 @@ namespace QuikSharp.Quik.Functions.Orders
             return _tradingFunctions.SendTransactionAsync(killOrderTransaction);
         }
 
-        /// <inheritdoc/>
-        public Task<Order> GetOrderAsync(string classCode, long orderId)
-        {
-            return ExecuteCommandAsync<Order>("get_order_by_number", new[] { classCode, TypeConverter.ToString(orderId) });
-        }
-
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<Order>> GetOrdersAsync()
-        {
-            return ExecuteCommandAsync<string, IReadOnlyCollection<Order>>("get_orders", string.Empty);
-        }
-
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<Order>> GetOrdersAsync(string classCode, string securityCode)
-        {
-            return ExecuteCommandAsync<IReadOnlyCollection<Order>>("get_orders", new[] { classCode, securityCode });
-        }
-
-        /// <inheritdoc/>
-        public Task<Order> GetOrderByTransactionIdAsync(string classCode, string securityCode, long trans_id)
-        {
-            return ExecuteCommandAsync<Order>("getOrder_by_ID", new[] { classCode, securityCode, TypeConverter.ToString(trans_id) });
-        }
-
-        /// <inheritdoc/>
-        public Task<Order> GetOrderByNumberAsync(long order_num)
-        {
-            return ExecuteCommandAsync<string, Order>("getOrder_by_Number", TypeConverter.ToString(order_num));
-        }
+        
     }
 }

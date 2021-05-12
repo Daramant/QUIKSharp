@@ -31,17 +31,7 @@ namespace QuikSharp.Quik.Functions.StopOrders
             _tradingFunctions = tradingFunctions;
         }
 
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<StopOrder>> GetStopOrdersAsync()
-        {
-            return ExecuteCommandAsync<string, IReadOnlyCollection<StopOrder>>("get_stop_orders", string.Empty);
-        }
-
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<StopOrder>> GetStopOrdersAsync(string classCode, string securityCode)
-        {
-            return ExecuteCommandAsync<IReadOnlyCollection<StopOrder>>("get_stop_orders", new[] { classCode, securityCode });
-        }
+        
 
         /// <inheritdoc/>
         public Task<long> CreateStopOrderAsync(StopOrder stopOrder)

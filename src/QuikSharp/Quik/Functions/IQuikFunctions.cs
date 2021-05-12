@@ -4,9 +4,12 @@ using QuikSharp.Quik.Functions.Debug;
 using QuikSharp.Quik.Functions.Labels;
 using QuikSharp.Quik.Functions.OrderBooks;
 using QuikSharp.Quik.Functions.Orders;
+using QuikSharp.Quik.Functions.QuotesTableParameters;
 using QuikSharp.Quik.Functions.Services;
 using QuikSharp.Quik.Functions.StopOrders;
+using QuikSharp.Quik.Functions.TableRows;
 using QuikSharp.Quik.Functions.Trading;
+using QuikSharp.Quik.Functions.Workplace;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,19 +19,34 @@ namespace QuikSharp.Quik.Functions
     public interface IQuikFunctions
     {
         /// <summary>
-        /// Debug functions
-        /// </summary>
-        IDebugFunctions Debug { get; }
-
-        /// <summary>
-        /// Сервисные функции
+        /// Сервисные функции.
         /// </summary>
         IServiceFunctions Service { get; }
 
         /// <summary>
-        /// Функции для обращения к спискам доступных параметров
+        /// Функции для обращения к строкам произвольных таблиц QUIK.
+        /// </summary>
+        ITableRowFunctions TableRows { get; set; }
+
+        /// <summary>
+        /// Функции для обращения к спискам доступных параметров.
         /// </summary>
         IClassFunctions Class { get; }
+
+        /// <summary>
+        /// Функции взаимодействия скрипта Lua и Рабочего места QUIK.
+        /// </summary>
+        IWorkstationFunctions Workstation { get; set; }
+
+        /// <summary>
+        /// Функции для работы с графиками.
+        /// </summary>
+        ICandleFunctions Candles { get; }
+
+        /// <summary>
+        /// Функции для работы с метками.
+        /// </summary>
+        ILabelFunctions Labels { get; }
 
         /// <summary>
         /// Функции для заказа стакана котировок.
@@ -36,28 +54,13 @@ namespace QuikSharp.Quik.Functions
         IOrderBookFunctions OrderBook { get; }
 
         /// <summary>
-        /// Функции взаимодействия скрипта Lua и Рабочего места QUIK
+        /// Функции для заказа параметров Таблицы текущих торгов.
         /// </summary>
-        ITradingFunctions Trading { get; }
+        IQuotesTableParametersFunctions QuotesTableParameters { get; set; }
 
         /// <summary>
-        /// Функции для работы со стоп-заявками
+        /// Функции для отладки работы QuikSharp.
         /// </summary>
-        IStopOrderFunctions StopOrders { get; }
-
-        /// <summary>
-        /// Функции для работы с заявками
-        /// </summary>
-        IOrderFunctions Orders { get; }
-
-        /// <summary>
-        /// Функции для работы со свечами
-        /// </summary>
-        ICandleFunctions Candles { get; }
-
-        /// <summary>
-        /// Функции для работы с метками
-        /// </summary>
-        ILabelFunctions Labels { get; }
+        IDebugFunctions Debug { get; }
     }
 }

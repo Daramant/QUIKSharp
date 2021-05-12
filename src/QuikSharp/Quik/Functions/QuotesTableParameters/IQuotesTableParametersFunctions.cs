@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.QuotesTableParameters
 {
+    /// <summary>
+    /// Функции для заказа параметров Таблицы текущих торгов.
+    /// </summary>
     public interface IQuotesTableParametersFunctions
     {
         /// <summary>

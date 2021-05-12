@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.Debug
 {
+    /// <summary>
+    /// Функции для отладки работы QuikSharp.
+    /// </summary>
     public class DebugFunctions : FunctionsBase, IDebugFunctions
     {
         public DebugFunctions(
@@ -34,6 +37,7 @@ namespace QuikSharp.Quik.Functions.Debug
             }
         }
 
+        /// <inheritdoc/>
         public async Task<string> PingAsync()
         {
             // could have used StringMessage directly. This is an example of how to define DTOs for custom commands
@@ -52,13 +56,13 @@ namespace QuikSharp.Quik.Functions.Debug
         /// <inheritdoc/>
         public Task<string> DivideStringByZeroAsync()
         {
-            return ExecuteCommandAsync<string, string>("divide_string_by_zero", string.Empty);
+            return ExecuteCommandAsync<string, string>("divideStringByZero", string.Empty);
         }
 
         /// <inheritdoc/>
         public async Task<bool> IsQuikAsync()
         {
-            return await ExecuteCommandAsync<string, string>("is_quik", string.Empty) == "1";
+            return await ExecuteCommandAsync<string, string>("isQuik", string.Empty) == "1";
         }
     }
 }

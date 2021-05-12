@@ -39,35 +39,11 @@ namespace QuikSharp.Quik.Functions.Trading
 
         
 
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<DepoLimitEx>> GetDepoLimitsAsync()
-        {
-            return ExecuteCommandAsync<string, IReadOnlyCollection<DepoLimitEx>>("get_depo_limits", string.Empty);
-        }
-
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<DepoLimitEx>> GetDepoLimitsAsync(string secCode)
-        {
-            return ExecuteCommandAsync<string, IReadOnlyCollection<DepoLimitEx>>("get_depo_limits", secCode);
-        }
-
-        
-
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<MoneyLimitEx>> GetMoneyLimitsAsync()
-        {
-            return ExecuteCommandAsync<string, IReadOnlyCollection<MoneyLimitEx>>("getMoneyLimits", string.Empty);
-        }
-
         
 
         
 
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<FuturesLimits>> GetFuturesClientLimitsAsync()
-        {
-            return ExecuteCommandAsync<string, IReadOnlyCollection<FuturesLimits>>("getFuturesClientLimits", string.Empty);
-        }
+        
 
         /// <inheritdoc/>
         public Task<IReadOnlyCollection<OptionBoard>> GetOptionBoardAsync(string classCode, string secCode)
@@ -75,23 +51,7 @@ namespace QuikSharp.Quik.Functions.Trading
             return ExecuteCommandAsync<IReadOnlyCollection<OptionBoard>>("getOptionBoard", new[] { classCode, secCode });
         }
 
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<Trade>> GetTradesAsync()
-        {
-            return ExecuteCommandAsync<string, IReadOnlyCollection<Trade>>("get_trades", string.Empty);
-        }
-
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<Trade>> GetTradesAsync(string classCode, string secCode)
-        {
-            return ExecuteCommandAsync<IReadOnlyCollection<Trade>>("get_trades", new[] { classCode, secCode });
-        }
-
-        /// <inheritdoc/>
-        public Task<IReadOnlyCollection<Trade>> GetTradesByOrderNumberAsync(long orderNum)
-        {
-            return ExecuteCommandAsync<IReadOnlyCollection<Trade>>("get_Trades_by_OrderNumber", new[] { TypeConverter.ToString(orderNum) });
-        }
+        
 
         
 

@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace QuikSharp.Quik.Functions.Labels
 {
+    /// <summary>
+    /// Функции для работы с метками.
+    /// </summary>
     public class LabelFunctions : FunctionsBase, ILabelFunctions
     {
         public LabelFunctions(
