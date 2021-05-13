@@ -5,15 +5,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuikSharp.Quik.Functions.Orders
+namespace QuikSharp.Transactions
 {
-    public interface IOrderFunctions
+    /// <summary>
+    /// Менеджер для работы с транзакциями.
+    /// </summary>
+    public interface ITransactionManager
     {
         /// <summary>
         /// Создание новой заявки.
         /// </summary>
         /// <param name="order">Инфомация о новой заявки, на основе которой будет сформирована транзакция.</param>
-        Task<long> CreateOrderAsync(Order order);
+        Task<long> SendOrderAsync(Order order);
 
         /// <summary>
         /// Создание "лимитрированной"заявки.
@@ -42,6 +45,18 @@ namespace QuikSharp.Quik.Functions.Orders
         /// <param name="order">Информация по заявке, которую требуется отменить.</param>
         Task<long> KillOrderAsync(Order order);
 
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stopOrder"></param>
+        /// <returns></returns>
+        Task<long> CreateStopOrderAsync(StopOrder stopOrder);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stopOrder"></param>
+        /// <returns></returns>
+        Task<long> KillStopOrderAsync(StopOrder stopOrder);
     }
 }

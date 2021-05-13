@@ -3,10 +3,7 @@ using QuikSharp.Quik.Functions.Candles;
 using QuikSharp.Quik.Functions.Classes;
 using QuikSharp.Quik.Functions.Debug;
 using QuikSharp.Quik.Functions.OrderBooks;
-using QuikSharp.Quik.Functions.Orders;
 using QuikSharp.Quik.Functions.Services;
-using QuikSharp.Quik.Functions.StopOrders;
-using QuikSharp.Quik.Functions.Trading;
 using QuikSharp.Quik.Client;
 using System;
 using System.Collections.Generic;
@@ -18,6 +15,10 @@ using QuikSharp.Serialization.Json;
 using QuikSharp.Quik.Events;
 using Microsoft.Extensions.Logging;
 using QuikSharp.Messages;
+using QuikSharp.Quik.Functions.Custom;
+using QuikSharp.Quik.Functions.TableRows;
+using QuikSharp.Quik.Functions.Workplace;
+using QuikSharp.Quik.Functions.QuotesTableParameters;
 
 namespace QuikSharp.Quik
 {
@@ -37,9 +38,8 @@ namespace QuikSharp.Quik
             var pendingResultContainer = new PendingResultContainer();
             var eventTypeProvider = new EventTypeProvider();
             var serializer = new QuikJsonSerializer(pendingResultContainer, eventTypeProvider);
-            var persistentStorage = new InMemoryPersistantStorage();
             var typeConverter = new CachingQuikTypeConverter();
-            var idProvider = new IdProvider();
+            var idProvider = new UniqueIdProvider();
             var dateTimeProvider = new CurrentDateTimeProvider();
             var messageFactory = new MessageFactory(idProvider, dateTimeProvider);
 
@@ -48,20 +48,19 @@ namespace QuikSharp.Quik
             var quikClient = new QuikClient(eventHandler, serializer, pendingResultContainer, options, 
                 _loggerFactory.CreateLogger<QuikClient>());
 
-            var tradingFunctions = new TradingFunctions(messageFactory, quikClient, typeConverter, persistentStorage, idProvider);
-
             var quik = new Quik(
                 quikClient,
                 new Functions.QuikFunctions(
-                    new DebugFunctions(messageFactory, quikClient, typeConverter),
                     new ServiceFunctions(messageFactory, quikClient, typeConverter),
+                    new TableRowFunctions(messageFactory, quikClient, typeConverter),
                     new ClassFunctions(messageFactory, quikClient, typeConverter),
-                    new OrderFunctions(messageFactory, quikClient, typeConverter, tradingFunctions),
-                    new OrderBookFunctions(messageFactory, quikClient, typeConverter),
-                    new StopOrderFunctions(messageFactory, quikClient, typeConverter, tradingFunctions),
-                    tradingFunctions,
+                    new WorkstationFunctions(messageFactory, quikClient, typeConverter),
                     new CandleFunctions(messageFactory, quikClient, typeConverter),
-                    new LabelFunctions(messageFactory, quikClient, typeConverter)),
+                    new LabelFunctions(messageFactory, quikClient, typeConverter),
+                    new OrderBookFunctions(messageFactory, quikClient, typeConverter),
+                    new QuotesTableParametersFunctions(messageFactory, quikClient, typeConverter),
+                    new DebugFunctions(messageFactory, quikClient, typeConverter),
+                    new CustomFunctions(messageFactory, quikClient, typeConverter)),
                 quikEvents);
 
             quikClient.SetEventSender(quik);

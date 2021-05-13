@@ -22,7 +22,7 @@ namespace QuikSharp.Messages
         {
             var command = new Command<T>(name, data);
 
-            command.Id = _idProvider.GetUniqueCommandId();
+            command.Id = _idProvider.GetNextId();
             command.CreatedTime = _dateTimeProvider.NowInMilliseconds;
 
             return command;

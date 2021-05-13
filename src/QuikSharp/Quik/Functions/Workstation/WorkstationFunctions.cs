@@ -104,13 +104,6 @@ namespace QuikSharp.Quik.Functions.Workplace
         /// <inheritdoc/>
         public Task<string> SendTransactionAsync(Transaction transaction, TimeSpan? timeout = null)
         {
-            transaction.TRANS_ID = _idProvider.GetUniqueTransactionId();
-
-            if (transaction.CLIENT_CODE == null)
-            {
-                transaction.CLIENT_CODE = TypeConverter.ToString(transaction.TRANS_ID.Value);
-            }
-
             return ExecuteCommandAsync<Transaction, string>("sendTransaction", transaction, timeout);
         }
 

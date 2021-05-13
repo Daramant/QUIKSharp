@@ -1,14 +1,12 @@
 ﻿using QuikSharp.Quik.Functions.Candles;
 using QuikSharp.Quik.Functions.Classes;
+using QuikSharp.Quik.Functions.Custom;
 using QuikSharp.Quik.Functions.Debug;
 using QuikSharp.Quik.Functions.Labels;
 using QuikSharp.Quik.Functions.OrderBooks;
-using QuikSharp.Quik.Functions.Orders;
 using QuikSharp.Quik.Functions.QuotesTableParameters;
 using QuikSharp.Quik.Functions.Services;
-using QuikSharp.Quik.Functions.StopOrders;
 using QuikSharp.Quik.Functions.TableRows;
-using QuikSharp.Quik.Functions.Trading;
 using QuikSharp.Quik.Functions.Workplace;
 using System;
 using System.Collections.Generic;
@@ -45,23 +43,8 @@ namespace QuikSharp.Quik.Functions
         /// <inheritdoc/>
         public IDebugFunctions Debug { get; }
 
-        
-
-
-        /// <summary>
-        /// Функции взаимодействия скрипта Lua и Рабочего места QUIK
-        /// </summary>
-        public ITradingFunctions Trading { get; }
-
-        /// <summary>
-        /// Функции для работы со стоп-заявками
-        /// </summary>
-        public IStopOrderFunctions StopOrders { get; }
-
-        /// <summary>
-        /// Функции для работы с заявками
-        /// </summary>
-        public IOrderFunctions Orders { get; }
+        /// <inheritdoc/>
+        public ICustomFunctions Custom { get; }
 
         public QuikFunctions(
             IServiceFunctions serviceFunctions,
@@ -73,11 +56,7 @@ namespace QuikSharp.Quik.Functions
             IOrderBookFunctions orderBookFunctions,
             IQuotesTableParametersFunctions quotesTableParametersFunctions,
             IDebugFunctions debugFunctions,
-
-            IOrderFunctions orderFunctions,
-            IStopOrderFunctions stopOrderFunctions,
-            ITradingFunctions tradingFunctions
-            )
+            ICustomFunctions customFunctions)
         {
             Service = serviceFunctions;
             TableRows = tableRowFunctions;
@@ -88,10 +67,7 @@ namespace QuikSharp.Quik.Functions
             OrderBook = orderBookFunctions;
             QuotesTableParameters = quotesTableParametersFunctions;
             Debug = debugFunctions;
-            
-            Trading = tradingFunctions;
-            StopOrders = stopOrderFunctions;
-            Orders = orderFunctions;
+            Custom = customFunctions;
         }
     }
 }

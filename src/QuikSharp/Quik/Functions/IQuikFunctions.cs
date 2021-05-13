@@ -1,14 +1,12 @@
 ﻿using QuikSharp.Quik.Functions.Candles;
 using QuikSharp.Quik.Functions.Classes;
+using QuikSharp.Quik.Functions.Custom;
 using QuikSharp.Quik.Functions.Debug;
 using QuikSharp.Quik.Functions.Labels;
 using QuikSharp.Quik.Functions.OrderBooks;
-using QuikSharp.Quik.Functions.Orders;
 using QuikSharp.Quik.Functions.QuotesTableParameters;
 using QuikSharp.Quik.Functions.Services;
-using QuikSharp.Quik.Functions.StopOrders;
 using QuikSharp.Quik.Functions.TableRows;
-using QuikSharp.Quik.Functions.Trading;
 using QuikSharp.Quik.Functions.Workplace;
 using System;
 using System.Collections.Generic;
@@ -62,5 +60,10 @@ namespace QuikSharp.Quik.Functions
         /// Функции для отладки работы QuikSharp.
         /// </summary>
         IDebugFunctions Debug { get; }
+
+        /// <summary>
+        /// Дополнительные пользовательские функции.
+        /// </summary>
+        ICustomFunctions Custom { get; }
     }
 }
