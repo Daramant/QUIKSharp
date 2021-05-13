@@ -16,13 +16,16 @@ using System.Threading;
 using QuikSharp.Quik;
 using QuikSharp.Quik.Client;
 using System.Net;
+using QuikSharp.Transactions;
 
 namespace QuikSharpDemo
 {
     public partial class FormMain : Form
     {
-        readonly Char separator = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-        public static IQuik _quik;
+        private readonly char separator = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
+        private IQuik _quik;
+        private ITransactionManager _transactionManager;
+
         bool isServerConnected = false;
         bool isSubscribedToolOrderBook = false;
         bool isSubscribedToolCandles = false;
@@ -102,6 +105,9 @@ namespace QuikSharpDemo
                 //// Отладочный вариант подключения
                 //if (checkBoxRemoteHost.Checked) _quik = new Quik(34136, new InMemoryStorage(), textBoxHost.Text);    // инициализируем объект Quik с использованием удаленного IP-адреса терминала
                 //else _quik = new Quik(34136, new InMemoryStorage());    // инициализируем объект Quik с использованием локального расположения терминала (по умолчанию)
+
+                var transactionManagerFactory = new TransactionManagerFactory();
+                _transactionManager = transactionManagerFactory.Create(_quik, TransactionManagerOptions.GetDefault());
             }
             catch
             {
@@ -149,7 +155,7 @@ namespace QuikSharpDemo
                 textBoxLogsWindow.AppendText("Определяем код класса инструмента " + secCode + ", по списку классов" + "..." + Environment.NewLine);
                 try
                 {
-                    classCode = _quik.Functions.Class.GetSecurityClassAsync("SPBFUT,TQBR,TQBS,TQNL,TQLV,TQNE,TQOB", secCode).Result;
+                    classCode = _quik.Functions.Workstation.GetSecurityClassAsync("SPBFUT,TQBR,TQBS,TQNL,TQLV,TQNE,TQOB", secCode).Result;
                 }
                 catch
                 {
@@ -159,7 +165,7 @@ namespace QuikSharpDemo
                 {
                     textBoxClassCode.Text   = classCode;
                     textBoxLogsWindow.AppendText("Определяем код клиента..." + Environment.NewLine);
-                    clientCode              = _quik.Functions.Class.GetClientCodeAsync().Result;
+                    clientCode              = _quik.Functions.TableRows.GetClientCodeAsync().Result;
                     textBoxClientCode.Text  = clientCode;
                     textBoxLogsWindow.AppendText("Создаем экземпляр инструмента " + secCode + "|" + classCode + "..." + Environment.NewLine);
                     tool                    = new Tool(_quik, secCode, classCode);
@@ -239,7 +245,7 @@ namespace QuikSharpDemo
         {
             if (_param.ClassCode == tool.ClassCode && _param.SecCode == tool.SecurityCode)
             {
-                double bid = Convert.ToDouble(_quik.Functions.Trading.GetParamEx2Async(tool.ClassCode, tool.SecurityCode, ParamName.BID).Result.ParamValue.Replace('.', separator));
+                double bid = Convert.ToDouble(_quik.Functions.Workstation.GetParamEx2Async(tool.ClassCode, tool.SecurityCode, ParamName.BID).Result.ParamValue.Replace('.', separator));
                 AppendText2TextBox(textBoxLogsWindow, "Вызвано событие OnParam. Актуальное значение параметра 'BID' = " + bid + Environment.NewLine);
             }
         }
@@ -387,7 +393,7 @@ namespace QuikSharpDemo
                     {
                         decimal priceInOrder = Math.Round(tool.LastPrice - tool.LastPrice / 20, tool.PriceAccuracy);
                         AppendText2TextBox(textBoxLogsWindow, "Выставляем заявку на покупку, по цене:" + priceInOrder + " ..." + Environment.NewLine);
-                        order = await _quik.Functions.Orders.SendLimitOrderAsync(tool.ClassCode, tool.SecurityCode, tool.AccountID, Operation.Buy, priceInOrder, 1).ConfigureAwait(false);
+                        order = await _transactionManager.SendLimitOrderAsync(tool.ClassCode, tool.SecurityCode, tool.AccountID, Operation.Buy, priceInOrder, 1).ConfigureAwait(false);
                         if (order.OrderNum > 0)
                         {
                             AppendText2TextBox(textBoxLogsWindow, "Заявка выставлена. ID транзакции - " + order.TransID + Environment.NewLine);
@@ -403,14 +409,14 @@ namespace QuikSharpDemo
                     {
                         decimal priceInOrder = Math.Round(tool.LastPrice + tool.Step * 5, tool.PriceAccuracy);
                         AppendText2TextBox(textBoxLogsWindow, "Выставляем заявку на покупку, по цене:" + priceInOrder + " ..." + Environment.NewLine);
-                        long transactionID = (await _quik.Functions.Orders.SendLimitOrderAsync(tool.ClassCode, tool.SecurityCode, tool.AccountID, Operation.Buy, priceInOrder, 1).ConfigureAwait(false)).TransID;
+                        long transactionID = (await _transactionManager.SendLimitOrderAsync(tool.ClassCode, tool.SecurityCode, tool.AccountID, Operation.Buy, priceInOrder, 1).ConfigureAwait(false)).TransID;
                         if (transactionID > 0)
                         {
                             AppendText2TextBox(textBoxLogsWindow, "Заявка выставлена. ID транзакции - " + transactionID + Environment.NewLine);
                             Thread.Sleep(500);
                             try
                             {
-                                listOrders = _quik.Functions.Orders.GetOrdersAsync().Result;
+                                listOrders = _quik.Functions.TableRows.GetOrdersAsync().Result;
                                 foreach (Order _order in listOrders)
                                 {
                                     if (_order.TransID == transactionID && _order.ClassCode == tool.ClassCode && _order.SecCode == tool.SecurityCode)
@@ -434,14 +440,14 @@ namespace QuikSharpDemo
                     {
                         decimal priceInOrder = Math.Round(tool.LastPrice + tool.Step * 5, tool.PriceAccuracy);
                         AppendText2TextBox(textBoxLogsWindow, "Выставляем рыночную заявку на покупку..." + Environment.NewLine);
-                        long transactionID = (await _quik.Functions.Orders.SendMarketOrderAsync(tool.ClassCode, tool.SecurityCode, tool.AccountID, Operation.Buy, 1).ConfigureAwait(false)).TransID;
+                        long transactionID = (await _transactionManager.SendMarketOrderAsync(tool.ClassCode, tool.SecurityCode, tool.AccountID, Operation.Buy, 1).ConfigureAwait(false)).TransID;
                         if (transactionID > 0)
                         {
                             AppendText2TextBox(textBoxLogsWindow, "Заявка выставлена. ID транзакции - " + transactionID + Environment.NewLine);
                             Thread.Sleep(500);
                             try
                             {
-                                listOrders = _quik.Functions.Orders.GetOrdersAsync().Result;
+                                listOrders = _quik.Functions.TableRows.GetOrdersAsync().Result;
                                 foreach (Order _order in listOrders)
                                 {
                                     if (_order.TransID == transactionID && _order.ClassCode == tool.ClassCode && _order.SecCode == tool.SecurityCode)
@@ -464,7 +470,7 @@ namespace QuikSharpDemo
                     try
                     {
                         if (order != null && order.OrderNum > 0) AppendText2TextBox(textBoxLogsWindow, "Удаляем заявку на покупку с номером - " + order.OrderNum + " ..." + Environment.NewLine);
-                        long x = _quik.Functions.Orders.KillOrderAsync(order).Result;
+                        long x = _transactionManager.KillOrderAsync(order).Result;
                         AppendText2TextBox(textBoxLogsWindow, "Результат - " + x + " ..." + Environment.NewLine);
                         Text2TextBox(textBoxOrderNumber, "");
                     }
@@ -474,7 +480,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Получаем таблицу информации..." + Environment.NewLine);
-                        listSecurityInfo = new List<SecurityInfo> { _quik.Functions.Class.GetSecurityInfoAsync(tool.ClassCode, tool.SecurityCode).Result };
+                        listSecurityInfo = new List<SecurityInfo> { _quik.Functions.Workstation.GetSecurityInfoAsync(tool.ClassCode, tool.SecurityCode).Result };
 
                         if (listSecurityInfo.Count > 0)
                         {
@@ -490,7 +496,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Получаем таблицу лимитов..." + Environment.NewLine);
-                        listDepoLimits = _quik.Functions.Trading.GetDepoLimitsAsync(tool.SecurityCode).Result;
+                        listDepoLimits = _quik.Functions.TableRows.GetDepoLimitsAsync(tool.SecurityCode).Result;
 
                         if (listDepoLimits.Count > 0)
                         {
@@ -506,7 +512,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Получаем таблицу лимитов..." + Environment.NewLine);
-                        listDepoLimits = _quik.Functions.Trading.GetDepoLimitsAsync().Result;
+                        listDepoLimits = _quik.Functions.TableRows.GetDepoLimitsAsync().Result;
 
                         if (listDepoLimits.Count > 0)
                         {
@@ -521,7 +527,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Получаем таблицу фьючерсных лимитов..." + Environment.NewLine);
-                        futLimit = _quik.Functions.Trading.GetFuturesLimitAsync(tool.FirmID, tool.AccountID, 0, "SUR").Result;
+                        futLimit = _quik.Functions.Workstation.GetFuturesLimitAsync(tool.FirmID, tool.AccountID, 0, "SUR").Result;
 
                         if (futLimit != null)
                         {
@@ -541,7 +547,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Получаем таблицу заявок..." + Environment.NewLine);
-                        listOrders = _quik.Functions.Orders.GetOrdersAsync().Result;
+                        listOrders = _quik.Functions.TableRows.GetOrdersAsync().Result;
 
                         if (listOrders.Count > 0)
                         {
@@ -556,7 +562,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Получаем таблицу сделок..." + Environment.NewLine);
-                        listTrades = _quik.Functions.Trading.GetTradesAsync().Result;
+                        listTrades = _quik.Functions.TableRows.GetTradesAsync().Result;
 
                         if (listTrades.Count > 0)
                         {
@@ -572,8 +578,8 @@ namespace QuikSharpDemo
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Получаем таблицу `Клиентский портфель`..." + Environment.NewLine);
                         listPortfolio = new List<PortfolioInfoEx>();
-                        if (classCode == "SPBFUT") listPortfolio.Add(_quik.Functions.Trading.GetPortfolioInfoExAsync(tool.FirmID, tool.AccountID, 0).Result);
-                        else listPortfolio.Add(_quik.Functions.Trading.GetPortfolioInfoExAsync(tool.FirmID, clientCode, 2).Result);
+                        if (classCode == "SPBFUT") listPortfolio.Add(_quik.Functions.Workstation.GetPortfolioInfoExAsync(tool.FirmID, tool.AccountID, 0).Result);
+                        else listPortfolio.Add(_quik.Functions.Workstation.GetPortfolioInfoExAsync(tool.FirmID, clientCode, 2).Result);
 
                         if (listPortfolio.Count > 0)
                         {
@@ -589,7 +595,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Получаем таблицу денежных лимитов..." + Environment.NewLine);
-                        listMoneyLimits = new List<MoneyLimit> { _quik.Functions.Trading.GetMoneyAsync(clientCode, tool.FirmID, "EQTV", "SUR").Result };
+                        listMoneyLimits = new List<MoneyLimit> { _quik.Functions.Workstation.GetMoneyAsync(clientCode, tool.FirmID, "EQTV", "SUR").Result };
 
                         if (listMoneyLimits.Count > 0)
                         {
@@ -599,7 +605,7 @@ namespace QuikSharpDemo
                         }
 
                         AppendText2TextBox(textBoxLogsWindow, "Получаем расширение таблицы денежных лимитов..." + Environment.NewLine);
-                        listMoneyLimitsEx = new List<MoneyLimitEx> { _quik.Functions.Trading.GetMoneyExAsync(tool.FirmID, clientCode, "EQTV", "SUR", 2).Result };
+                        listMoneyLimitsEx = new List<MoneyLimitEx> { _quik.Functions.Workstation.GetMoneyExAsync(tool.FirmID, clientCode, "EQTV", "SUR", 2).Result };
 
                         if (listMoneyLimitsEx.Count > 0)
                         {
@@ -631,7 +637,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Подписываемся на получение обновляемого параметра 'BID', через ParamRequest..." + Environment.NewLine);
-                        bool pReq = _quik.Functions.Trading.ParamRequestAsync(tool.ClassCode, tool.SecurityCode, ParamName.BID).Result;
+                        bool pReq = _quik.Functions.QuotesTableParameters.ParamRequestAsync(tool.ClassCode, tool.SecurityCode, ParamName.BID).Result;
                         if (pReq)
                         {
                             AppendText2TextBox(textBoxLogsWindow, "Подписываемся на колбэк 'OnParam'..." + Environment.NewLine);
@@ -648,7 +654,7 @@ namespace QuikSharpDemo
                     try
                     {
                         AppendText2TextBox(textBoxLogsWindow, "Отменяем подписку на получение обновляемого параметра 'BID', через ParamRequest..." + Environment.NewLine);
-                        bool pReq = _quik.Functions.Trading.CancelParamRequestAsync(tool.ClassCode, tool.SecurityCode, ParamName.BID).Result;
+                        bool pReq = _quik.Functions.QuotesTableParameters.CancelParamRequestAsync(tool.ClassCode, tool.SecurityCode, ParamName.BID).Result;
                         if (pReq)
                         {
                             AppendText2TextBox(textBoxLogsWindow, "Отменяем подписку на колбэк 'OnParam'..." + Environment.NewLine);
@@ -722,14 +728,14 @@ namespace QuikSharpDemo
                             Quantity        = 1
                         };
                         AppendText2TextBox(textBoxLogsWindow, "Выставляем стоп-заявку на покупку, по цене:" + priceInOrder + " ..." + Environment.NewLine);
-                        long transID = await _quik.Functions.StopOrders.CreateStopOrderAsync(orderNew).ConfigureAwait(false);
+                        long transID = await _transactionManager.CreateStopOrderAsync(orderNew).ConfigureAwait(false);
                         if (transID > 0)
                         {
                             AppendText2TextBox(textBoxLogsWindow, "Заявка выставлена. ID транзакции - " + transID + Environment.NewLine);
                             Thread.Sleep(500);
                             try
                             {
-                                var listStopOrders = _quik.Functions.StopOrders.GetStopOrdersAsync().Result;
+                                var listStopOrders = _quik.Functions.TableRows.GetStopOrdersAsync().Result;
 
                                 foreach (StopOrder stopOrder in listStopOrders)
                                 {
@@ -774,7 +780,7 @@ namespace QuikSharpDemo
                 // фьючерсы
                 try
                 {
-                    FuturesClientHolding q1 = _quik.Functions.Trading.GetFuturesHoldingAsync(instrument.FirmID, instrument.AccountID, instrument.SecurityCode, 0).Result;
+                    FuturesClientHolding q1 = _quik.Functions.Workstation.GetFuturesHoldingAsync(instrument.FirmID, instrument.AccountID, instrument.SecurityCode, 0).Result;
                     if (q1 != null) qty = Convert.ToInt32(q1.totalNet);
                 }
                 catch (Exception e) { Console.WriteLine("GetPositionT2: SPBFUT, ошибка - " + e.Message); }
@@ -784,7 +790,7 @@ namespace QuikSharpDemo
                 // акции
                 try
                 {
-                    DepoLimitEx q1 = _quik.Functions.Trading.GetDepoExAsync(instrument.FirmID, clientCode, instrument.SecurityCode, instrument.AccountID, 2).Result;
+                    DepoLimitEx q1 = _quik.Functions.Workstation.GetDepoExAsync(instrument.FirmID, clientCode, instrument.SecurityCode, instrument.AccountID, 2).Result;
                     if (q1 != null) qty = Convert.ToInt32(q1.CurrentBalance);
                 }
                 catch (Exception e) { Console.WriteLine("GetPositionT2: ошибка - " + e.Message); }

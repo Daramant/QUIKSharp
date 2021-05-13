@@ -9,12 +9,15 @@ using System.Threading.Tasks;
 using QuikSharp.Serialization;
 using QuikSharp.Serialization.Json;
 using QuikSharp.Quik.Events;
+using QuikSharp.Transactions;
 
 namespace QuikSharp.Tests
 {
     public abstract class BaseTest
     {
         protected IQuik Quik { get; private set; }
+
+        protected ITransactionManager TransactionManager { get; private set; }
 
         protected IQuikFactory QuikFactory { get; private set; }
 
@@ -24,14 +27,17 @@ namespace QuikSharp.Tests
         {
             QuikFactory = new QuikFactory();
 
-            var options = QuikClientOptions.GetDefault();
-            Quik = QuikFactory.Create(options);
+            var quikClientOptions = QuikClientOptions.GetDefault();
+            Quik = QuikFactory.Create(quikClientOptions);
 
             Quik.Client.Start();
 
             var pendingResultContainer = new PendingResultContainer();
             var eventTypeProvider = new EventTypeProvider();
             Serializer = new QuikJsonSerializer(pendingResultContainer, eventTypeProvider);
+
+            var transactionManagerFactory = new TransactionManagerFactory();
+            TransactionManager = transactionManagerFactory.Create(Quik, TransactionManagerOptions.GetDefault());
         }
     }
 }

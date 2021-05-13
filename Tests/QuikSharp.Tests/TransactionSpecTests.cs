@@ -182,11 +182,11 @@ namespace QuikSharp.Tests
         public void CouldSendEmptyTransactionSpec()
         {
             var t = new Transaction();
-            var result = Quik.Functions.Trading.SendTransactionAsync(t).Result;
+            var result = Quik.Functions.Workstation.SendTransactionAsync(t).Result;
 
             Console.WriteLine("Sent Id: " + t.TRANS_ID);
             Console.WriteLine("Result Id: " + result);
-            Assert.IsTrue(result < 0);
+            Assert.IsNotEmpty(result);
             Console.WriteLine("Error: " + t.ErrorMessage);
         }
 

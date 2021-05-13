@@ -65,7 +65,7 @@ public class Tool
     {
         get
         {
-            lastPrice = Convert.ToDecimal(_quik.Functions.Trading.GetParamExAsync(classCode, securityCode, "LAST").Result.ParamValue.Replace('.', separator));
+            lastPrice = Convert.ToDecimal(_quik.Functions.Workstation.GetParamExAsync(classCode, securityCode, ParamName.LAST).Result.ParamValue.Replace('.', separator));
             return lastPrice;
         }
     }
@@ -95,13 +95,13 @@ public class Tool
                 {
                     try
                     {
-                        name = quik.Functions.Class.GetSecurityInfoAsync(classCode, securityCode).Result.ShortName;
-                        accountID = quik.Functions.Class.GetTradeAccountAsync(classCode).Result;
+                        name = quik.Functions.Workstation.GetSecurityInfoAsync(classCode, securityCode).Result.ShortName;
+                        accountID = quik.Functions.TableRows.GetTradeAccountAsync(classCode).Result;
                         firmID = quik.Functions.Class.GetClassInfoAsync(classCode).Result.FirmId;
                         //step = Convert.ToDecimal(quik.Trading.GetParamEx(classCode, securityCode, "SEC_PRICE_STEP").Result.ParamValue.Replace('.', separator));
                         //priceAccuracy = Convert.ToInt32(Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, "SEC_SCALE").Result.ParamValue.Replace('.', separator)));
-                        step = Convert.ToDecimal(quik.Functions.Trading.GetParamExAsync(classCode, securityCode, ParamName.SEC_PRICE_STEP).Result.ParamValue.Replace('.', separator));
-                        priceAccuracy = Convert.ToInt32(Convert.ToDouble(quik.Functions.Trading.GetParamExAsync(classCode, securityCode, ParamName.SEC_SCALE).Result.ParamValue.Replace('.', separator)));
+                        step = Convert.ToDecimal(quik.Functions.Workstation.GetParamExAsync(classCode, securityCode, ParamName.SEC_PRICE_STEP).Result.ParamValue.Replace('.', separator));
+                        priceAccuracy = Convert.ToInt32(Convert.ToDouble(quik.Functions.Workstation.GetParamExAsync(classCode, securityCode, ParamName.SEC_SCALE).Result.ParamValue.Replace('.', separator)));
                     }
                     catch (Exception e)
                     {
@@ -113,13 +113,13 @@ public class Tool
                         Console.WriteLine("Получаем 'guaranteeProviding'.");
                         lot = 1;
                         //guaranteeProviding = Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, "BUYDEPO").Result.ParamValue.Replace('.', separator));
-                        guaranteeProviding = Convert.ToDouble(quik.Functions.Trading.GetParamExAsync(classCode, securityCode, ParamName.BUYDEPO).Result.ParamValue.Replace('.', separator));
+                        guaranteeProviding = Convert.ToDouble(quik.Functions.Workstation.GetParamExAsync(classCode, securityCode, ParamName.BUYDEPO).Result.ParamValue.Replace('.', separator));
                     }
                     else
                     {
                         Console.WriteLine("Получаем 'lot'.");
                         //lot = Convert.ToInt32(Convert.ToDouble(quik.Trading.GetParamEx(classCode, securityCode, "LOTSIZE").Result.ParamValue.Replace('.', separator)));
-                        lot = Convert.ToInt32(Convert.ToDouble(quik.Functions.Trading.GetParamExAsync(classCode, securityCode, ParamName.LOTSIZE).Result.ParamValue.Replace('.', separator)));
+                        lot = Convert.ToInt32(Convert.ToDouble(quik.Functions.Workstation.GetParamExAsync(classCode, securityCode, ParamName.LOTSIZE).Result.ParamValue.Replace('.', separator)));
                         guaranteeProviding = 0;
                     }
                 }

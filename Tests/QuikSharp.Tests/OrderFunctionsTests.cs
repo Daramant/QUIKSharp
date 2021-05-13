@@ -18,12 +18,12 @@ namespace QuikSharp.Tests
         {
             //Заведомо не существующая заявка.
             long orderId = 123456789;
-            Order order = Quik.Functions.Orders.GetOrderAsync("TQBR", orderId).Result;
+            Order order = Quik.Functions.TableRows.GetOrderByNumberAsync("TQBR", orderId).Result;
             Assert.IsNull(order);
 
             //Заявка с таким номером должна присутствовать в таблице заявок.
             orderId = 14278245258;//вставьте свой номер
-            order = Quik.Functions.Orders.GetOrderAsync("TQBR", orderId).Result;
+            order = Quik.Functions.TableRows.GetOrderByNumberAsync("TQBR", orderId).Result;
             if (order != null)
             {
                 Console.WriteLine("Order state: " + order.State);

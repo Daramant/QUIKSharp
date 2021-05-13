@@ -10,13 +10,16 @@ using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Quik;
 using QuikSharp.Quik.Client;
+using QuikSharp.Transactions;
 
 namespace RobotDemo
 {
-    public partial class RobotDemo   : Form
+    public partial class RobotDemo : Form
     {
-        Char separator = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-        public static IQuik _quik;
+        private readonly char separator = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
+        private IQuik _quik;
+        private ITransactionManager _transactionManager;
+
         bool statusQuotation = false;
         bool isServerConnected = false;
         //bool isSubscribedToolOrderBook = false;
@@ -85,6 +88,9 @@ namespace RobotDemo
                 var options = QuikClientOptions.GetDefault();
                 _quik = quikFactory.Create(options);    // инициализируем объект Quik
                 //_quik = new Quik(34136, new InMemoryStorage());    // отладочный вариант
+                
+                var transactionManagerFactory = new TransactionManagerFactory();
+                _transactionManager = transactionManagerFactory.Create(_quik, TransactionManagerOptions.GetDefault());
             }
             catch
             {
@@ -133,7 +139,7 @@ namespace RobotDemo
                 settings.QtyOrder = Convert.ToInt32(textBoxQty.Text);
                 try
                 {
-                    clientCode = _quik.Functions.Class.GetClientCodeAsync().Result;
+                    clientCode = _quik.Functions.TableRows.GetClientCodeAsync().Result;
                 }
                 catch
                 {
@@ -142,7 +148,7 @@ namespace RobotDemo
                 textBoxLogs.AppendText("Определяем код класса инструмента " + secCode + ", по списку классов" + "..." + Environment.NewLine);
                 try
                 {
-                    classCode = _quik.Functions.Class.GetSecurityClassAsync("SPBFUT,TQBR,TQBS,TQNL,TQLV,TQNE,TQOB", secCode).Result;
+                    classCode = _quik.Functions.Workstation.GetSecurityClassAsync("SPBFUT,TQBR,TQBS,TQNL,TQLV,TQNE,TQOB", secCode).Result;
                 }
                 catch
                 {
@@ -374,7 +380,7 @@ namespace RobotDemo
                 // фьючерсы
                 try
                 {
-                    FuturesClientHolding q1 = _quik.Functions.Trading.GetFuturesHoldingAsync(instrument.FirmID, instrument.AccountID, instrument.SecurityCode, 0).Result;
+                    FuturesClientHolding q1 = _quik.Functions.Workstation.GetFuturesHoldingAsync(instrument.FirmID, instrument.AccountID, instrument.SecurityCode, 0).Result;
                     if (q1 != null) qty = Convert.ToInt32(q1.totalNet);
                 }
                 catch (Exception e) { Console.WriteLine("GetPositionT2: SPBFUT, ошибка - " + e.Message); }
@@ -384,7 +390,7 @@ namespace RobotDemo
                 // акции
                 try
                 {
-                    DepoLimitEx q1 = _quik.Functions.Trading.GetDepoExAsync(instrument.FirmID, clientCode, instrument.SecurityCode, instrument.AccountID, 2).Result;
+                    DepoLimitEx q1 = _quik.Functions.Workstation.GetDepoExAsync(instrument.FirmID, clientCode, instrument.SecurityCode, instrument.AccountID, 2).Result;
                     if (q1 != null) qty = Convert.ToInt32(q1.CurrentBalance);
                 }
                 catch (Exception e) { Console.WriteLine("GetPositionT2: ошибка - " + e.Message); }
@@ -405,7 +411,7 @@ namespace RobotDemo
                 order_new.Account   = _tool.AccountID;
                 try
                 {
-                    res = _quik.Functions.Orders.CreateOrderAsync(order_new).Result;
+                    res = _transactionManager.SendOrderAsync(order_new).Result;
                 }
                 catch
                 {
@@ -613,7 +619,7 @@ namespace RobotDemo
                     //textBoxLogs.AppendText("Получаем номер заявки по ID заявки..." + Environment.NewLine);
                     try
                     {
-                        position.entranceOrderNumber = _quik.Functions.Orders.GetOrderByTransactionIdAsync(tool.ClassCode, tool.SecurityCode, position.entranceOrderID).Result.OrderNum;
+                        position.entranceOrderNumber = _quik.Functions.TableRows.GetOrderByTransactionIdAsync(tool.ClassCode, tool.SecurityCode, position.entranceOrderID).Result.OrderNum;
                         //textBoxLogs.AppendText("entranceOrderNumber - " + position.entranceOrderNumber + Environment.NewLine);
                     }
                     catch
@@ -630,7 +636,7 @@ namespace RobotDemo
                     //textBoxLogs.AppendText("Получаем заявку № " + position.entranceOrderNumber + " из журнала..." + Environment.NewLine);
                     try
                     {
-                        Order order = _quik.Functions.Orders.GetOrderByNumberAsync(position.entranceOrderNumber).Result;
+                        Order order = _quik.Functions.TableRows.GetOrderByOrderNumberAsync(position.entranceOrderNumber).Result;
                         //textBoxLogs.AppendText("order.Balance - " + order.Balance + Environment.NewLine);
                         textBoxOrderDirection.Text = order.Operation.ToString();
                         textBoxOrderBalance.Text = order.Balance.ToString();
@@ -644,7 +650,7 @@ namespace RobotDemo
                                 priceTrade = 0;
                                 qtyTrade = 0;
                                 //textBoxLogs.AppendText("Получаем журнал сделок..." + Environment.NewLine);
-                                var trades = _quik.Functions.Trading.GetTradesAsync().Result;
+                                var trades = _quik.Functions.TableRows.GetTradesAsync().Result;
                                 foreach (Trade trade in trades)
                                 {
                                     if (trade.OrderNum == order.OrderNum)
@@ -667,7 +673,7 @@ namespace RobotDemo
                                 if (DateTime.Now > orderEndTime)
                                 {
                                     textBoxLogs.AppendText("Отменяем просроченную заявку: " + order.OrderNum + Environment.NewLine);
-                                    _quik.Functions.Orders.KillOrderAsync(order).Wait();
+                                    _transactionManager.KillOrderAsync(order).Wait();
                                 }
                             }
                         }
@@ -712,7 +718,7 @@ namespace RobotDemo
                 {
                     try
                     {
-                        position.closingOrderNumber = _quik.Functions.Orders.GetOrderByTransactionIdAsync(tool.ClassCode, tool.SecurityCode, position.closingOrderID).Result.OrderNum;
+                        position.closingOrderNumber = _quik.Functions.TableRows.GetOrderByTransactionIdAsync(tool.ClassCode, tool.SecurityCode, position.closingOrderID).Result.OrderNum;
                     }
                     catch
                     {
@@ -727,7 +733,7 @@ namespace RobotDemo
                 {
                     try
                     {
-                        Order order = _quik.Functions.Orders.GetOrderByNumberAsync(position.closingOrderNumber).Result;
+                        Order order = _quik.Functions.TableRows.GetOrderByOrderNumberAsync(position.closingOrderNumber).Result;
                         textBoxOrderDirection.Text = order.Operation.ToString();
                         textBoxOrderBalance.Text = order.Balance.ToString();
                         textBoxOrderNumber.Text = order.OrderNum.ToString();
@@ -740,7 +746,7 @@ namespace RobotDemo
                             {
                                 priceTrade = 0;
                                 qtyTrade = 0;
-                                var trades = _quik.Functions.Trading.GetTradesAsync().Result;
+                                var trades = _quik.Functions.TableRows.GetTradesAsync().Result;
                                 foreach (Trade trade in trades)
                                 {
                                     if (trade.OrderNum == order.OrderNum)
@@ -762,7 +768,7 @@ namespace RobotDemo
                                 if (DateTime.Now > orderEndTime)
                                 {
                                     textBoxLogs.AppendText("Отменяем просроченную заявку: " + order.OrderNum + Environment.NewLine);
-                                    _quik.Functions.Orders.KillOrderAsync(order).Wait();
+                                    _transactionManager.KillOrderAsync(order).Wait();
                                 }
                             }
                         }
