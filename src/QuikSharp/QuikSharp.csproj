@@ -30,8 +30,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove="lua\**\*.*" />
-        <Content Include="lua\**\*.*" />
+        <Compile Remove="LuaScripts\logs\**" />
+        <EmbeddedResource Remove="LuaScripts\logs\**" />
+        <None Remove="LuaScripts\**\*.*" />
+        <None Remove="LuaScripts\logs\**" />
+        <Content Include="LuaScripts\**\*.*" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="LuaScripts\logs\**" />
     </ItemGroup>
     
     <ItemGroup>
@@ -45,8 +52,5 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="lua\logs" />
     </ItemGroup>
 </Project>

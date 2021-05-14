@@ -1,5 +1,6 @@
 ﻿using QuikSharp.DataStructures;
 using QuikSharp.DataStructures.Transaction;
+using QuikSharp.Transactions.PersistentStorages;
 using QuikSharp.TypeConverters;
 using System;
 using System.Collections.Generic;

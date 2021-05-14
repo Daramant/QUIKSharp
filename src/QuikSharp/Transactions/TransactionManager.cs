@@ -4,6 +4,7 @@ using QuikSharp.DataStructures.Transaction;
 using QuikSharp.Exceptions;
 using QuikSharp.Providers;
 using QuikSharp.Quik;
+using QuikSharp.Transactions.PersistentStorages;
 using System;
 using System.Collections.Generic;
 using System.Text;

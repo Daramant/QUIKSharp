@@ -1,5 +1,4 @@
-﻿using QuikSharp.PersistentStorages;
-using QuikSharp.Quik.Functions.Candles;
+﻿using QuikSharp.Quik.Functions.Candles;
 using QuikSharp.Quik.Functions.Classes;
 using QuikSharp.Quik.Functions.Debug;
 using QuikSharp.Quik.Functions.OrderBooks;

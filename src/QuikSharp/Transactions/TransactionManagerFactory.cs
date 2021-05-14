@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using QuikSharp.PersistentStorages;
+using QuikSharp.Transactions.PersistentStorages;
 using QuikSharp.Quik;
 using System;
 using System.Collections.Generic;

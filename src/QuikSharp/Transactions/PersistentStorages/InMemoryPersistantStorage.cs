@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuikSharp.PersistentStorages
+namespace QuikSharp.Transactions.PersistentStorages
 {
     /// <summary>
     /// Thread-unsafe
