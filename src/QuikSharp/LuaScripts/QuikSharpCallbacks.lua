@@ -3,7 +3,7 @@
 
 package.path = package.path..";"..".\\?.lua;"..".\\?.luac"
 
-local qscallbacks = {}
+local QuikSharpCallbacks = {}
 
 local function CleanUp()
     closeLog()
@@ -232,4 +232,4 @@ function OnMoneyLimitDelete(mlimit_del)
     sendCallback(msg)
 end
 
-return qscallbacks
+return QuikSharpCallbacks

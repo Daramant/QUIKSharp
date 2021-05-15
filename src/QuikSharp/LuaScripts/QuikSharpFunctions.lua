@@ -2,7 +2,7 @@
 --~ Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
 local json = require ("dkjson")
-local qsfunctions = {}
+local QuikSharpFunctions = {}
 
 ---------------------------------
 -- Сервисные функции (Service functions)
@@ -10,7 +10,7 @@ local qsfunctions = {}
 
 -- Функция предназначена для определения состояния подключения клиентского места к
 -- серверу. Возвращает «1», если клиентское место подключено и «0», если не подключено.
-function qsfunctions.isConnected(msg)
+function QuikSharpFunctions.isConnected(msg)
     msg.t = timemsec()
     msg.data = isConnected() == 1
     return msg
@@ -18,7 +18,7 @@ end
 
 --Функция возвращает путь, по которому находится запускаемый скрипт, без завершающего
 -- обратного слэша («\»). Например, C:\QuikFront\Scripts.
-function qsfunctions.getScriptPath(msg)
+function QuikSharpFunctions.getScriptPath(msg)
     msg.t = timemsec()
     msg.data = getScriptPath()
     return msg
@@ -26,14 +26,14 @@ end
 
 -- Функция возвращает значения параметров информационного окна (пункт меню
 -- Связь / Информационное окно…).
-function qsfunctions.getInfoParam(msg)
+function QuikSharpFunctions.getInfoParam(msg)
     msg.t = timemsec()
     msg.data = getInfoParam(msg.data)
     return msg
 end
 
 -- Функция отображает сообщения в терминале QUIK.
-function qsfunctions.message(msg)
+function QuikSharpFunctions.message(msg)
 	local text, level = msg.data[1], msg.data[2]
     log(text, level)
     msg.data = true -- TODO: Заполнить.
@@ -41,7 +41,7 @@ function qsfunctions.message(msg)
 end
 
 -- Функция приостанавливает выполнение скрипта.
-function qsfunctions.sleep(msg)
+function QuikSharpFunctions.sleep(msg)
     delay(msg.data)
     msg.data = ""
     return msg
@@ -49,21 +49,21 @@ end
 
 -- Функция возвращает путь, по которому находится файл info.exe, исполняющий данный
 -- скрипт, без завершающего обратного слэша («\»). Например, C:\QuikFront.
-function qsfunctions.getWorkingFolder(msg)
+function QuikSharpFunctions.getWorkingFolder(msg)
     msg.t = timemsec()
     msg.data = getWorkingFolder()
     return msg
 end
 
 -- Функция для вывода отладочной информации.
-function qsfunctions.PrintDbgStr(msg)
+function QuikSharpFunctions.PrintDbgStr(msg)
     log(msg.data, 0)
     msg.data = ""
     return msg
 end
 
 -- Функция возвращает системные дату и время с точностью до микросекунд. 
-function qsfunctions.sysdate(msg)
+function QuikSharpFunctions.sysdate(msg)
     log(msg.data, 0)
     msg.data = sysdate()
     return msg
@@ -74,7 +74,7 @@ end
 ---------------------
 
 -- Функция возвращает код клиента.
-function qsfunctions.getClientCode(msg)
+function QuikSharpFunctions.getClientCode(msg)
 	for i=0,getNumberOf("MONEY_LIMITS")-1 do
 		local clientcode = getItem("MONEY_LIMITS",i).client_code
 		if clientcode ~= nil then
@@ -86,7 +86,7 @@ function qsfunctions.getClientCode(msg)
 end
 
 -- Функция возвращает торговый счет для запрашиваемого кода класса.
-function qsfunctions.getTradeAccount(msg)
+function QuikSharpFunctions.getTradeAccount(msg)
 	for i=0,getNumberOf("trade_accounts")-1 do
 		local trade_account = getItem("trade_accounts",i)
 		if string.find(trade_account.class_codes,'|' .. msg.data .. '|',1,1) then
@@ -98,7 +98,7 @@ function qsfunctions.getTradeAccount(msg)
 end
 
 -- Функция возвращает торговые счета в системе, у которых указаны поддерживаемые классы инструментов.
-function qsfunctions.getTradeAccounts(msg)
+function QuikSharpFunctions.getTradeAccounts(msg)
 	local trade_accounts = {}
 	for i=0,getNumberOf("trade_accounts")-1 do
 		local trade_account = getItem("trade_accounts",i)
@@ -111,7 +111,7 @@ function qsfunctions.getTradeAccounts(msg)
 end
 
 -- Функция возвращает информацию по всем денежным лимитам.
-function qsfunctions.getMoneyLimits(msg)
+function QuikSharpFunctions.getMoneyLimits(msg)
     local limits = {}
     for i=0,getNumberOf("money_limits")-1 do
         local limit = getItem("money_limits",i)
@@ -122,7 +122,7 @@ function qsfunctions.getMoneyLimits(msg)
 end
 
 -- Функция возвращает информацию по фьючерсным лимитам для всех торговых счетов.
-function qsfunctions.getFuturesClientLimits(msg)
+function QuikSharpFunctions.getFuturesClientLimits(msg)
     local limits = {}
     for i=0,getNumberOf("futures_client_limits")-1 do
         local limit = getItem("futures_client_limits",i)
@@ -133,7 +133,7 @@ function qsfunctions.getFuturesClientLimits(msg)
 end
 
 -- Функция возвращает таблицу заявок (всю или по заданному инструменту).
-function qsfunctions.getOrders(msg)
+function QuikSharpFunctions.getOrders(msg)
 	if msg.data ~= "" then
 		class_code, sec_code = msg.data[1], msg.data[2]
 	end
@@ -150,7 +150,7 @@ function qsfunctions.getOrders(msg)
 end
 
 -- Функция возвращает заявку по заданному инструменту и id транзакции.
-function qsfunctions.getOrderById(msg)
+function QuikSharpFunctions.getOrderById(msg)
 	if msg.data ~= "" then
 		class_code, sec_code, trans_id = msg.data[1], msg.data[2], msg.data[3]
 	end
@@ -169,7 +169,7 @@ function qsfunctions.getOrderById(msg)
 end
 
 -- Функция возвращает заявку по номеру.
-function qsfunctions.getOrderByOrderNumber(msg)
+function QuikSharpFunctions.getOrderByOrderNumber(msg)
 	for i=0,getNumberOf("orders")-1 do
 		local order = getItem("orders",i)
 		if order.order_num == tonumber(msg.data) then
@@ -182,7 +182,7 @@ end
 
 -- Возвращает список записей из таблицы 'Лимиты по бумагам'
 -- На основе http://help.qlua.org/ch4_6_11.htm и http://help.qlua.org/ch4_5_3.htm
-function qsfunctions.getDepoLimits(msg)
+function QuikSharpFunctions.getDepoLimits(msg)
 	local sec_code = msg.data
 	local count = getNumberOf("depo_limits")
 	local depo_limits = {}
@@ -197,7 +197,7 @@ function qsfunctions.getDepoLimits(msg)
 end
 
 -- Функция возвращает таблицу сделок (всю или по заданному инструменту).
-function qsfunctions.getTrades(msg)
+function QuikSharpFunctions.getTrades(msg)
 	if msg.data ~= "" then
 		class_code, sec_code = msg.data[1], msg.data[2]
 	end
@@ -214,7 +214,7 @@ function qsfunctions.getTrades(msg)
 end
 
 -- Функция возвращает таблицу сделок по номеру заявки.
-function qsfunctions.getTradesByOrderNumber(msg)
+function QuikSharpFunctions.getTradesByOrderNumber(msg)
 	local order_num = tonumber(msg.data)
 
 	local trades = {}
@@ -229,7 +229,7 @@ function qsfunctions.getTradesByOrderNumber(msg)
 end
 
 --- Возвращает список стоп-заявок
-function qsfunctions.getStopOrders(msg)
+function QuikSharpFunctions.getStopOrders(msg)
 	if msg.data ~= "" then
 		
 		class_code, sec_code = msg.data[1], msg.data[2]
@@ -249,7 +249,7 @@ end
 
 -- Возвращает заявку по её номеру и классу инструмента ---
 -- На основе http://help.qlua.org/ch4_5_1_1.htm ---
-function qsfunctions.getOrderByNumber(msg)
+function QuikSharpFunctions.getOrderByNumber(msg)
 	local class_code = msg.data[1]
 	local order_id = tonumber(msg.data[2])
 	msg.data = getOrderByNumber(class_code, order_id)
@@ -261,19 +261,19 @@ end
 ---------------------
 
 -- Функция предназначена для получения списка кодов классов, переданных с сервера в ходе сеанса связи.
-function qsfunctions.getClassesList(msg)
+function QuikSharpFunctions.getClassesList(msg)
     msg.data = getClassesList()
     return msg
 end
 
 -- Функция предназначена для получения информации о классе.
-function qsfunctions.getClassInfo(msg)
+function QuikSharpFunctions.getClassInfo(msg)
     msg.data = getClassInfo(msg.data)
     return msg
 end
 
 -- Функция предназначена для получения списка кодов бумаг для списка классов, заданного списком кодов.
-function qsfunctions.getClassSecurities(msg)
+function QuikSharpFunctions.getClassSecurities(msg)
     msg.data = getClassSecurities(msg.data)
     return msg
 end
@@ -283,35 +283,35 @@ end
 -------------------------
 
 -- Функция предназначена для получения информации по денежным позициям. 
-function qsfunctions.getMoney(msg)
+function QuikSharpFunctions.getMoney(msg)
     local client_code, firm_id, tag, curr_code = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
     msg.data = getMoney(client_code, firm_id, tag, curr_code)
     return msg
 end
 
 -- Функция предназначена для получения информации по денежным позициям указанного типа.
-function qsfunctions.getMoneyEx(msg)
+function QuikSharpFunctions.getMoneyEx(msg)
     local firm_id, client_code, tag, curr_code, limit_kind = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5]
     msg.data = getMoneyEx(firm_id, client_code, tag, curr_code, tonumber(limit_kind))
     return msg
 end
 
 -- Функция предназначена для получения позиций по инструментам. 
-function qsfunctions.getDepo(msg)
+function QuikSharpFunctions.getDepo(msg)
     local clientCode, firmId, secCode, account = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
     msg.data = getDepo(clientCode, firmId, secCode, account)
     return msg
 end
 
 -- Функция предназначена для получения позиций по инструментам указанного типа.
-function qsfunctions.getDepoEx(msg)
+function QuikSharpFunctions.getDepoEx(msg)
     local firmId, clientCode, secCode, account, limit_kind = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5]
     msg.data = getDepoEx(firmId, clientCode, secCode, account, tonumber(limit_kind))
     return msg
 end
 
 -- Функция предназначена для получения информации по фьючерсным лимитам.
-function qsfunctions.getFuturesLimit(msg)
+function QuikSharpFunctions.getFuturesLimit(msg)
     local firmId, accId, limitType, currCode = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
 	local result, err = getFuturesLimit(firmId, accId, limitType*1, currCode)
 	if result then
@@ -324,7 +324,7 @@ function qsfunctions.getFuturesLimit(msg)
 end
 
 -- Функция предназначена для получения информации по фьючерсным позициям.
-function qsfunctions.getFuturesHolding(msg)
+function QuikSharpFunctions.getFuturesHolding(msg)
     
     local firmId, accId, secCode, posType = msg.data[1], msg.data[2], msg.data[3], msg.data[4]
 	local result, err = getFuturesHolding(firmId, accId, secCode, posType*1)
@@ -338,7 +338,7 @@ function qsfunctions.getFuturesHolding(msg)
 end
 
 -- Функция предназначена для получения информации по инструменту.
-function qsfunctions.getSecurityInfo(msg)
+function QuikSharpFunctions.getSecurityInfo(msg)
     local class_code, sec_code = msg.data[1], msg.data[2]
     msg.data = getSecurityInfo(class_code, sec_code)
     return msg
@@ -347,7 +347,7 @@ end
 -- Функция предназначена для получения информации по группе инструментов.
 -- Функция принимает на вход список из элементов в формате class_code|sec_code и возвращает список ответов функции getSecurityInfo. 
 -- Если какая-то из бумаг не будет найдена, вместо ее значения придет null.
-function qsfunctions.getSecurityInfoBulk(msg)
+function QuikSharpFunctions.getSecurityInfoBulk(msg)
 	local result = {}
 	for i=1,#msg.data do
 		local spl = msg.data[i]
@@ -368,7 +368,7 @@ function qsfunctions.getSecurityInfoBulk(msg)
 end
 
 -- Функция предназначена для определения класса по коду инструмента из заданного списка классов.
-function qsfunctions.getSecurityClass(msg)
+function QuikSharpFunctions.getSecurityClass(msg)
     local classes_list, sec_code = msg.data[1], msg.data[2]
 
 	for class_code in string.gmatch(classes_list,"([^,]+)") do
@@ -382,13 +382,13 @@ function qsfunctions.getSecurityClass(msg)
 end
 
 -- Функция возвращает дату текущей торговой сессии. 
-function qsfunctions.getTradeDate(msg)
+function QuikSharpFunctions.getTradeDate(msg)
     msg.data = getTradeDate()
     return msg
 end
 
 -- Функция предназначена для получения стакана по указанному классу и инструменту.
-function qsfunctions.getQuoteLevel2(msg)
+function QuikSharpFunctions.getQuoteLevel2(msg)
     
     local class_code, sec_code = msg.data[1], msg.data[2]
     local server_time = getInfoParam("SERVERTIME")
@@ -411,7 +411,7 @@ end
 
 -- Функция предназначена для получения значений всех параметров биржевой информации из таблицы «Текущие торги». 
 -- С помощью этой функции можно получить любое из значений Таблицы текущих торгов для заданных кодов класса и инструмента.
-function qsfunctions.getParamEx(msg)
+function QuikSharpFunctions.getParamEx(msg)
     local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
     msg.data = getParamEx(class_code, sec_code, param_name)
     return msg
@@ -420,7 +420,7 @@ end
 -- Функция предназначена для получения значений всех параметров биржевой информации из Таблицы текущих торгов с возможностью 
 -- в дальнейшем отказаться от получения определенных параметров, заказанных с помощью функции ParamRequest. 
 -- Для отказа от получения какого-либо параметра воспользуйтесь функцией CancelParamRequest. 
-function qsfunctions.getParamEx2(msg)
+function QuikSharpFunctions.getParamEx2(msg)
     local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
     msg.data = getParamEx2(class_code, sec_code, param_name)
     return msg
@@ -428,7 +428,7 @@ end
 
 -- Функция принимает список строк (JSON Array) в формате class_code|sec_code|param_name и возвращает результаты вызова
 -- функции getParamEx2 для каждой строки запроса в виде списка в таком же порядке, как в запросе
-function qsfunctions.getParamEx2Bulk(msg)
+function QuikSharpFunctions.getParamEx2Bulk(msg)
 	local result = {}
 	for i=1,#msg.data do
 		local spl = msg.data[i]
@@ -449,14 +449,14 @@ end
 -- отправляет транзакцию на сервер и возвращает пустое сообщение, которое
 -- будет проигноировано. Вместо него, отправитель будет ждать события
 -- OnTransReply, из которого по TRANS_ID он получит результат отправленной транзакции
-function qsfunctions.sendTransaction(msg)
+function QuikSharpFunctions.sendTransaction(msg)
     msg.data = sendTransaction(msg.data)
     return msg
 end
 
 -- Функция предназначена для получения значений параметров таблицы «Клиентский портфель», соответствующих идентификатору 
 -- участника торгов «firmid» и коду клиента «client_code». 
-function qsfunctions.getPortfolioInfo(msg)
+function QuikSharpFunctions.getPortfolioInfo(msg)
     
     local firmId, clientCode = msg.data[1], msg.data[2]
     msg.data = getPortfolioInfo(firmId, clientCode)
@@ -465,7 +465,7 @@ end
 
 -- Функция предназначена для получения значений параметров таблицы «Клиентский портфель», соответствующих идентификатору 
 -- участника торгов «firmid», коду клиента «client_code» и сроку расчётов «limit_kind». 
-function qsfunctions.getPortfolioInfoEx(msg)
+function QuikSharpFunctions.getPortfolioInfoEx(msg)
     
     local firmId, clientCode, limit_kind = msg.data[1], msg.data[2], msg.data[3]
     msg.data = getPortfolioInfoEx(firmId, clientCode, tonumber(limit_kind))
@@ -477,7 +477,7 @@ end
 --
 
 -- Функция возвращает торговый счет срочного рынка, соответствующий коду клиента фондового рынка с единой денежной позицией
-function qsfunctions.getTrdAccByClientCode(msg)
+function QuikSharpFunctions.getTrdAccByClientCode(msg)
     
     local firmId, clientCode = msg.data[1], msg.data[2]
     msg.data = getTrdAccByClientCode(firmId, clientCode)
@@ -485,7 +485,7 @@ function qsfunctions.getTrdAccByClientCode(msg)
 end
 
 -- Функция возвращает код клиента фондового рынка с единой денежной позицией, соответствующий торговому счету срочного рынка
-function qsfunctions.getClientCodeByTrdAcc(msg)
+function QuikSharpFunctions.getClientCodeByTrdAcc(msg)
     
     local firmId, trdAccId = msg.data[1], msg.data[2]
     msg.data = getClientCodeByTrdAcc(firmId, trdAccId)
@@ -493,7 +493,7 @@ function qsfunctions.getClientCodeByTrdAcc(msg)
 end
 
 -- Функция предназначена для получения признака, указывающего имеет ли клиент единую денежную позицию
-function qsfunctions.isUcpClient(msg)
+function QuikSharpFunctions.isUcpClient(msg)
     
     local firmId, client = msg.data[1], msg.data[2]
     msg.data = isUcpClient(firmId, client)
@@ -505,7 +505,7 @@ end
 --
 
 -- Возвращаем количество свечей по тегу.
-function qsfunctions.getNumCandles(msg)
+function QuikSharpFunctions.getNumCandles(msg)
 	log("Called getNumCandles" .. msg.data, 2)
 	
 	local tag = msg.data[1]
@@ -515,7 +515,7 @@ function qsfunctions.getNumCandles(msg)
 end
 
 -- Возвращаем все свечи по идентификатору графика. График должен быть открыт.
-function qsfunctions.getCandles(msg)
+function QuikSharpFunctions.getCandles(msg)
 	log("Called getCandles" .. msg.data, 2)
 	
 	local tag = msg.data[1]
@@ -538,7 +538,7 @@ function qsfunctions.getCandles(msg)
 end
 
 -- Возвращаем все свечи по заданному инструменту и интервалу.
-function qsfunctions.getCandlesFromDataSource(msg)
+function QuikSharpFunctions.getCandlesFromDataSource(msg)
 	local ds, is_error = createDataSourceFromMessage(msg)
 	if not is_error then
 		-- датасорс изначально приходит пустой, нужно некоторое время подождать пока он заполниться данными
@@ -593,7 +593,7 @@ local candleDataSources = {}
 local candleLastIndexes = {}
 
 -- Подписаться на получения свечей по заданному инструмент и интервалу.
-function qsfunctions.subscribeToCandles(msg)
+function QuikSharpFunctions.subscribeToCandles(msg)
 	local ds, is_error = createDataSourceFromMessage(msg)
 	if not is_error then
 		local class, sec, interval = getCandleParams(msg)
@@ -627,7 +627,7 @@ local function dataSourceUpdateCallback(index, class, sec, interval)
 end
 
 -- Отписать от получения свечей по заданному инструменту и интервалу
-function qsfunctions.unsubscribeFromCandles(msg)
+function QuikSharpFunctions.unsubscribeFromCandles(msg)
 	local class, sec, interval = getCandleParams(msg)
 	local key = getCandlesKey(class, sec, interval)
 	candleDataSources[key]:Close()
@@ -637,7 +637,7 @@ function qsfunctions.unsubscribeFromCandles(msg)
 end
 
 -- Проверить открыта ли подписка на заданный инструмент и интервал
-function qsfunctions.isSubscribedToCandles(msg)
+function QuikSharpFunctions.isSubscribedToCandles(msg)
 	local class, sec, interval = getCandleParams(msg)
 	local key = getCandlesKey(class, sec, interval)
 	for k, v in pairs(candleDataSources) do
@@ -672,7 +672,7 @@ end
 -------------------------
 
 -- Добавляет метку с заданными параметрами. 
-function qsfunctions.addLabel(msg)
+function QuikSharpFunctions.addLabel(msg)
 	local price, curdate, curtime, qty, path, id, algmnt, bgnd = msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7], msg.data[8]
 	label = {
 			TEXT = "",
@@ -696,7 +696,7 @@ function qsfunctions.addLabel(msg)
 end
 
 -- Удаляет метку с заданными параметрами. 
-function qsfunctions.delLabel(msg)
+function QuikSharpFunctions.delLabel(msg)
 	local tag, id = msg.data[1], msg.data[2]
 	DelLabel(tag, tonumber(id))
 	msg.data = ""
@@ -704,7 +704,7 @@ function qsfunctions.delLabel(msg)
 end
 
 -- Команда удаляет все метки на диаграмме с указанным графиком.
-function qsfunctions.delAllLabels(msg)
+function QuikSharpFunctions.delAllLabels(msg)
 	local id = msg.data[1]
 	DelAllLabels(id)
 	msg.data = ""
@@ -716,21 +716,21 @@ end
 ---------------------
 
 -- Функция заказывает на сервер получение стакана по указанному классу и инструменту.
-function qsfunctions.Subscribe_Level_II_Quotes(msg)
+function QuikSharpFunctions.Subscribe_Level_II_Quotes(msg)
     local class_code, sec_code = msg.data[1], msg.data[2]
     msg.data = Subscribe_Level_II_Quotes(class_code, sec_code)
     return msg
 end
 
 -- Функция отменяет заказ на получение с сервера стакана по указанному классу и инструменту.
-function qsfunctions.Unsubscribe_Level_II_Quotes(msg)
+function QuikSharpFunctions.Unsubscribe_Level_II_Quotes(msg)
     local class_code, sec_code = msg.data[1], msg.data[2]
     msg.data = Unsubscribe_Level_II_Quotes(class_code, sec_code)
     return msg
 end
 
 -- Функция позволяет узнать, заказан ли с сервера стакан по указанному классу и инструменту.
-function qsfunctions.IsSubscribed_Level_II_Quotes(msg)
+function QuikSharpFunctions.IsSubscribed_Level_II_Quotes(msg)
     local class_code, sec_code = msg.data[1], msg.data[2]
     msg.data = IsSubscribed_Level_II_Quotes(class_code, sec_code)
     return msg
@@ -742,7 +742,7 @@ end
 
 -- Функция заказывает получение параметров Таблицы текущих торгов. 
 -- В случае успешного завершения функция возвращает «true», иначе – «false»
-function qsfunctions.paramRequest(msg)
+function QuikSharpFunctions.paramRequest(msg)
     
     local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
     msg.data = ParamRequest(class_code, sec_code, param_name)
@@ -751,7 +751,7 @@ end
 
 -- Функция принимает список строк (JSON Array) в формате class_code|sec_code|param_name, вызывает функцию paramRequest для каждой строки.
 -- Возвращает список ответов в том же порядке
-function qsfunctions.paramRequestBulk(msg)
+function QuikSharpFunctions.paramRequestBulk(msg)
 	local result = {}
 	for i=1,#msg.data do
 		local spl = msg.data[i]
@@ -764,7 +764,7 @@ end
 
 -- Функция отменяет заказ на получение параметров Таблицы текущих торгов. 
 -- В случае успешного завершения функция возвращает «true», иначе – «false»
-function qsfunctions.cancelParamRequest(msg)
+function QuikSharpFunctions.cancelParamRequest(msg)
     
     local class_code, sec_code, param_name = msg.data[1], msg.data[2], msg.data[3]
     msg.data = CancelParamRequest(class_code, sec_code, param_name)
@@ -773,7 +773,7 @@ end
 
 --- Функция принимает список строк (JSON Array) в формате class_code|sec_code|param_name, вызывает функцию CancelParamRequest для каждой строки.
 -- Возвращает список ответов в том же порядке
-function qsfunctions.cancelParamRequestBulk(msg)
+function QuikSharpFunctions.cancelParamRequestBulk(msg)
 	local result = {}
 	for i=1,#msg.data do
 		local spl = msg.data[i]
@@ -791,7 +791,7 @@ end
 --- Returns Pong to Ping
 -- @param msg message table
 -- @return same msg table
-function qsfunctions.ping(msg)
+function QuikSharpFunctions.ping(msg)
     -- need to know data structure the caller gives
     msg.t = 0 -- avoid time generation. Could also leave original
     if msg.data == "Ping" then
@@ -804,18 +804,18 @@ function qsfunctions.ping(msg)
 end
 
 --- Echoes its message
-function qsfunctions.echo(msg)
+function QuikSharpFunctions.echo(msg)
     return msg
 end
 
 --- Test error handling
-function qsfunctions.divideStringByZero(msg)
+function QuikSharpFunctions.divideStringByZero(msg)
     msg.data = "asd" / 0
     return msg
 end
 
 --- Is running inside quik
-function qsfunctions.isQuik(msg)
+function QuikSharpFunctions.isQuik(msg)
     if getScriptPath then msg.data = 1 else msg.data = 0 end
     return msg
 end
@@ -824,7 +824,7 @@ end
 -- Дополнительные пользовательские функции (Custom functions)
 ---------------------
 
-function qsfunctions.getOptionBoard(msg)
+function QuikSharpFunctions.getOptionBoard(msg)
     
     local classCode, secCode = msg.data[1], msg.data[2]
 	local result, err = getOptions(classCode, secCode)
@@ -869,11 +869,11 @@ end
 
 -------------------------------
 
-function qsfunctions.dispatch_and_process(msg)
-    if qsfunctions[msg.n] then
+function QuikSharpFunctions.dispatch_and_process(msg)
+    if QuikSharpFunctions[msg.n] then
         -- dispatch a command simply by a table lookup
-        -- in qsfunctions method names must match commands
-        local status, result = pcall(qsfunctions[msg.n], msg)
+        -- in QuikSharpFunctions method names must match commands
+        local status, result = pcall(QuikSharpFunctions[msg.n], msg)
         if status then
             return result
         else
@@ -883,10 +883,10 @@ function qsfunctions.dispatch_and_process(msg)
         end
     else
 		log(to_json(msg), 3)
-		msg.error = "Command not implemented in Lua qsfunctions module: " .. msg.n
+		msg.error = "Command not implemented in Lua QuikSharpFunctions module: " .. msg.n
         msg.n = "Error"
         return msg
     end
 end
 
-return qsfunctions
+return QuikSharpFunctions

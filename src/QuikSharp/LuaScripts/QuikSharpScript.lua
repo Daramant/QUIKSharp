@@ -44,8 +44,8 @@ package.path = package.path .. ";" .. script_path .. "\\?.lua;" .. script_path .
 package.cpath = package.cpath .. ";" .. script_path .. libPath .. '?.dll'..";".. '.' .. libPath .. '?.dll'
 
 local util = require("qsutils")
-local qf = require("qsfunctions")
-require("qscallbacks")
+local qf = require("QuikSharpFunctions")
+require("QuikSharpCallbacks")
 
 log("Detected Quik version: ".. quikVersion .." and using cpath: "..package.cpath  , 0)
 

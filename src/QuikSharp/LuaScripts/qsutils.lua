@@ -49,16 +49,6 @@ function openLog()
     return lf
 end
 
--- Returns contents of config.json file or nil if no such file exists
-function readConfigAsJson()
-    local conf = io.open (script_path.. "\\config.json", "r")
-    if not conf then
-        return nil
-    end
-    local content = conf:read "*a"
-    conf:close()
-    return from_json(content)
-end
 
 function paramsFromConfig(scriptName)
     local params = {}
