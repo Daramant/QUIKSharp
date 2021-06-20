@@ -30,7 +30,7 @@ namespace QuikSharp.Messages
         /// <summary>
         /// String message
         /// </summary>
-        [JsonProperty(PropertyName = "d")]
+        [JsonProperty(PropertyName = "data")]
         public T Data { get; set; }
     }
 }

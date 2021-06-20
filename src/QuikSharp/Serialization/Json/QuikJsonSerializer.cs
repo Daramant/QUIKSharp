@@ -18,8 +18,7 @@ namespace QuikSharp.Serialization.Json
         private readonly IEventTypeProvider _eventTypeProvider;
 
         private readonly ObjectPool<StringBuilder> _stringBuilderPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
-
-
+        
         public QuikJsonSerializer(
             IResultTypeProvider resultTypeProvider,
             IEventTypeProvider eventTypeProvider)
@@ -41,7 +40,6 @@ namespace QuikSharp.Serialization.Json
             using (var jsonReader = new JsonTextReader(new StringReader(data)))
             {
                 jsonReader.SupportMultipleContent = true;
-                // reader will get buffer from array pool
                 jsonReader.ArrayPool = JsonArrayPool.Instance;
 
                 if (!jsonReader.Read())
@@ -83,7 +81,6 @@ namespace QuikSharp.Serialization.Json
             using (var jsonReader = new JsonTextReader(new StringReader(data)))
             {
                 jsonReader.SupportMultipleContent = true;
-                // reader will get buffer from array pool
                 jsonReader.ArrayPool = JsonArrayPool.Instance;
 
                 if (!jsonReader.Read())
@@ -109,7 +106,6 @@ namespace QuikSharp.Serialization.Json
         {
             using (var reader = new JsonTextReader(new StringReader(data)))
             {
-                // reader will get buffer from array pool
                 reader.ArrayPool = JsonArrayPool.Instance;
                 
                 return _serializer.Deserialize<T>(reader);
@@ -121,7 +117,6 @@ namespace QuikSharp.Serialization.Json
         {
             using (var reader = new JsonTextReader(new StringReader(data)))
             {
-                // reader will get buffer from array pool
                 reader.ArrayPool = JsonArrayPool.Instance;
                 
                 return _serializer.Deserialize(reader, type);
@@ -138,7 +133,6 @@ namespace QuikSharp.Serialization.Json
                 if (!reader.Read())
                     return null;
 
-                // reader will get buffer from array pool
                 reader.ArrayPool = JsonArrayPool.Instance;
                 var value = _serializer.Deserialize(reader, type);
                 return value;
@@ -154,7 +148,6 @@ namespace QuikSharp.Serialization.Json
             {
                 using (var writer = new JsonTextWriter(new StringWriter(stringBuilder)))
                 {
-                    // reader will get buffer from array pool
                     writer.ArrayPool = JsonArrayPool.Instance;
 
                     _serializer.Serialize(writer, obj);

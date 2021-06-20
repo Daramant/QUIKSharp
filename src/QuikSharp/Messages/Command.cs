@@ -14,7 +14,7 @@ namespace QuikSharp.Messages
         /// <summary>
         /// A name of a function to call for requests
         /// </summary>
-        [JsonProperty(PropertyName = "n")]
+        [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
         public Command()

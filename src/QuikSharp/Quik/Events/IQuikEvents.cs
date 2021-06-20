@@ -55,12 +55,12 @@ namespace QuikSharp.Quik.Events
         event QuikEventHandler<AccountPosition> AccountPosition;
 
         /// <summary>
-        /// Новая обезличенная сделка
+        /// Новая обезличенная сделка.
         /// </summary>
         event QuikEventHandler<AllTrade> AllTrade;
 
         /// <summary>
-        /// Функция вызывается терминалом QUIK при смене сессии и при выгрузке файла qlua.dll
+        /// Функция вызывается терминалом QUIK при смене сессии и при выгрузке файла qlua.dll.
         /// </summary>
         event QuikEventHandler<EventArgs> CleanUp;
 
@@ -170,6 +170,9 @@ namespace QuikSharp.Quik.Events
         /// </summary>
         event QuikEventHandler<Candle> Candle;
 
+        /// <summary>
+        /// 
+        /// </summary>
         event QuikEventHandler<ErrorEventArgs> Error;
     }
 }

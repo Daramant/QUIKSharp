@@ -1,9 +1,59 @@
---~ Copyright (c) 2014-2020 QUIKSharp Authors https://github.com/finsight/QUIKSharp/blob/master/AUTHORS.md. All rights reserved.
---~ Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
-
 local socket = require ("socket")
 local json = require ("dkjson")
-local qsutils = {}
+local EventsServer = {}
+
+-- high precision current time
+function timemsec()
+    local st, res = pcall(socket.gettime)
+    if st then
+        return (res) * 1000
+    else
+        log("unexpected error in timemsec", 3)
+        error("unexpected error in timemsec")
+    end
+end
+
+-- when true will show QUIK message for log(...,0)
+is_debug = false
+
+-- log files
+
+function openLog()
+    os.execute("mkdir \""..script_path.."\\logs\"")
+    local lf = io.open (script_path.. "\\logs\\QUIK#_"..os.date("%Y%m%d")..".log", "a")
+    if not lf then
+        lf = io.open (script_path.. "\\QUIK#_"..os.date("%Y%m%d")..".log", "a")
+    end
+    return lf
+end
+
+-- closes log
+function closeLog()
+    if logfile then
+        pcall(logfile:close(logfile))
+    end
+end
+
+logfile = openLog()
+
+--- Write to log file and to Quik messages
+function log(msg, level)
+    if not msg then msg = "" end
+    if level == 1 or level == 2 or level == 3 or is_debug then
+        -- only warnings and recoverable errors to Quik
+        if message then
+            pcall(message, msg, level)
+        end
+    end
+    if not level then level = 0 end
+    local logLine = "LOG "..level..": "..msg
+    print(logLine)
+    local msecs = math.floor(math.fmod(timemsec(), 1000));
+    if logfile then
+        pcall(logfile.write, logfile, os.date("%Y-%m-%d %H:%M:%S").."."..msecs.." "..logLine.."\n")
+        pcall(logfile.flush, logfile)
+    end
+end
 
 -- current connection state
 is_connected = false
@@ -45,7 +95,7 @@ local function getCallbackClient()
 	end
 end
 
-function qsutils.connect(command_host, command_port, event_host, event_port)
+function EventsServer.connect(command_host, command_port, event_host, event_port)
     if not command_server then
         command_server = socket.bind(command_host, command_port, 1)
     end
@@ -55,7 +105,16 @@ function qsutils.connect(command_host, command_port, event_host, event_port)
 
     if not is_connected then
         log('QUIK# is waiting for client connection...', 1)
-        
+        if command_client then
+            log("is_connected is false but the response client is not nil", 3)
+            -- Quik crashes without pcall
+            pcall(command_client.close, command_client)
+        end
+        if event_client then
+            log("is_connected is false but the callback client is not nil", 3)
+            -- Quik crashes without pcall
+            pcall(event_client.close, event_client)
+        end
         command_client = getResponseServer()
         event_client = getCallbackClient()
         if command_client and event_client then
@@ -129,4 +188,4 @@ function sendEvent(msg)
     end
 end
 
-return qsutils
+return EventsServer

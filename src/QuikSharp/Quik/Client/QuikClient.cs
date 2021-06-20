@@ -12,7 +12,6 @@ using QuikSharp.Messages;
 using QuikSharp.Extensions;
 using QuikSharp.Exceptions;
 using QuikSharp.Quik.Events;
-using QuikSharp.Providers;
 using QuikSharp.Serialization;
 using Microsoft.Extensions.Logging;
 

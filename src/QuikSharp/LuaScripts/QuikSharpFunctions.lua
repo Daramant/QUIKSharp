@@ -1,7 +1,6 @@
 --~ Copyright (c) 2014-2020 QUIKSharp Authors https://github.com/finsight/QUIKSharp/blob/master/AUTHORS.md. All rights reserved.
 --~ Licensed under the Apache License, Version 2.0. See LICENSE.txt in the project root for license information.
 
-local json = require ("dkjson")
 local QuikSharpFunctions = {}
 
 ---------------------------------
@@ -43,7 +42,7 @@ end
 -- Функция приостанавливает выполнение скрипта.
 function QuikSharpFunctions.sleep(msg)
     delay(msg.data)
-    msg.data = ""
+    msg.data = nil
     return msg
 end
 
@@ -360,7 +359,7 @@ function QuikSharpFunctions.getSecurityInfoBulk(msg)
 			if not status then
 				log("Error happened while calling getSecurityInfoBulk with ".. class_code .. "|".. sec_code .. ": ".. security)
 			end
-			table.insert(result, json.null)
+			table.insert(result, nil)
 		end
 	end
 	msg.data = result
@@ -398,7 +397,7 @@ function QuikSharpFunctions.getQuoteLevel2(msg)
         msg.data.class_code		= class_code
         msg.data.sec_code		= sec_code
         msg.data.server_time	= server_time
-        sendCallback(msg)
+        sendEvent(msg)
     else
         OnError(ql2)
     end
@@ -566,12 +565,12 @@ local function createDataSourceFromMessage(msg)
 	local ds, error_descr = CreateDataSource(class, sec, interval)
 	local is_error = false
 	if(error_descr ~= nil) then
-		msg.n = "lua_create_data_source_error"
-		msg.error = error_descr
+		msg.name = "Error"
+		msg.error = "lua_create_data_source_error: " .. error_descr
 		is_error = true
 	elseif ds == nil then
-		msg.n = "lua_create_data_source_error"
-		msg.error = "Can't create data source for " .. class .. ", " .. sec .. ", " .. tostring(interval)
+		msg.name = "Error"
+		msg.error = "lua_create_data_source_error. Can't create data source for " .. class .. ", " .. sec .. ", " .. tostring(interval)
 		is_error = true
 	end
 	return ds, is_error
@@ -620,9 +619,9 @@ local function dataSourceUpdateCallback(index, class, sec, interval)
 
 		local msg = {}
         msg.t = timemsec()
-        msg.n = "NewCandle"
+        msg.name = "wCandle"
         msg.data = candle
-        sendCallback(msg)
+        sendEvent(msg)
 	end
 end
 
@@ -866,26 +865,23 @@ local function getOptions(classCode,secCode)
 	return t
 end
 
-
 -------------------------------
 
-function QuikSharpFunctions.dispatch_and_process(msg)
-    if QuikSharpFunctions[msg.n] then
-        -- dispatch a command simply by a table lookup
-        -- in QuikSharpFunctions method names must match commands
-        local status, result = pcall(QuikSharpFunctions[msg.n], msg)
-        if status then
+function QuikSharpFunctions.callFunction(command)
+	local func = QuikSharpFunctions[command.name]
+    if func then
+        local success, result = pcall(func, command)
+        if success then
             return result
         else
-            msg.n = "Error"
-            msg.error = "Lua error: " .. result
-            return msg
+            command.name = "Error"
+            command.d = result
+            return command
         end
     else
-		log(to_json(msg), 3)
-		msg.error = "Command not implemented in Lua QuikSharpFunctions module: " .. msg.n
-        msg.n = "Error"
-        return msg
+		command.name = "Error"
+		command.d = "Команда с именем: '" .. command.name .. "' не поддерживается."
+        return command
     end
 end
 
